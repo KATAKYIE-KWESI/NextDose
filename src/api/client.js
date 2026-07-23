@@ -24,7 +24,6 @@ export const api = {
     });
     if (error) throw new Error(error.message);
     
-    // Also save user profile to your custom users table
     if (data.user) {
       await supabase.from('users').upsert([{
         id: data.user.id,
@@ -52,7 +51,6 @@ export const api = {
     if (error) throw new Error(error.message);
     if (!user) return null;
 
-    // Fetch extra user details from your custom users table
     const { data: profile } = await supabase
       .from('users')
       .select('*')
@@ -63,7 +61,14 @@ export const api = {
   },
 
   listLogs: async () => {
-    const { data, error } = await supabase.from('cycle_logs').select('*');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('cycle_logs')
+      .select('*')
+      .eq('user_id', user.id);
+
     if (error) throw new Error(error.message);
     return data;
   },
@@ -86,7 +91,14 @@ export const api = {
   },
 
   getReminders: async () => {
-    const { data, error } = await supabase.from('users').select('last_pap, last_breast_exam');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('last_pap, last_breast_exam')
+      .eq('id', user.id);
+
     if (error) throw new Error(error.message);
     return data;
   },
@@ -106,7 +118,14 @@ export const api = {
   },
 
   listBookings: async () => {
-    const { data, error } = await supabase.from('bookings').select('*');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('user_id', user.id);
+
     if (error) throw new Error(error.message);
     return data;
   },
