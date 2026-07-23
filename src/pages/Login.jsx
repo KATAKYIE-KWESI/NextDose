@@ -29,7 +29,7 @@ export default function Login() {
       <div className="card auth-card">
         {/* Brand Header */}
         <div className="auth-header">
-          <span className="auth-brand">NextDose</span>
+          <span className="auth-brand">NextDoe</span>
           <h1 className="auth-title">Welcome back</h1>
           <p className="auth-subtitle">Log in to your private health workspace.</p>
         </div>
