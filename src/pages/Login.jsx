@@ -65,7 +65,7 @@ export default function Login() {
               marginBottom: '12px'
             }}
           >
-            NextDose
+              HerSignal
           </span>
           <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', color: '#1E293B', fontWeight: '700' }}>
             Welcome back
