@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// 1. Initialize Supabase using Vite's environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -17,7 +16,6 @@ export function setToken(token) {
   else localStorage.removeItem(TOKEN_KEY);
 }
 
-// 2. Map your API functions directly to Supabase queries
 export const api = {
   signup: async (payload) => {
     const { data, error } = await supabase.auth.signUp({
@@ -25,6 +23,16 @@ export const api = {
       password: payload.password,
     });
     if (error) throw new Error(error.message);
+    
+    // Also save user profile to your custom users table
+    if (data.user) {
+      await supabase.from('users').upsert([{
+        id: data.user.id,
+        email: payload.email,
+        password_hash: 'managed_by_supabase_auth',
+        name: payload.name || ''
+      }]);
+    }
     if (data.session) setToken(data.session.access_token);
     return data;
   },
@@ -42,7 +50,16 @@ export const api = {
   me: async () => {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) throw new Error(error.message);
-    return user;
+    if (!user) return null;
+
+    // Fetch extra user details from your custom users table
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    return { ...user, ...(profile || {}) };
   },
 
   listLogs: async () => {
@@ -52,7 +69,12 @@ export const api = {
   },
 
   addLog: async (payload) => {
-    const { data, error } = await supabase.from('cycle_logs').insert([payload]);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase.from('cycle_logs').insert([{
+      id: 'log_' + Math.random().toString(36).substring(2, 9),
+      user_id: user ? user.id : null,
+      ...payload
+    }]);
     if (error) throw new Error(error.message);
     return data;
   },
@@ -64,13 +86,15 @@ export const api = {
   },
 
   getReminders: async () => {
-    const { data, error } = await supabase.from('screening').select('*');
+    const { data, error } = await supabase.from('users').select('last_pap, last_breast_exam');
     if (error) throw new Error(error.message);
     return data;
   },
 
   updateScreening: async (payload) => {
-    const { data, error } = await supabase.from('screening').upsert([payload]);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not logged in");
+    const { data, error } = await supabase.from('users').update(payload).eq('id', user.id);
     if (error) throw new Error(error.message);
     return data;
   },
@@ -88,7 +112,12 @@ export const api = {
   },
 
   createBooking: async (payload) => {
-    const { data, error } = await supabase.from('bookings').insert([payload]);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase.from('bookings').insert([{
+      id: 'bk_' + Math.random().toString(36).substring(2, 9),
+      user_id: user ? user.id : null,
+      ...payload
+    }]);
     if (error) throw new Error(error.message);
     return data;
   },
