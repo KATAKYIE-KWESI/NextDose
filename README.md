@@ -1,4 +1,4 @@
-# Rifqa — v1 MVP
+# NextDose — v1 MVP
 
 Cycle/symptom tracking + screening reminders + concierge specialist booking,
 scoped to the "v1" tier of the plan: prove women will pay for trusted,
