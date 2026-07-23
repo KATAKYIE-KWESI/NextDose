@@ -128,11 +128,11 @@ export default function Dashboard() {
   };
 
   return (
-    <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`}>
+    <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box' }}>
       
       {/* UTILITY BAR: CARE POINTS & PRIVACY SHIELD */}
-      <div className="top-utility-bar">
-        <div className="utility-item care-points-badge">
+      <div className="top-utility-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+        <div className="utility-item care-points-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
           <span className="star-icon">✨</span>
           <strong>{carePoints} Care Points</strong>
           <span className="tier-label">· Silver Tier</span>
@@ -142,52 +142,54 @@ export default function Dashboard() {
           className={`discreet-toggle-btn ${discreetMode ? 'on' : ''}`}
           onClick={() => setDiscreetMode(!discreetMode)}
           title="Shield sensitive cycle details on screen with Zero-Knowledge masking"
+          style={{ padding: '6px 12px', fontSize: '0.85rem', cursor: 'pointer' }}
         >
           {discreetMode ? '🔒 Zero-Knowledge Shield Active' : '👁️ Privacy Shield'}
         </button>
       </div>
 
       {/* HERO / GREETING BANNER */}
-      <header className="dashboard-hero">
-        <div className="hero-text">
-          <span className="welcome-badge">🌿 Direct-to-Care Wellness Hub</span>
-          <h1 className="greeting-title">Hello, {firstName}</h1>
-          <p className="greeting-subtitle">
+      <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F8FAFC', padding: '16px', borderRadius: '12px' }}>
+        <div className="hero-text" style={{ flex: '1 1 250px' }}>
+          <span className="welcome-badge" style={{ fontSize: '0.75rem', fontWeight: '700', color: '#be185d', background: '#fce7f3', padding: '2px 8px', borderRadius: '4px' }}>🌿 Direct-to-Care Wellness Hub</span>
+          <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '6px 0' }}>Hello, {firstName}</h1>
+          <p className="greeting-subtitle" style={{ fontSize: '0.9rem', color: '#64748B', margin: 0 }}>
             {discreetMode 
               ? 'Your private schedule and encrypted wellness routine.' 
               : 'Your secure, culturally attuned health space for today.'}
           </p>
         </div>
-        <div className="hero-avatar">
+        <div className="hero-avatar" style={{ position: 'relative' }}>
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"
             alt="User profile avatar"
             className="avatar-img"
+            style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover' }}
           />
-          <span className="online-indicator" title="End-to-End Encrypted Connection"></span>
+          <span className="online-indicator" title="End-to-End Encrypted Connection" style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#2ecc71', borderRadius: '50%', border: '2px solid #fff' }}></span>
         </div>
       </header>
 
       {/* STANDOUT SUPPORTIVE AURA AI COMPANION BANNER */}
-      <div className="card aura-ai-featured-banner" style={{ background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)', border: '2px solid #fbcfe8', boxShadow: '0 8px 24px rgba(244, 114, 182, 0.15)', marginBottom: '24px', padding: '24px', borderRadius: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-          <div style={{ background: '#ec4899', color: '#fff', fontSize: '26px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '14px', flexShrink: 0, boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)' }} title="Supportive Companion">
+      <div className="card aura-ai-featured-banner" style={{ background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)', border: '2px solid #fbcfe8', boxShadow: '0 8px 24px rgba(244, 114, 182, 0.15)', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ background: '#ec4899', color: '#fff', fontSize: '22px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px', flexShrink: 0, boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)' }} title="Supportive Companion">
             👩‍❤️‍👩
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-              <span style={{ background: '#fff', color: '#be185d', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #fbcfe8' }}>
-                Aura AI · Supportive Sisterhood Companion
+          <div style={{ flex: '1 1 250px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+              <span style={{ background: '#fff', color: '#be185d', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #fbcfe8' }}>
+                Aura AI · Supportive Sisterhood
               </span>
-              <span style={{ fontSize: '12px', color: '#555', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ width: '8px', height: '8px', background: '#2ecc71', borderRadius: '50%', display: 'inline-block' }}></span> 
-                Zero-Knowledge Encrypted
+              <span style={{ fontSize: '11px', color: '#555', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '6px', height: '6px', background: '#2ecc71', borderRadius: '50%', display: 'inline-block' }}></span> 
+                Encrypted
               </span>
             </div>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#2c3e50', marginBottom: '6px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#2c3e50', marginBottom: '4px' }}>
               Your Safe Space Guidance
             </h2>
-            <p style={{ fontSize: '15px', color: '#4a5568', lineHeight: '1.5', fontStyle: 'italic', margin: 0 }}>
+            <p style={{ fontSize: '14px', color: '#4a5568', lineHeight: '1.4', fontStyle: 'italic', margin: 0, overflowWrap: 'break-word' }}>
               "{auraInsight}"
             </p>
           </div>
@@ -195,94 +197,95 @@ export default function Dashboard() {
       </div>
 
       {/* DASHBOARD GRID */}
-      <div className="dashboard-grid">
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         
         {/* CYCLE & PHASE TRACKER CARD */}
-        <div className="card cycle-hero-card">
-          <div className="card-header">
-            <span className="card-tag phase-tag">
-              <span className="blood-dot"></span> 
+        <div className="card cycle-hero-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <span className="card-tag phase-tag" style={{ fontSize: '0.8rem', fontWeight: '600' }}>
               {discreetMode ? 'Phase Active (Masked)' : currentPhase}
             </span>
-            <Link to="/tracker" className="card-link">
+            <Link to="/tracker" className="card-link" style={{ fontSize: '0.85rem' }}>
               Log Today &rarr;
             </Link>
           </div>
 
-          <div className="cycle-visual-wrapper">
-            <div className="cycle-ring-container">
-              <svg className="cycle-ring" viewBox="0 0 100 100">
-                <circle className="ring-bg" cx="50" cy="50" r="42" />
+          <div className="cycle-visual-wrapper" style={{ textAlign: 'center', margin: '16px 0' }}>
+            <div className="cycle-ring-container" style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto' }}>
+              <svg className="cycle-ring" viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                <circle className="ring-bg" cx="50" cy="50" r="42" stroke="#E2E8F0" strokeWidth="8" fill="none" />
                 <circle
                   className="ring-progress blood-flow-progress"
                   cx="50"
                   cy="50"
                   r="42"
+                  stroke="#ec4899"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeLinecap="round"
                   style={{
                     strokeDasharray: 264,
                     strokeDashoffset: 264 - (264 * Math.min(currentDay, cycleLength)) / cycleLength,
                   }}
                 />
               </svg>
-              <div className="ring-content">
-                <span className="ring-label">DAY</span>
-                <span className="ring-number">{loadingLogs ? '...' : (discreetMode ? '••' : currentDay)}</span>
-                <span className="ring-pill">
-                  {discreetMode ? 'Encrypted Vault 🛡️' : currentPhase}
-                </span>
+              <div className="ring-content" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%', textAlign: 'center' }}>
+                <span className="ring-label" style={{ fontSize: '0.65rem', display: 'block', color: '#64748B' }}>DAY</span>
+                <span className="ring-number" style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1E293B' }}>{loadingLogs ? '...' : (discreetMode ? '••' : currentDay)}</span>
               </div>
             </div>
           </div>
 
-          <div className="cycle-details-row">
-            <div className="detail-item">
-              <span className="detail-icon">📅</span>
-              <div>
+          <div className="cycle-details-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px', borderTop: '1px solid #F1F5F9', paddingTop: '12px' }}>
+            <div className="detail-item" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <span className="detail-icon" style={{ fontSize: '1.1rem' }}>📅</span>
+              <div style={{ fontSize: '0.8rem' }}>
                 <strong>Next Window</strong>
-                <p>{discreetMode ? 'Protected' : `In ~${daysUntilNext} days`}</p>
+                <p style={{ margin: 0, color: '#64748B' }}>{discreetMode ? 'Protected' : `~${daysUntilNext} days`}</p>
               </div>
             </div>
-            <div className="detail-item">
-              <span className="detail-icon">🔒</span>
-              <div>
-                <strong>Data Security</strong>
-                <p>Zero-Knowledge</p>
+            <div className="detail-item" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <span className="detail-icon" style={{ fontSize: '1.1rem' }}>🔒</span>
+              <div style={{ fontSize: '0.8rem' }}>
+                <strong>Security</strong>
+                <p style={{ margin: 0, color: '#64748B' }}>Zero-Knowledge</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* DAILY MOOD & CARE CHECK-IN */}
-        <div className="card care-checkin-card">
-          <div className="card-header">
-            <h2 className="card-title">How is your body feeling?</h2>
-            <span className="points-hint">+10 Points</span>
+        <div className="card care-checkin-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h2 className="card-title" style={{ fontSize: '1.05rem', margin: 0 }}>How is your body feeling?</h2>
+            <span className="points-hint" style={{ fontSize: '0.75rem', background: '#fef3c7', color: '#92400E', padding: '2px 6px', borderRadius: '4px' }}>+10 Pts</span>
           </div>
-          <p className="card-subtext">Aura adapts real-time guidance to your emotional tone.</p>
+          <p className="card-subtext" style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '12px' }}>Aura adapts real-time guidance to your emotional tone.</p>
 
-          <div className="mood-chips-container">
+          <div className="mood-chips-container" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
             {moods.map((m) => (
               <button
                 key={m.label}
                 type="button"
                 className={`mood-chip ${selectedMood === m.label ? 'selected' : ''}`}
                 onClick={() => handleMoodSelect(m.label)}
+                style={{ flex: '1 1 30%', padding: '6px 8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #CBD5E1', background: selectedMood === m.label ? '#fce7f3' : '#fff' }}
               >
-                <span className="chip-icon">{m.icon}</span>
-                <span className="chip-label">{m.label}</span>
+                <span>{m.icon}</span>
+                <span>{m.label}</span>
               </button>
             ))}
           </div>
 
-          <div className="care-counter-box">
-            <div className="care-counter-info">
-              <span className="care-icon">🍵</span>
-              <div>
+          <div className="care-counter-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', padding: '10px', borderRadius: '8px' }}>
+            <div className="care-counter-info" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span className="care-icon" style={{ fontSize: '1.2rem' }}>🍵</span>
+              <div style={{ fontSize: '0.8rem' }}>
                 <strong>Self-Care Hydration</strong>
-                <p>{hydrationCount} of 8 glasses logged (+5 pts/glass)</p>
+                <p style={{ margin: 0, color: '#64748B' }}>{hydrationCount}/8 glasses logged</p>
               </div>
             </div>
-            <button type="button" className="hydration-btn" onClick={addHydration}>
+            <button type="button" className="hydration-btn" onClick={addHydration} style={{ padding: '6px 10px', fontSize: '0.8rem', cursor: 'pointer' }}>
               + 💧 Add
             </button>
           </div>
@@ -290,76 +293,51 @@ export default function Dashboard() {
       </div>
 
       {/* TELEHEALTH ACCESS SECTION */}
-      <section className="section-block">
-        <div className="section-header">
-          <h2 className="section-title">Direct Specialist Access (Concierge)</h2>
-          <span className="guarantee-badge">🔒 100% Confidential Tele-Consults</span>
+      <section className="section-block" style={{ marginTop: '20px' }}>
+        <div className="section-header" style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0 }}>Direct Specialist Access (Concierge)</h2>
+          <span className="guarantee-badge" style={{ fontSize: '0.75rem', color: '#166534', background: '#DCFCE7', padding: '2px 8px', borderRadius: '4px' }}>🔒 Confidential Tele-Consults</span>
         </div>
 
-        <div className="two-column-cards">
-          <div className="card promo-consult-card">
-            <div className="promo-badge">On-Demand Gynecologists</div>
-            <h3 className="promo-title">Book a Private Tele-Consult</h3>
-            <p className="promo-desc">
+        <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          <div className="card promo-consult-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+            <div className="promo-badge" style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0369A1', background: '#E0F2FE', display: 'inline-block', padding: '2px 8px', borderRadius: '4px', marginBottom: '8px' }}>On-Demand Gynecologists</div>
+            <h3 className="promo-title" style={{ fontSize: '1.05rem', margin: '0 0 6px 0' }}>Book a Private Tele-Consult</h3>
+            <p className="promo-desc" style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '12px' }}>
               Connect with verified regional specialists without long hospital waiting times or public records.
             </p>
             
-            <div className="live-slots-container">
-              <span className="live-dot"></span>
-              <span className="live-text">Next Available Today:</span>
-              <div className="slot-chips">
-                <Link to="/specialists" className="slot-chip">4:30 PM ($45)</Link>
-                <Link to="/specialists" className="slot-chip highlighted">6:00 PM ($45)</Link>
+            <div className="live-slots-container" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+              <span className="live-dot" style={{ width: '8px', height: '8px', background: '#2ecc71', borderRadius: '50%' }}></span>
+              <span className="live-text" style={{ fontSize: '0.8rem', color: '#475569' }}>Next Available:</span>
+              <div className="slot-chips" style={{ display: 'flex', gap: '6px' }}>
+                <Link to="/specialists" className="slot-chip" style={{ fontSize: '0.75rem', padding: '2px 6px', background: '#F1F5F9', borderRadius: '4px', textDecoration: 'none', color: '#334155' }}>4:30 PM ($45)</Link>
+                <Link to="/specialists" className="slot-chip highlighted" style={{ fontSize: '0.75rem', padding: '2px 6px', background: '#fce7f3', color: '#be185d', borderRadius: '4px', textDecoration: 'none' }}>6:00 PM ($45)</Link>
               </div>
             </div>
-
-            <div className="doctor-avatars-row">
-              <img
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=120"
-                alt="Dr. Layla"
-                className="doc-avatar"
-              />
-              <img
-                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=120"
-                alt="Dr. Sara"
-                className="doc-avatar"
-              />
-              <span className="doc-count-pill">+14 Licensed MDs Online</span>
-            </div>
             
-            <Link to="/specialists" className="auth-btn consult-btn">
+            <Link to="/specialists" className="auth-btn consult-btn" style={{ display: 'block', textAlign: 'center', padding: '10px', background: '#ec4899', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>
               Schedule Instant Consultation 💬
             </Link>
           </div>
 
-          <div className="card screening-reminder-card">
-            <div className="card-header">
-              <h3 className="card-title">Preventative Milestones</h3>
-              <span className="status-pill-ok">Awareness Mode</span>
+          <div className="card screening-reminder-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+            <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 className="card-title" style={{ fontSize: '1.05rem', margin: 0 }}>Preventative Milestones</h3>
+              <span className="status-pill-ok" style={{ fontSize: '0.75rem', color: '#475569', background: '#F1F5F9', padding: '2px 6px', borderRadius: '4px' }}>Awareness Mode</span>
             </div>
-            <p className="card-subtext">
+            <p className="card-subtext" style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '12px' }}>
               Routine self-check & screening reminders curated for long-term health:
             </p>
 
-            <ul className="screening-list">
-              <li className="screening-item">
-                <div className="screening-icon">🎀</div>
-                <div className="screening-text">
-                  <strong>Self Breast Exam Guidance</strong>
-                  <span>Recommended monthly post-cycle</span>
+            <ul className="screening-list" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '10px' }}>
+              <li className="screening-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', background: '#F8FAFC', padding: '8px', borderRadius: '8px' }}>
+                <div className="screening-icon" style={{ fontSize: '1.2rem' }}>🎀</div>
+                <div className="screening-text" style={{ flex: 1 }}>
+                  <strong style={{ display: 'block', color: '#1E293B' }}>Self Breast Exam Guidance</strong>
+                  <span style={{ color: '#64748B', fontSize: '0.78rem' }}>Recommended monthly post-cycle</span>
                 </div>
-                <span className="screening-check">✓ Completed</span>
-              </li>
-
-              <li className="screening-item">
-                <div className="screening-icon">🩺</div>
-                <div className="screening-text">
-                  <strong>Cervical Screening Awareness</strong>
-                  <span>Schedule every 3 years with a clinician</span>
-                </div>
-                <Link to="/screening" className="action-pill">
-                  Book Screening
-                </Link>
+                <span className="screening-check" style={{ color: '#166534', fontWeight: '600', fontSize: '0.78rem' }}>✓ Done</span>
               </li>
             </ul>
           </div>

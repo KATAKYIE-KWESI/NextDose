@@ -19,7 +19,6 @@ export default function Screening() {
   const loadReminders = async () => {
     try {
       const res = await api.getReminders();
-      // Directly assign database response (fallback to empty array if undefined/null)
       setReminders(res?.reminders || []);
     } catch (err) {
       setErrorMsg(err?.message || 'Failed to fetch screening reminders from backend.');
@@ -42,7 +41,7 @@ export default function Screening() {
 
     try {
       await api.updateScreening({ type, date: selectedDate });
-      await loadReminders(); // Re-fetch updated list from database
+      await loadReminders(); 
       setDates((prev) => ({ ...prev, [type]: '' }));
       setSuccessMsg(`Successfully updated record for ${formatTypeLabel(type)}!`);
       setTimeout(() => setSuccessMsg(''), 4000);
@@ -54,11 +53,20 @@ export default function Screening() {
   };
 
   return (
-    <div className="screening-page" style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 16px' }}>
+    <div 
+      className="screening-page" 
+      style={{ 
+        width: '100%',
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        padding: '16px 12px',
+        boxSizing: 'border-box'
+      }}
+    >
       
       {/* HEADER */}
-      <div className="screening-header" style={{ marginBottom: '24px' }}>
-        <h1 style={{ margin: '0 0 8px 0', fontSize: '1.8rem', color: '#2C3E50' }}>
+      <div className="screening-header" style={{ marginBottom: '20px' }}>
+        <h1 style={{ margin: '0 0 8px 0', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', color: '#2C3E50', fontWeight: '700' }}>
           Screening Reminders
         </h1>
         <div 
@@ -79,28 +87,28 @@ export default function Screening() {
 
       {/* FEEDBACK BANNERS */}
       {successMsg && (
-        <div style={{ background: '#ECFDF5', border: '1px solid #10B981', color: '#065F46', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px' }}>
+        <div style={{ background: '#ECFDF5', border: '1px solid #10B981', color: '#065F46', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
           ✨ {successMsg}
         </div>
       )}
 
       {errorMsg && (
-        <div style={{ background: '#FEF2F2', border: '1px solid #EF4444', color: '#991B1B', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px' }}>
+        <div style={{ background: '#FEF2F2', border: '1px solid #EF4444', color: '#991B1B', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
           ⚠️ {errorMsg}
         </div>
       )}
 
       {/* DYNAMIC CONTENT LOADING */}
       {loading ? (
-        <p style={{ color: '#6B7280', fontSize: '0.95rem' }}>Loading schedule from server...</p>
+        <p style={{ color: '#6B7280', fontSize: '0.95rem', textAlign: 'center', padding: '30px 0' }}>Loading schedule from server...</p>
       ) : reminders.length === 0 ? (
-        <div className="card empty-state" style={{ padding: '32px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
+        <div className="card empty-state" style={{ padding: '32px 16px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
           <p style={{ margin: 0, color: '#64748B', fontSize: '1rem' }}>
             No screening reminders found in your account profile.
           </p>
         </div>
       ) : (
-        <div className="reminders-list" style={{ display: 'grid', gap: '20px' }}>
+        <div className="reminders-list" style={{ display: 'grid', gap: '16px' }}>
           {reminders.map((r) => {
             const displayTitle = r.label || formatTypeLabel(r.type);
             const isSavingThis = saving === r.type;
@@ -113,42 +121,54 @@ export default function Screening() {
                   background: '#FFFFFF',
                   border: '1px solid #E2E8F0',
                   borderRadius: '12px',
-                  padding: '20px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                  padding: '16px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                  overflowWrap: 'break-word'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#1E293B' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1E293B', fontWeight: '600', flex: '1 1 200px' }}>
                     {displayTitle}
                   </h3>
                   <span
                     className={`pill ${r.due ? 'due' : 'ok'}`}
                     style={{
-                      padding: '4px 12px',
+                      padding: '4px 10px',
                       borderRadius: '999px',
-                      fontSize: '0.8rem',
+                      fontSize: '0.75rem',
                       fontWeight: '700',
                       background: r.due ? '#FEE2E2' : '#DCFCE7',
-                      color: r.due ? '#991B1B' : '#166534'
+                      color: r.due ? '#991B1B' : '#166534',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {r.due ? 'Due' : 'Up to date'}
                   </span>
                 </div>
 
-                <p style={{ margin: '0 0 12px 0', fontSize: '0.88rem', color: '#64748B' }}>
+                <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#64748B' }}>
                   Last logged: <strong>{r.lastDate ? r.lastDate : 'Never'}</strong>
                 </p>
 
                 {r.guidance && (
-                  <p style={{ margin: '0 0 16px 0', fontSize: '0.92rem', color: '#334155', lineHeight: '1.4' }}>
+                  <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#334155', lineHeight: '1.4' }}>
                     {r.guidance}
                   </p>
                 )}
 
-                {/* FORM CONTROLS */}
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {/* FORM CONTROLS: Mobile Friendly Grid/Stack */}
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    gap: '12px', 
+                    alignItems: 'stretch', 
+                    flexWrap: 'wrap',
+                    background: '#F8FAFC',
+                    padding: '12px',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 200px' }}>
                     <label style={{ fontSize: '0.8rem', color: '#475569', fontWeight: '600' }}>
                       Log completed {displayTitle}
                     </label>
@@ -157,11 +177,14 @@ export default function Screening() {
                       value={dates[r.type] || ''}
                       onChange={(e) => setDates((d) => ({ ...d, [r.type]: e.target.value }))}
                       style={{
+                        width: '100%',
                         padding: '8px 12px',
                         borderRadius: '6px',
                         border: '1px solid #CBD5E1',
                         fontSize: '0.9rem',
-                        outline: 'none'
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                        background: '#FFFFFF'
                       }}
                     />
                   </div>
@@ -171,14 +194,17 @@ export default function Screening() {
                     onClick={() => logDate(r.type)}
                     disabled={isSavingThis || !dates[r.type]}
                     style={{
-                      padding: '9px 16px',
+                      alignSelf: 'flex-end',
+                      padding: '10px 16px',
                       borderRadius: '6px',
                       border: 'none',
                       background: dates[r.type] ? '#0F172A' : '#94A3B8',
                       color: '#FFFFFF',
                       fontWeight: '600',
                       fontSize: '0.85rem',
-                      cursor: dates[r.type] && !isSavingThis ? 'pointer' : 'not-allowed'
+                      cursor: dates[r.type] && !isSavingThis ? 'pointer' : 'not-allowed',
+                      flex: '1 1 auto',
+                      minWidth: '110px'
                     }}
                   >
                     {isSavingThis ? 'Saving…' : 'Save date'}

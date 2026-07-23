@@ -80,14 +80,20 @@ export default function Bookings() {
   return (
     <div
       className="main bookings-page"
-      style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 16px' }}
+      style={{
+        width: '100%',
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '16px 12px',
+        boxSizing: 'border-box',
+      }}
     >
       {/* PAGE HEADER */}
-      <div className="bookings-header" style={{ marginBottom: '24px' }}>
-        <h1 style={{ margin: '0 0 8px 0', fontSize: '1.8rem', color: '#1E293B', fontWeight: '700' }}>
+      <div className="bookings-header" style={{ marginBottom: '20px' }}>
+        <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', color: '#1E293B', fontWeight: '700' }}>
           My Consultations
         </h1>
-        <p style={{ margin: 0, fontSize: '0.92rem', color: '#64748B' }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748B' }}>
           Track and manage your requested private appointments and specialist sessions.
         </p>
       </div>
@@ -103,8 +109,11 @@ export default function Bookings() {
             borderRadius: '8px',
             marginBottom: '20px',
             display: 'flex',
+            flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: '10px',
+            flexWrap: 'wrap',
           }}
         >
           <span>⚠️ {error}</span>
@@ -137,7 +146,7 @@ export default function Bookings() {
             background: '#FFFFFF',
             border: '1px dashed #CBD5E1',
             borderRadius: '12px',
-            padding: '40px 20px',
+            padding: '30px 16px',
             textAlign: 'center',
           }}
         >
@@ -165,8 +174,9 @@ export default function Bookings() {
                   background: '#FFFFFF',
                   border: '1px solid #E2E8F0',
                   borderRadius: '12px',
-                  padding: '20px',
+                  padding: '16px',
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)',
+                  overflowWrap: 'break-word',
                 }}
               >
                 {/* CARD HEADER */}
@@ -177,13 +187,14 @@ export default function Bookings() {
                     alignItems: 'flex-start',
                     gap: '12px',
                     marginBottom: '12px',
+                    flexWrap: 'wrap',
                   }}
                 >
-                  <div>
+                  <div style={{ flex: '1 1 200px' }}>
                     <h3
                       style={{
                         margin: '0 0 4px 0',
-                        fontSize: '1.15rem',
+                        fontSize: '1.05rem',
                         color: '#0F172A',
                         fontWeight: '600',
                       }}
@@ -205,7 +216,7 @@ export default function Bookings() {
                       color: badge.color,
                       padding: '4px 10px',
                       borderRadius: '999px',
-                      fontSize: '0.78rem',
+                      fontSize: '0.75rem',
                       fontWeight: '700',
                       textTransform: 'uppercase',
                       letterSpacing: '0.3px',
@@ -221,10 +232,10 @@ export default function Bookings() {
                   style={{
                     display: 'grid',
                     gap: '8px',
-                    fontSize: '0.9rem',
+                    fontSize: '0.88rem',
                     color: '#334155',
                     background: '#F8FAFC',
-                    padding: '12px 14px',
+                    padding: '12px',
                     borderRadius: '8px',
                     marginBottom: '12px',
                   }}
@@ -253,7 +264,7 @@ export default function Bookings() {
 
                 {/* FOOTER TIMESTAMP */}
                 {b.createdAt && (
-                  <div style={{ fontSize: '0.8rem', color: '#94A3B8', textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#94A3B8', textAlign: 'right' }}>
                     Requested on {formatDate(b.createdAt)}
                   </div>
                 )}
