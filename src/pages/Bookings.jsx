@@ -51,7 +51,6 @@ export default function Bookings() {
         api.listSpecialists().catch(() => ({ specialists: [] })),
       ]);
 
-      // Handle raw array responses or nested objects safely
       const rawBookings = Array.isArray(bookingsRes)
         ? bookingsRes
         : (bookingsRes?.bookings || []);
@@ -60,7 +59,6 @@ export default function Bookings() {
         ? specialistsRes
         : (specialistsRes?.specialists || []);
 
-      // Map specialists by ID for fast lookup safely
       const specialistMap = Object.fromEntries(
         (Array.isArray(rawSpecialists) ? rawSpecialists : []).map((sp) => [sp.id, sp])
       );
@@ -105,7 +103,7 @@ export default function Bookings() {
             borderRadius: '8px',
             marginBottom: '20px',
             display: 'flex',
-            justifySpaceBetween: 'space-between',
+            justifyContent: 'space-between',
             alignItems: 'center',
           }}
         >

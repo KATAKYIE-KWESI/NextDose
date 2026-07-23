@@ -135,7 +135,11 @@ export const api = {
     const { data, error } = await supabase.from('bookings').insert([{
       id: 'bk_' + Math.random().toString(36).substring(2, 9),
       user_id: user ? user.id : null,
-      ...payload
+      specialist_id: payload.specialistId || payload.specialist_id,
+      preferred_times: payload.preferredTimes || payload.preferred_times,
+      reason: payload.reason,
+      contact: payload.contact,
+      status: 'requested'
     }]);
     if (error) throw new Error(error.message);
     return data;
