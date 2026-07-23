@@ -27,17 +27,24 @@ export default function CycleTracker() {
   const [symptoms, setSymptoms] = useState([]);
   const [notes, setNotes] = useState('');
 
-  // Load logs from API
+  // Load logs safely from API
   const loadLogs = async () => {
     try {
       const response = await api.listLogs();
-      const sortedLogs = (response.logs || []).sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
+      const rawLogs = Array.isArray(response)
+        ? response
+        : (response?.logs || []);
+
+      const sortedLogs = [...rawLogs].sort(
+        (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
       );
+
       setLogs(sortedLogs);
+      setError('');
     } catch (err) {
       console.error('Failed to load logs:', err);
       setError('Failed to load your history.');
+      setLogs([]);
     }
   };
 
@@ -64,7 +71,7 @@ export default function CycleTracker() {
         notes: notes.trim(),
       });
 
-      // Reset symptoms and notes
+      // Reset symptoms and notes on success
       setSymptoms([]);
       setNotes('');
       await loadLogs();
@@ -86,13 +93,16 @@ export default function CycleTracker() {
   };
 
   const formatDateDisplay = (dateStr) => {
+    if (!dateStr) return 'Date unavailable';
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return isNaN(d.getTime())
+      ? dateStr
+      : d.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
   };
 
   return (
@@ -202,7 +212,7 @@ export default function CycleTracker() {
           <div className="card loading-card">
             <p className="muted">Loading history…</p>
           </div>
-        ) : logs.length === 0 ? (
+        ) : !Array.isArray(logs) || logs.length === 0 ? (
           <div className="card empty-card">
             <p className="muted">
               No entries logged yet. Use the form above to start your history.
@@ -211,7 +221,7 @@ export default function CycleTracker() {
         ) : (
           <div className="history-list">
             {logs.map((log) => (
-              <div className="card log-entry-card" key={log.id}>
+              <div className="card log-entry-card" key={log.id || log._id}>
                 <div className="log-entry-header">
                   <div className="log-meta">
                     <span className={`log-type-pill ${log.type}`}>
@@ -223,7 +233,7 @@ export default function CycleTracker() {
                   </div>
                   <button
                     className="icon-btn-delete"
-                    onClick={() => onDelete(log.id)}
+                    onClick={() => onDelete(log.id || log._id)}
                     title="Delete entry"
                   >
                     &times;

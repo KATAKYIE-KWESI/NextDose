@@ -47,22 +47,29 @@ export default function Bookings() {
     setError('');
     try {
       const [bookingsRes, specialistsRes] = await Promise.all([
-        api.listBookings(),
-        api.listSpecialists(),
+        api.listBookings().catch(() => ({ bookings: [] })),
+        api.listSpecialists().catch(() => ({ specialists: [] })),
       ]);
 
-      const rawBookings = bookingsRes?.bookings || [];
-      const rawSpecialists = specialistsRes?.specialists || [];
+      // Handle raw array responses or nested objects safely
+      const rawBookings = Array.isArray(bookingsRes)
+        ? bookingsRes
+        : (bookingsRes?.bookings || []);
 
-      // Map specialists by ID for fast lookup
+      const rawSpecialists = Array.isArray(specialistsRes)
+        ? specialistsRes
+        : (specialistsRes?.specialists || []);
+
+      // Map specialists by ID for fast lookup safely
       const specialistMap = Object.fromEntries(
-        rawSpecialists.map((sp) => [sp.id, sp])
+        (Array.isArray(rawSpecialists) ? rawSpecialists : []).map((sp) => [sp.id, sp])
       );
 
-      setBookings(rawBookings);
+      setBookings(Array.isArray(rawBookings) ? rawBookings : []);
       setSpecialists(specialistMap);
     } catch (err) {
       setError(err?.message || 'Failed to load consultation records.');
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -98,7 +105,7 @@ export default function Bookings() {
             borderRadius: '8px',
             marginBottom: '20px',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifySpaceBetween: 'space-between',
             alignItems: 'center',
           }}
         >
@@ -125,7 +132,7 @@ export default function Bookings() {
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748B' }}>
           <p style={{ fontSize: '0.95rem' }}>Fetching your consult requests...</p>
         </div>
-      ) : bookings.length === 0 ? (
+      ) : !Array.isArray(bookings) || bookings.length === 0 ? (
         <div
           className="card empty-state"
           style={{
