@@ -1,3 +1,11 @@
+import { createClient } from '@supabase/supabase-js';
+
+// 1. Initialize Supabase using Vite's environment variables
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 const TOKEN_KEY = 'femcare_token';
 
 export function getToken() {
@@ -9,38 +17,79 @@ export function setToken(token) {
   else localStorage.removeItem(TOKEN_KEY);
 }
 
-async function request(path, { method = 'GET', body } = {}) {
-  const headers = { 'Content-Type': 'application/json' };
-  const token = getToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  const res = await fetch(`/api${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(data.error || `Request failed (${res.status})`);
-  }
-  return data;
-}
-
+// 2. Map your API functions directly to Supabase queries
 export const api = {
-  signup: (payload) => request('/auth/signup', { method: 'POST', body: payload }),
-  login: (payload) => request('/auth/login', { method: 'POST', body: payload }),
-  me: () => request('/auth/me'),
+  signup: async (payload) => {
+    const { data, error } = await supabase.auth.signUp({
+      email: payload.email,
+      password: payload.password,
+    });
+    if (error) throw new Error(error.message);
+    if (data.session) setToken(data.session.access_token);
+    return data;
+  },
 
-  listLogs: () => request('/cycle'),
-  addLog: (payload) => request('/cycle', { method: 'POST', body: payload }),
-  deleteLog: (id) => request(`/cycle/${id}`, { method: 'DELETE' }),
+  login: async (payload) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: payload.email,
+      password: payload.password,
+    });
+    if (error) throw new Error(error.message);
+    if (data.session) setToken(data.session.access_token);
+    return data;
+  },
 
-  getReminders: () => request('/screening'),
-  updateScreening: (payload) => request('/screening', { method: 'POST', body: payload }),
+  me: async () => {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) throw new Error(error.message);
+    return user;
+  },
 
-  listSpecialists: () => request('/specialists'),
+  listLogs: async () => {
+    const { data, error } = await supabase.from('cycle_logs').select('*');
+    if (error) throw new Error(error.message);
+    return data;
+  },
 
-  listBookings: () => request('/bookings'),
-  createBooking: (payload) => request('/bookings', { method: 'POST', body: payload }),
+  addLog: async (payload) => {
+    const { data, error } = await supabase.from('cycle_logs').insert([payload]);
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  deleteLog: async (id) => {
+    const { error } = await supabase.from('cycle_logs').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+    return { success: true };
+  },
+
+  getReminders: async () => {
+    const { data, error } = await supabase.from('screening').select('*');
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  updateScreening: async (payload) => {
+    const { data, error } = await supabase.from('screening').upsert([payload]);
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  listSpecialists: async () => {
+    const { data, error } = await supabase.from('specialists').select('*');
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  listBookings: async () => {
+    const { data, error } = await supabase.from('bookings').select('*');
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  createBooking: async (payload) => {
+    const { data, error } = await supabase.from('bookings').insert([payload]);
+    if (error) throw new Error(error.message);
+    return data;
+  },
 };
