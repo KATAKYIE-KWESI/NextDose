@@ -67,7 +67,7 @@ export default function Signup() {
               border: '2px solid #fbcfe8'
             }}
           >
-            <span className="auth-logo-initials" style={{ fontWeight: '700', color: '#be185d', fontSize: '1.1rem' }}>ND</span>
+            <span className="auth-logo-initials" style={{ fontWeight: '700', color: '#be185d', fontSize: '1.1rem' }}>HS</span>
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export default function Signup() {
               marginBottom: '8px'
             }}
           >
-            NextDose
+            HerSignal
           </span>
           <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.4rem, 4vw, 1.7rem)', color: '#1E293B', fontWeight: '700' }}>
             Create your account

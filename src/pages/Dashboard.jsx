@@ -170,6 +170,24 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {/* SIGNAL RIVER: PEER WISDOM & NURTURING VOICES */}
+      <div className="card signal-river-banner" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', border: '1px solid #bbf7d0', marginBottom: '20px', padding: '14px 16px', borderRadius: '14px', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '20px' }}>🌊</span>
+            <div>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Signal River · Live Community Pulse</span>
+              <p style={{ fontSize: '13px', color: '#14532d', margin: '2px 0 0 0' }}>
+                "Drink warm ginger tea today sisters—cramps have nothing on us!" <span style={{ opacity: 0.7, fontSize: '11px' }}>— Akosua, Accra</span>
+              </p>
+            </div>
+          </div>
+          <Link to="/community" style={{ fontSize: '12px', fontWeight: '600', color: '#166534', background: '#fff', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', border: '1px solid #86efac' }}>
+            Join River &rarr;
+          </Link>
+        </div>
+      </div>
+
       {/* STANDOUT SUPPORTIVE AURA AI COMPANION BANNER */}
       <div className="card aura-ai-featured-banner" style={{ background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)', border: '2px solid #fbcfe8', boxShadow: '0 8px 24px rgba(244, 114, 182, 0.15)', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
@@ -199,15 +217,20 @@ export default function Dashboard() {
       {/* DASHBOARD GRID */}
       <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         
-        {/* CYCLE & PHASE TRACKER CARD */}
+        {/* DUAL-MODE TRACKER / RECORD CARD */}
         <div className="card cycle-hero-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
           <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span className="card-tag phase-tag" style={{ fontSize: '0.8rem', fontWeight: '600' }}>
               {discreetMode ? 'Phase Active (Masked)' : currentPhase}
             </span>
-            <Link to="/tracker" className="card-link" style={{ fontSize: '0.85rem' }}>
-              Log Today &rarr;
-            </Link>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link to="/tracker" className="card-link" style={{ fontSize: '0.8rem', background: '#fce7f3', padding: '2px 6px', borderRadius: '4px', color: '#be185d', textDecoration: 'none' }}>
+                Tracker
+              </Link>
+              <Link to="/health-story" className="card-link" style={{ fontSize: '0.8rem', background: '#e0f2fe', padding: '2px 6px', borderRadius: '4px', color: '#0369a1', textDecoration: 'none' }} title="My Health Story & Clinical Record">
+                Record 📋
+              </Link>
+            </div>
           </div>
 
           <div className="cycle-visual-wrapper" style={{ textAlign: 'center', margin: '16px 0' }}>
@@ -229,7 +252,7 @@ export default function Dashboard() {
                   }}
                 />
               </svg>
-              <div className="ring-content" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%', textAlign: 'center' }}>
+              <div className="ring-content" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
                 <span className="ring-label" style={{ fontSize: '0.65rem', display: 'block', color: '#64748B' }}>DAY</span>
                 <span className="ring-number" style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1E293B' }}>{loadingLogs ? '...' : (discreetMode ? '••' : currentDay)}</span>
               </div>
@@ -292,14 +315,16 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* TELEHEALTH ACCESS SECTION */}
+      {/* TELEHEALTH ACCESS & CONSULTIONS & COMMUNITY SECTION */}
       <section className="section-block" style={{ marginTop: '20px' }}>
         <div className="section-header" style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0 }}>Direct Specialist Access (Concierge)</h2>
+          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0 }}>Consults & Community (Concierge)</h2>
           <span className="guarantee-badge" style={{ fontSize: '0.75rem', color: '#166534', background: '#DCFCE7', padding: '2px 8px', borderRadius: '4px' }}>🔒 Confidential Tele-Consults</span>
         </div>
 
         <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          
+          {/* SPECIALIST ACCESS CARD */}
           <div className="card promo-consult-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
             <div className="promo-badge" style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0369A1', background: '#E0F2FE', display: 'inline-block', padding: '2px 8px', borderRadius: '4px', marginBottom: '8px' }}>On-Demand Gynecologists</div>
             <h3 className="promo-title" style={{ fontSize: '1.05rem', margin: '0 0 6px 0' }}>Book a Private Tele-Consult</h3>
@@ -321,13 +346,14 @@ export default function Dashboard() {
             </Link>
           </div>
 
+          {/* MY HEALTH STORY & SCREENING CARD */}
           <div className="card screening-reminder-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
             <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h3 className="card-title" style={{ fontSize: '1.05rem', margin: 0 }}>Preventative Milestones</h3>
-              <span className="status-pill-ok" style={{ fontSize: '0.75rem', color: '#475569', background: '#F1F5F9', padding: '2px 6px', borderRadius: '4px' }}>Awareness Mode</span>
+              <h3 className="card-title" style={{ fontSize: '1.05rem', margin: 0 }}>My Health Story & Screening</h3>
+              <Link to="/health-story" style={{ fontSize: '0.78rem', color: '#be185d', textDecoration: 'none', fontWeight: '600' }}>View Summary &rarr;</Link>
             </div>
             <p className="card-subtext" style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '12px' }}>
-              Routine self-check & screening reminders curated for long-term health:
+              Your secure exportable timeline and preventative clinical milestones:
             </p>
 
             <ul className="screening-list" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '10px' }}>

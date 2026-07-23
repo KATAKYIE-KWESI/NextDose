@@ -36,6 +36,12 @@ const formatDate = (dateString) => {
       });
 };
 
+// Utility to parse API responses safely whether they return an array or an object wrapper
+const extractArrayData = (res, key) => {
+  if (Array.isArray(res)) return res;
+  return Array.isArray(res?.[key]) ? res[key] : [];
+};
+
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [specialists, setSpecialists] = useState({});
@@ -51,19 +57,14 @@ export default function Bookings() {
         api.listSpecialists().catch(() => ({ specialists: [] })),
       ]);
 
-      const rawBookings = Array.isArray(bookingsRes)
-        ? bookingsRes
-        : (bookingsRes?.bookings || []);
-
-      const rawSpecialists = Array.isArray(specialistsRes)
-        ? specialistsRes
-        : (specialistsRes?.specialists || []);
+      const rawBookings = extractArrayData(bookingsRes, 'bookings');
+      const rawSpecialists = extractArrayData(specialistsRes, 'specialists');
 
       const specialistMap = Object.fromEntries(
-        (Array.isArray(rawSpecialists) ? rawSpecialists : []).map((sp) => [sp.id, sp])
+        rawSpecialists.map((sp) => [sp.id, sp])
       );
 
-      setBookings(Array.isArray(rawBookings) ? rawBookings : []);
+      setBookings(rawBookings);
       setSpecialists(specialistMap);
     } catch (err) {
       setError(err?.message || 'Failed to load consultation records.');
@@ -139,7 +140,7 @@ export default function Bookings() {
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748B' }}>
           <p style={{ fontSize: '0.95rem' }}>Fetching your consult requests...</p>
         </div>
-      ) : !Array.isArray(bookings) || bookings.length === 0 ? (
+      ) : bookings.length === 0 ? (
         <div
           className="card empty-state"
           style={{
@@ -160,7 +161,7 @@ export default function Bookings() {
         </div>
       ) : (
         <div className="bookings-list" style={{ display: 'grid', gap: '16px' }}>
-          {bookings.map((b) => {
+          {bookings.map((b, index) => {
             const specialist = specialists[b.specialistId] || {};
             const specialistName = specialist.name || b.specialistName || 'Specialist';
             const specialty = specialist.specialty;
@@ -168,7 +169,7 @@ export default function Bookings() {
 
             return (
               <div
-                key={b.id || b._id}
+                key={b.id || b._id || index}
                 className="card booking-card"
                 style={{
                   background: '#FFFFFF',

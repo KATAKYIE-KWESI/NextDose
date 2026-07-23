@@ -14,6 +14,24 @@ const SYMPTOM_OPTIONS = [
   { key: 'cravings', label: 'Cravings', icon: '🍫' }
 ];
 
+const formatDateDisplay = (dateStr) => {
+  if (!dateStr) return 'Date unavailable';
+  const d = new Date(dateStr);
+  return isNaN(d.getTime())
+    ? dateStr
+    : d.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+};
+
+const extractLogsArray = (response) => {
+  if (Array.isArray(response)) return response;
+  return Array.isArray(response?.logs) ? response.logs : [];
+};
+
 export default function CycleTracker() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,13 +45,10 @@ export default function CycleTracker() {
   const [symptoms, setSymptoms] = useState([]);
   const [notes, setNotes] = useState('');
 
-  // Load logs safely from API
   const loadLogs = async () => {
     try {
       const response = await api.listLogs();
-      const rawLogs = Array.isArray(response)
-        ? response
-        : (response?.logs || []);
+      const rawLogs = extractLogsArray(response);
 
       const sortedLogs = [...rawLogs].sort(
         (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
@@ -75,7 +90,7 @@ export default function CycleTracker() {
       setNotes('');
       await loadLogs();
     } catch (err) {
-      setError(err.message || 'Failed to save entry.');
+      setError(err?.message || 'Failed to save entry.');
     } finally {
       setSaving(false);
     }
@@ -91,42 +106,55 @@ export default function CycleTracker() {
     }
   };
 
-  const formatDateDisplay = (dateStr) => {
-    if (!dateStr) return 'Date unavailable';
-    const d = new Date(dateStr);
-    return isNaN(d.getTime())
-      ? dateStr
-      : d.toLocaleDateString('en-US', {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        });
-  };
-
   return (
-    <div className="dashboard-container tracker-page" style={{ width: '100%', maxWidth: '800px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box' }}>
+    <div
+      className="dashboard-container tracker-page"
+      style={{
+        width: '100%',
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '16px 12px',
+        boxSizing: 'border-box',
+      }}
+    >
       <header className="dashboard-header" style={{ marginBottom: '20px' }}>
-        <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)' }}>Cycle & symptom tracker</h1>
-        <p className="greeting-date" style={{ fontSize: '0.9rem' }}>
+        <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '0 0 6px 0' }}>
+          Cycle & symptom tracker
+        </h1>
+        <p className="greeting-date" style={{ fontSize: '0.9rem', color: '#64748B', margin: 0 }}>
           Log periods and symptoms to build your private health history.
         </p>
       </header>
 
       {/* NEW ENTRY CARD */}
-      <div className="card tracker-form-card" style={{ padding: '16px', marginBottom: '24px' }}>
-        <h2 className="card-title" style={{ fontSize: '1.2rem', marginBottom: '12px' }}>New Entry</h2>
-        {error && <div className="error-banner">{error}</div>}
+      <div className="card tracker-form-card" style={{ padding: '16px', marginBottom: '24px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+        <h2 className="card-title" style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#1E293B' }}>
+          New Entry
+        </h2>
+        {error && (
+          <div className="error-banner" style={{ background: '#FEF2F2', border: '1px solid #EF4444', color: '#991B1B', padding: '10px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.9rem' }}>
+            {error}
+          </div>
+        )}
 
         <form onSubmit={onSubmit} className="auth-form tracker-form">
-          <div className="form-row-split" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          <div
+            className="form-row-split"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px',
+            }}
+          >
             <div className="field">
-              <label htmlFor="entryType">Entry type</label>
+              <label htmlFor="entryType" style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', marginBottom: '4px', color: '#334155' }}>
+                Entry type
+              </label>
               <select
                 id="entryType"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '6px', border: '1px solid #CBD5E1' }}
               >
                 <option value="period">Period Start/End</option>
                 <option value="symptom">Symptom Log Only</option>
@@ -134,21 +162,25 @@ export default function CycleTracker() {
             </div>
 
             <div className="field">
-              <label htmlFor="entryDate">Date</label>
+              <label htmlFor="entryDate" style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', marginBottom: '4px', color: '#334155' }}>
+                Date
+              </label>
               <input
                 id="entryDate"
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
-                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '6px', border: '1px solid #CBD5E1' }}
               />
             </div>
           </div>
 
           {type === 'period' && (
             <div className="field flow-field" style={{ marginTop: '12px' }}>
-              <label>Flow intensity</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', marginBottom: '4px', color: '#334155' }}>
+                Flow intensity
+              </label>
               <div className="flow-selector" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {['light', 'medium', 'heavy'].map((f) => (
                   <button
@@ -156,7 +188,16 @@ export default function CycleTracker() {
                     type="button"
                     className={`flow-btn ${f} ${flow === f ? 'selected' : ''}`}
                     onClick={() => setFlow(f)}
-                    style={{ flex: 1, padding: '8px', cursor: 'pointer' }}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      border: flow === f ? '2px solid #3B82F6' : '1px solid #CBD5E1',
+                      background: flow === f ? '#EFF6FF' : '#FFFFFF',
+                      color: flow === f ? '#1D4ED8' : '#334155',
+                      fontWeight: '500',
+                    }}
                   >
                     {f.charAt(0).toUpperCase() + f.slice(1)}
                   </button>
@@ -166,8 +207,18 @@ export default function CycleTracker() {
           )}
 
           <div className="field symptoms-field" style={{ marginTop: '12px' }}>
-            <label>Symptoms & Mood</label>
-            <div className="symptoms-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: '8px', marginTop: '6px' }}>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', marginBottom: '4px', color: '#334155' }}>
+              Symptoms & Mood
+            </label>
+            <div
+              className="symptoms-grid"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
+                gap: '8px',
+                marginTop: '6px',
+              }}
+            >
               {SYMPTOM_OPTIONS.map((item) => {
                 const isSelected = symptoms.includes(item.label);
                 return (
@@ -176,10 +227,22 @@ export default function CycleTracker() {
                     type="button"
                     className={`symptom-card ${isSelected ? 'selected' : ''}`}
                     onClick={() => toggleSymptom(item.label)}
-                    style={{ padding: '8px', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-start', cursor: 'pointer' }}
+                    style={{
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      justifyContent: 'flex-start',
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      border: isSelected ? '2px solid #3B82F6' : '1px solid #CBD5E1',
+                      background: isSelected ? '#EFF6FF' : '#FFFFFF',
+                    }}
                   >
                     <span className="symptom-icon">{item.icon}</span>
-                    <span className="symptom-label" style={{ fontSize: '0.85rem' }}>{item.label}</span>
+                    <span className="symptom-label" style={{ fontSize: '0.85rem', color: isSelected ? '#1D4ED8' : '#334155' }}>
+                      {item.label}
+                    </span>
                   </button>
                 );
               })}
@@ -187,14 +250,16 @@ export default function CycleTracker() {
           </div>
 
           <div className="field" style={{ marginTop: '12px' }}>
-            <label htmlFor="notes">Notes (optional)</label>
+            <label htmlFor="notes" style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', marginBottom: '4px', color: '#334155' }}>
+              Notes (optional)
+            </label>
             <textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="How are you feeling overall?"
               rows="3"
-              style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '6px', border: '1px solid #CBD5E1' }}
             />
           </div>
 
@@ -202,7 +267,17 @@ export default function CycleTracker() {
             className="auth-btn tracker-submit-btn"
             type="submit"
             disabled={saving}
-            style={{ width: '100%', marginTop: '16px', padding: '12px', cursor: 'pointer' }}
+            style={{
+              width: '100%',
+              marginTop: '16px',
+              padding: '12px',
+              cursor: 'pointer',
+              background: '#2563EB',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '6px',
+              fontWeight: '600',
+            }}
           >
             {saving ? 'Saving Entry…' : 'Save entry'}
           </button>
@@ -211,25 +286,49 @@ export default function CycleTracker() {
 
       {/* HISTORY SECTION */}
       <section className="section-block history-section">
-        <h3 className="section-title" style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Your History</h3>
+        <h3 className="section-title" style={{ fontSize: '1.2rem', marginBottom: '12px', color: '#1E293B' }}>
+          Your History
+        </h3>
 
         {loading ? (
-          <div className="card loading-card" style={{ padding: '20px', textAlign: 'center' }}>
-            <p className="muted">Loading history…</p>
+          <div className="card loading-card" style={{ padding: '20px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+            <p className="muted" style={{ color: '#64748B', margin: 0 }}>Loading history…</p>
           </div>
-        ) : !Array.isArray(logs) || logs.length === 0 ? (
-          <div className="card empty-card" style={{ padding: '20px', textAlign: 'center' }}>
-            <p className="muted" style={{ fontSize: '0.9rem' }}>
+        ) : logs.length === 0 ? (
+          <div className="card empty-card" style={{ padding: '20px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+            <p className="muted" style={{ fontSize: '0.9rem', color: '#64748B', margin: 0 }}>
               No entries logged yet. Use the form above to start your history.
             </p>
           </div>
         ) : (
           <div className="history-list" style={{ display: 'grid', gap: '12px' }}>
             {logs.map((log) => (
-              <div className="card log-entry-card" key={log.id || log._id} style={{ padding: '16px' }}>
-                <div className="log-entry-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div
+                className="card log-entry-card"
+                key={log.id || log._id}
+                style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}
+              >
+                <div
+                  className="log-entry-header"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '8px',
+                  }}
+                >
                   <div className="log-meta" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span className={`log-type-pill ${log.type}`} style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px' }}>
+                    <span
+                      className={`log-type-pill ${log.type}`}
+                      style={{
+                        fontSize: '0.75rem',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        background: log.type === 'period' ? '#FEE2E2' : '#E0F2FE',
+                        color: log.type === 'period' ? '#991B1B' : '#0369A1',
+                        fontWeight: '700',
+                      }}
+                    >
                       {log.type === 'period' ? 'PERIOD' : 'SYMPTOM'}
                     </span>
                     <span className="log-date-display" style={{ fontSize: '0.85rem', color: '#64748B' }}>
@@ -248,17 +347,30 @@ export default function CycleTracker() {
 
                 <div className="log-entry-body">
                   {log.type === 'period' && (
-                    <p className="log-flow-data" style={{ fontSize: '0.9rem', margin: '4px 0' }}>
-                      Flow: <strong>{log.flow}</strong>
+                    <p className="log-flow-data" style={{ fontSize: '0.9rem', margin: '4px 0', color: '#334155' }}>
+                      Flow: <strong style={{ textTransform: 'capitalize' }}>{log.flow}</strong>
                     </p>
                   )}
 
                   {log.symptoms?.length > 0 && (
-                    <div className="log-symptoms-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '8px 0' }}>
+                    <div
+                      className="log-symptoms-list"
+                      style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '8px 0' }}
+                    >
                       {log.symptoms.map((sLabel) => {
                         const sOpt = SYMPTOM_OPTIONS.find((o) => o.label === sLabel);
                         return (
-                          <span key={sLabel} className="history-symptom-pill" style={{ fontSize: '0.8rem', background: '#F1F5F9', padding: '4px 8px', borderRadius: '6px' }}>
+                          <span
+                            key={sLabel}
+                            className="history-symptom-pill"
+                            style={{
+                              fontSize: '0.8rem',
+                              background: '#F1F5F9',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              color: '#334155',
+                            }}
+                          >
                             {sOpt?.icon} {sLabel}
                           </span>
                         );
@@ -267,8 +379,13 @@ export default function CycleTracker() {
                   )}
 
                   {log.notes && (
-                    <div className="log-notes-box" style={{ marginTop: '8px', padding: '8px', background: '#F8FAFC', borderRadius: '6px' }}>
-                      <p className="log-notes-text" style={{ fontSize: '0.88rem', margin: 0, color: '#334155' }}>{log.notes}</p>
+                    <div
+                      className="log-notes-box"
+                      style={{ marginTop: '8px', padding: '8px', background: '#F8FAFC', borderRadius: '6px' }}
+                    >
+                      <p className="log-notes-text" style={{ fontSize: '0.88rem', margin: 0, color: '#334155' }}>
+                        {log.notes}
+                      </p>
                     </div>
                   )}
                 </div>
