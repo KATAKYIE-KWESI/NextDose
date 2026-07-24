@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export default function CycleTracker() {
   // Navigation & Life Stage state
-  const [activeTab, setActiveTab] = useState('tracker'); // 'tracker', 'analytics', etc.
+  const [activeTab, setActiveTab] = useState('tracker'); 
   const [lifeStage, setLifeStage] = useState('expectant'); // 'adolescent', 'conceiving', 'expectant', 'postpartum'
 
   // Collapsible section toggles state
@@ -22,6 +22,29 @@ export default function CycleTracker() {
   // Calendar Mock State
   const [selectedDate, setSelectedDate] = useState('2026-07-24');
 
+  // Adolescent Stage Specific States
+  const [cycleDay, setCycleDay] = useState(14);
+  const [flowIntensity, setFlowIntensity] = useState('Medium');
+  const [adolescentSymptoms, setAdolescentSymptoms] = useState([]);
+  const adolescentSymptomList = ['Cramps', 'Headache', 'Acne', 'Bloating', 'Mood Swings', 'Fatigue'];
+
+  const toggleAdolescentSymptom = (symptom) => {
+    setAdolescentSymptoms(prev => 
+      prev.includes(symptom) ? prev.filter(s => s !== symptom) : [...prev, symptom]
+    );
+  };
+
+  // Conceiving Stage Specific States
+  const [fertilityStatus, setFertilityStatus] = useState('High Fertility (Ovulation Approaching)');
+  const [basalTemp, setBasalTemp] = useState('36.4');
+  const [cervicalMucus, setCervicalMucus] = useState('Eggwhite / Stretchy');
+
+  // Postpartum Stage Specific States
+  const [weeksPostpartum, setWeeksPostpartum] = useState('6 Weeks');
+  const [lochiaFlow, setLochiaFlow] = useState('Light (Scant)');
+  const [moodCheckin, setMoodCheckin] = useState('Doing well / Calm');
+  const [babyFeeding, setBabyFeeding] = useState('Exclusive Breastfeeding');
+
   // Maternal / Expectant Journey State
   const [pregnancyData, setPregnancyData] = useState({
     currentWeek: '24',
@@ -35,26 +58,17 @@ export default function CycleTracker() {
   });
 
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  const [symptomSeverity, setSymptomSeverity] = useState('Mild');
-  const [symptomDuration, setSymptomDuration] = useState('Today');
-  const [symptomNote, setSymptomNote] = useState('');
   const [selectedUrgentFlags, setSelectedUrgentFlags] = useState([]);
 
   // Vitals State
   const [weight, setWeight] = useState('72.5');
-  const [bpSystolic, setBpSystolic] = useState('120');
-  const [bpDiastolic, setBpDiastolic] = useState('80');
   const [bloodSugar, setBloodSugar] = useState('5.4');
-  const [temperature, setTemperature] = useState('36.6');
 
   // Fetal & Contraction State
   const [fetalStatus, setFetalStatus] = useState('Movement feels normal');
-  const [movementCount, setMovementCount] = useState('');
   const [contractions, setContractions] = useState([]);
   const [isContractionActive, setIsContractionActive] = useState(false);
   const [startTime, setStartTime] = useState(null);
-  const [watersBreaking, setWatersBreaking] = useState(false);
-  const [hospitalContacted, setHospitalContacted] = useState(false);
 
   const routineSymptomsList = [
     'Nausea', 'Fatigue', 'Headache', 'Back/Pelvic pain', 
@@ -159,6 +173,7 @@ export default function CycleTracker() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
               {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
                 const isSelected = day === 24;
+                const isPeriodDay = day >= 1 && day <= 5; // Mocking a 5-day period window
                 return (
                   <button
                     key={day}
@@ -167,17 +182,20 @@ export default function CycleTracker() {
                       aspectRatio: '1',
                       borderRadius: '8px',
                       border: isSelected ? '2px solid #0284c7' : '1px solid #F1F5F9',
-                      background: isSelected ? '#E0F2FE' : '#F8FAFC',
-                      color: isSelected ? '#0369a1' : '#334155',
+                      background: isPeriodDay ? '#FFE4E6' : (isSelected ? '#E0F2FE' : '#F8FAFC'),
+                      color: isPeriodDay ? '#9F1239' : (isSelected ? '#0369a1' : '#334155'),
                       fontSize: '0.78rem',
                       fontWeight: '600',
                       cursor: 'pointer',
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      position: 'relative'
                     }}
                   >
-                    {day}
+                    <span>{day}</span>
+                    {isPeriodDay && <span style={{ fontSize: '0.5rem', color: '#E11D48', fontWeight: '800' }}>● DROP</span>}
                   </button>
                 );
               })}
@@ -185,6 +203,115 @@ export default function CycleTracker() {
           </div>
         )}
       </div>
+
+      {/* ADOLESCENT STAGE VIEW */}
+      {lifeStage === 'adolescent' && (
+        <div style={{ display: 'grid', gap: '14px' }}>
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#E11D48', textTransform: 'uppercase' }}>Adolescent Cycle Tracker</span>
+            <h3 style={{ margin: '2px 0 10px 0', fontSize: '1rem' }}>Cycle Day {cycleDay} • Flow & Symptoms</h3>
+            
+            <div style={{ background: '#FFF1F2', padding: '12px', borderRadius: '8px', border: '1px solid #FECDD3', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ margin: '0 0 4px 0', fontSize: '0.8rem', color: '#9F1239', fontWeight: '700' }}>🩸 Period & Flow Status</p>
+                <span style={{ fontSize: '0.75rem', color: '#881337' }}>Current Flow: <strong>{flowIntensity}</strong></span>
+              </div>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                {['Light', 'Medium', 'Heavy'].map((flow) => (
+                  <button 
+                    key={flow} 
+                    onClick={() => setFlowIntensity(flow)}
+                    style={{
+                      background: flowIntensity === flow ? '#E11D48' : '#FFFFFF',
+                      color: flowIntensity === flow ? '#FFFFFF' : '#9F1239',
+                      border: '1px solid #FDA4AF',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {flow}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>Log Daily Teen Symptoms</h4>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {adolescentSymptomList.map((sym) => {
+                const active = adolescentSymptoms.includes(sym);
+                return (
+                  <button
+                    key={sym}
+                    onClick={() => toggleAdolescentSymptom(sym)}
+                    style={{
+                      padding: '6px 10px',
+                      borderRadius: '16px',
+                      border: active ? '1px solid #E11D48' : '1px solid #CBD5E1',
+                      background: active ? '#FFE4E6' : '#F8FAFC',
+                      color: active ? '#9F1239' : '#334155',
+                      fontSize: '0.72rem',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {active ? '✓ ' : '+ '}{sym}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONCEIVING STAGE VIEW */}
+      {lifeStage === 'conceiving' && (
+        <div style={{ display: 'grid', gap: '14px' }}>
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#10B981', textTransform: 'uppercase' }}>Fertility & Ovulation Tracking</span>
+            <h3 style={{ margin: '2px 0 10px 0', fontSize: '1rem' }}>{fertilityStatus}</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ background: '#F0FDF4', padding: '10px', borderRadius: '8px', border: '1px solid #BBF7D0' }}>
+                <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#166534' }}>Basal Body Temp (°C)</span>
+                <input type="number" step="0.1" value={basalTemp} onChange={(e) => setBasalTemp(e.target.value)} style={{ width: '100%', marginTop: '4px', padding: '6px', borderRadius: '6px', border: '1px solid #86EFAC', fontSize: '0.85rem', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ background: '#F0FDF4', padding: '10px', borderRadius: '8px', border: '1px solid #BBF7D0' }}>
+                <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#166534' }}>Cervical Mucus</span>
+                <select value={cervicalMucus} onChange={(e) => setCervicalMucus(e.target.value)} style={{ width: '100%', marginTop: '4px', padding: '6px', borderRadius: '6px', border: '1px solid #86EFAC', fontSize: '0.8rem', boxSizing: 'border-box' }}>
+                  <option>Dry</option>
+                  <option>Sticky</option>
+                  <option>Creamy</option>
+                  <option>Eggwhite / Stretchy</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* POSTPARTUM STAGE VIEW */}
+      {lifeStage === 'postpartum' && (
+        <div style={{ display: 'grid', gap: '14px' }}>
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#8B5CF6', textTransform: 'uppercase' }}>Postpartum Recovery</span>
+            <h3 style={{ margin: '2px 0 10px 0', fontSize: '1rem' }}>Recovery Phase • {weeksPostpartum}</h3>
+
+            <div style={{ display: 'grid', gap: '8px', fontSize: '0.8rem' }}>
+              <div style={{ background: '#F5F3FF', padding: '10px', borderRadius: '8px', border: '1px solid #DDD6FE', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Lochia Flow: <strong>{lochiaFlow}</strong></span>
+                <span>Baby Feeding: <strong>{babyFeeding}</strong></span>
+              </div>
+              <div style={{ background: '#F8FAFC', padding: '10px', borderRadius: '8px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Emotional Check-in: <strong>{moodCheckin}</strong></span>
+                <button onClick={() => alert('Logged postpartum check-in')} style={{ background: '#8B5CF6', color: '#FFFFFF', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}>Update</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* EXPECTANT MOTHER / MATERNAL JOURNEY INTEGRATED VIEWS */}
       {lifeStage === 'expectant' && (
@@ -354,13 +481,6 @@ export default function CycleTracker() {
             )}
           </div>
 
-        </div>
-      )}
-
-      {/* NON-EXPECTANT LIFE STAGE FALLBACK */}
-      {lifeStage !== 'expectant' && (
-        <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '24px', textAlign: 'center', color: '#64748B', fontSize: '0.85rem' }}>
-          Standard cycle and symptom tracking logs for the selected life stage are active. Switch to <strong>Expectant Mother</strong> to view maternal tools.
         </div>
       )}
     </div>
