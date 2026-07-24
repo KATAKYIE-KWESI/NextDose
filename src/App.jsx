@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Navigate, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import Login from './pages/Login.jsx';
@@ -8,6 +9,68 @@ import Screening from './pages/Screening.jsx';
 import Specialists from './pages/Specialists.jsx';
 import Bookings from './pages/Bookings.jsx';
 import HerSignalBrand from './pages/HerSignalBrand.jsx';
+
+function Logo({ size = 32, className = '' }) {
+  return (
+    <div 
+      className={className}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '50%',
+        background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
+        boxShadow: '0 2px 6px rgba(100, 116, 139, 0.08)',
+        border: '1px solid #E2E8F0',
+        boxSizing: 'border-box',
+        padding: `${size * 0.18}px`,
+        flexShrink: 0
+      }}
+    >
+      <svg 
+        viewBox="0 0 100 100" 
+        width="100%" 
+        height="100%" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="50%" stopColor="#818CF8" />
+            <stop offset="100%" stopColor="#2DD4BF" />
+          </linearGradient>
+        </defs>
+        <circle 
+          cx="50" 
+          cy="50" 
+          r="44" 
+          stroke="url(#waveGradient)" 
+          strokeWidth="5" 
+          strokeLinecap="round" 
+          strokeDasharray="220"
+          strokeDashoffset="30"
+          opacity="0.85"
+        />
+        <path 
+          d="M 18 52 C 30 38, 40 62, 52 50 C 64 38, 74 62, 82 48" 
+          stroke="url(#waveGradient)" 
+          strokeWidth="6" 
+          strokeLinecap="round" 
+        />
+        <path 
+          d="M 22 66 C 34 52, 44 76, 56 64 C 68 52, 76 72, 84 60" 
+          stroke="url(#waveGradient)" 
+          strokeWidth="4" 
+          strokeLinecap="round" 
+          opacity="0.5"
+        />
+      </svg>
+    </div>
+  );
+}
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -22,11 +85,11 @@ function PrivateRoute({ children }) {
   return children;
 }
 
-function NavLink({ to, children }) {
+function NavLink({ to, children, onClick }) {
   const location = useLocation();
   const active = location.pathname === to;
   return (
-    <Link to={to} className={`nav-link${active ? ' active' : ''}`}>
+    <Link to={to} className={`nav-link${active ? ' active' : ''}`} onClick={onClick}>
       {children}
     </Link>
   );
@@ -34,25 +97,117 @@ function NavLink({ to, children }) {
 
 function Topbar() {
   const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   if (!user) return null;
 
   return (
-    <header className="navbar">
-      <div className="nav-container">
-        <div className="nav-brand">HerSignal</div>
-        <nav className="nav-links">
+    <header className="navbar" style={{ position: 'relative' }}>
+      <div className="nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', position: 'relative' }}>
+        
+        {/* Brand Logo & Name */}
+        <Link to="/" className="nav-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
+          <Logo size={32} />
+          <span style={{ fontWeight: '700', fontSize: '1.1rem' }}>HerSignal</span>
+        </Link>
+
+        {/* Desktop Nav Links */}
+        <nav className="nav-links desktop-only-nav" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: 'auto', marginRight: '16px' }}>
           <NavLink to="/">Dashboard</NavLink>
           <NavLink to="/tracker">Tracker</NavLink>
           <NavLink to="/screening">Screening</NavLink>
           <NavLink to="/specialists">Specialists</NavLink>
           <NavLink to="/bookings">My Consults</NavLink>
         </nav>
-        <div className="nav-actions">
-          <button className="nav-logout-btn" onClick={logout}>
-            Log out
+
+        {/* Desktop Logout & Mobile Hamburger Toggle */}
+        <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="desktop-only-action">
+            <button className="nav-logout-btn" onClick={logout}>
+              Log out
+            </button>
+          </div>
+
+          {/* Hamburger Menu Button */}
+          <button 
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="mobile-menu-toggle"
+            aria-label="Toggle navigation menu"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-around',
+              width: '28px',
+              height: '24px',
+              padding: 0,
+              zIndex: 101
+            }}
+          >
+            <span style={{ width: '100%', height: '3px', background: '#334155', borderRadius: '2px', transition: 'all 0.3s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
+            <span style={{ width: '100%', height: '3px', background: '#334155', borderRadius: '2px', opacity: menuOpen ? 0 : 1, transition: 'all 0.3s' }}></span>
+            <span style={{ width: '100%', height: '3px', background: '#334155', borderRadius: '2px', transition: 'all 0.3s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}></span>
           </button>
         </div>
       </div>
+
+      {/* Mobile Dropdown Menu Drawer */}
+      {menuOpen && (
+        <div 
+          className="mobile-dropdown-menu"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: '#FFFFFF',
+            borderBottom: '1px solid #E2E8F0',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            zIndex: 100
+          }}
+        >
+          <NavLink to="/" onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
+          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>Tracker</NavLink>
+          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>Screening</NavLink>
+          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>Specialists</NavLink>
+          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>My Consults</NavLink>
+          
+          <div style={{ paddingTop: '12px', borderTop: '1px solid #F1F5F9', marginTop: '4px' }}>
+            <button 
+              className="nav-logout-btn" 
+              onClick={() => { setMenuOpen(false); logout(); }}
+              style={{ width: '100%', padding: '10px', textAlign: 'center' }}
+            >
+              Log out
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Responsive CSS Rules */}
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-only-nav, .desktop-only-action {
+            display: none !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .mobile-menu-toggle, .mobile-dropdown-menu {
+            display: none !important;
+          }
+        }
+      `}</style>
     </header>
   );
 }
