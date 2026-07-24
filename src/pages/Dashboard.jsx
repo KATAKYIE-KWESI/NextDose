@@ -112,7 +112,7 @@ export default function Dashboard() {
           date: new Date().toISOString().slice(0, 10),
           type: 'symptom',
           symptoms: [newMood],
-          notes: 'Logged via Aura Dashboard Companion'
+          notes: 'Logged via HerSignal Dashboard Companion'
         });
       } catch (err) {
         console.error('Failed to sync check-in securely:', err);
@@ -127,64 +127,203 @@ export default function Dashboard() {
     }
   };
 
+  // Determine dynamic river gradient/accent colors based on current phase
+  const getRiverTheme = () => {
+    switch (currentPhase) {
+      case 'Menstrual Phase':
+        return {
+          gradient: 'linear-gradient(90deg, rgba(236, 72, 153, 0.15) 0%, rgba(225, 29, 72, 0.3) 100%)',
+          waveStroke: '#e11d48',
+          badgeBg: '#ffe4e6',
+          badgeColor: '#9f1239',
+        };
+      case 'Follicular Phase':
+        return {
+          gradient: 'linear-gradient(90deg, rgba(52, 211, 153, 0.15) 0%, rgba(14, 165, 233, 0.25) 100%)',
+          waveStroke: '#0ea5e9',
+          badgeBg: '#e0f2fe',
+          badgeColor: '#0369a1',
+        };
+      case 'Ovulation Phase':
+        return {
+          gradient: 'linear-gradient(90deg, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.25) 100%)',
+          waveStroke: '#a855f7',
+          badgeBg: '#f3e8ff',
+          badgeColor: '#7e22ce',
+        };
+      default: // Luteal Phase
+        return {
+          gradient: 'linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(236, 72, 153, 0.25) 100%)',
+          waveStroke: '#f59e0b',
+          badgeBg: '#fef3c7',
+          badgeColor: '#b45309',
+        };
+    }
+  };
+
+  const riverTheme = getRiverTheme();
+
   return (
-    <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box' }}>
+    <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', color: '#1E293B' }}>
       
-      {/* UTILITY BAR: CARE POINTS & PRIVACY SHIELD */}
+      {/* TOP UTILITY BAR: CARE POINTS & PRIVACY SHIELD */}
       <div className="top-utility-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
         <div className="utility-item care-points-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
           <span className="star-icon">✨</span>
           <strong>{carePoints} Care Points</strong>
-          <span className="tier-label">· Silver Tier</span>
+          <span className="tier-label" style={{ color: '#64748B' }}>· Silver Tier</span>
         </div>
 
         <button 
           className={`discreet-toggle-btn ${discreetMode ? 'on' : ''}`}
           onClick={() => setDiscreetMode(!discreetMode)}
           title="Shield sensitive cycle details on screen with Zero-Knowledge masking"
-          style={{ padding: '6px 12px', fontSize: '0.85rem', cursor: 'pointer' }}
+          style={{ padding: '6px 12px', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '8px', border: '1px solid #CBD5E1', background: discreetMode ? '#fce7f3' : '#fff', color: discreetMode ? '#be185d' : '#334155', fontWeight: '500' }}
         >
           {discreetMode ? '🔒 Zero-Knowledge Shield Active' : '👁️ Privacy Shield'}
         </button>
       </div>
 
       {/* HERO / GREETING BANNER */}
-      <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F8FAFC', padding: '16px', borderRadius: '12px' }}>
+      <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F8FAFC', padding: '20px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
         <div className="hero-text" style={{ flex: '1 1 250px' }}>
-          <span className="welcome-badge" style={{ fontSize: '0.75rem', fontWeight: '700', color: '#be185d', background: '#fce7f3', padding: '2px 8px', borderRadius: '4px' }}>🌿 Direct-to-Care Wellness Hub</span>
-          <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '6px 0' }}>Hello, {firstName}</h1>
-          <p className="greeting-subtitle" style={{ fontSize: '0.9rem', color: '#64748B', margin: 0 }}>
-            {discreetMode 
-              ? 'Your private schedule and encrypted wellness routine.' 
-              : 'Your secure, culturally attuned health space for today.'}
+          <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '0 0 6px 0', fontWeight: '700', color: '#0F172A' }}>
+            Good morning, {firstName}
+          </h1>
+          <p className="greeting-subtitle" style={{ fontSize: '0.95rem', color: '#64748B', margin: 0 }}>
+            Your body is in the <span style={{ color: '#be185d', fontWeight: '600' }}>{discreetMode ? 'protected phase' : currentPhase.toLowerCase()}</span>.
           </p>
         </div>
-        <div className="hero-avatar" style={{ position: 'relative' }}>
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"
-            alt="User profile avatar"
-            className="avatar-img"
-            style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover' }}
-          />
-          <span className="online-indicator" title="End-to-End Encrypted Connection" style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#2ecc71', borderRadius: '50%', border: '2px solid #fff' }}></span>
+        <div className="hero-avatar" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          {/* Sunrise illustration or notification icon matching reference */}
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #fde047 0%, #f43f5e 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(244, 63, 94, 0.2)' }}>
+            <span style={{ fontSize: '24px' }}>🌅</span>
+          </div>
         </div>
       </header>
 
-      {/* SIGNAL RIVER: PEER WISDOM & NURTURING VOICES */}
-      <div className="card signal-river-banner" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', border: '1px solid #bbf7d0', marginBottom: '20px', padding: '14px 16px', borderRadius: '14px', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '20px' }}>🌊</span>
-            <div>
-              <span style={{ fontSize: '11px', fontWeight: '700', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Signal River · Live Community Pulse</span>
-              <p style={{ fontSize: '13px', color: '#14532d', margin: '2px 0 0 0' }}>
-                "Drink warm ginger tea today sisters—cramps have nothing on us!" <span style={{ opacity: 0.7, fontSize: '11px' }}>— Akosua, Accra</span>
-              </p>
+      {/* SIGNAL RIVER FEATURED COMPONENT */}
+      <div className="card signal-river-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)', marginBottom: '20px', padding: '20px', borderRadius: '16px', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0, color: '#0F172A' }}>Signal River</h2>
+            <span title="Your body's signals over the last 7 days" style={{ cursor: 'pointer', fontSize: '0.85rem', color: '#94A3B8' }}>ⓘ</span>
+          </div>
+          <span style={{ fontSize: '0.78rem', fontWeight: '600', color: '#7e22ce', background: '#f3e8ff', padding: '3px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            ✨ Pattern noticed
+          </span>
+        </div>
+        <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 16px 0' }}>
+          Your body's signals over the last 7 days
+        </p>
+
+        {/* Graphical River Wave UI Simulation */}
+        <div style={{ position: 'relative', background: riverTheme.gradient, borderRadius: '12px', padding: '20px 10px 16px 10px', marginBottom: '16px', overflow: 'hidden' }}>
+          
+          {/* SVG Wave Line Overlay */}
+          <div style={{ position: 'absolute', top: '35px', left: 0, right: 0, height: '40px', pointerEvents: 'none', opacity: 0.4 }}>
+            <svg viewBox="0 0 500 50" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+              <path d="M 0,25 Q 60,5 125,25 T 250,25 T 375,15 T 500,25" fill="none" stroke={riverTheme.waveStroke} strokeWidth="4" strokeLinecap="round" />
+            </svg>
+          </div>
+
+          {/* Timeline Nodes / Markers */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2, textAlign: 'center', gap: '4px' }}>
+            
+            {/* Day -5 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: '#0ea5e9', fontWeight: '600', marginBottom: '4px' }}>Fatigue</span>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E0F2FE', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                ⚡
+              </div>
+              <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Thu</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 9</span>
+            </div>
+
+            {/* Day -4 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: '#6366f1', fontWeight: '600', marginBottom: '4px' }}>Poor sleep</span>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#EEF2FF', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                🌙
+              </div>
+              <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Fri</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 10</span>
+            </div>
+
+            {/* Day -3 (Headache below) */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
+              <div style={{ height: '28px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                {/* Spacer */}
+              </div>
+              <div style={{ width: '2px', height: '8px', background: 'transparent', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Sat</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 11</span>
+              {/* Lower node for Headache */}
+              <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#F1F5F9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', border: '1px solid #CBD5E1' }}>
+                  👤
+                </div>
+                <span style={{ fontSize: '0.68rem', color: '#475569', marginTop: '2px' }}>Headache</span>
+              </div>
+            </div>
+
+            {/* Day -2 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
+              <div style={{ height: '28px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
+              <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Sun</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 12</span>
+            </div>
+
+            {/* Day -1 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: '#ec4899', fontWeight: '600', marginBottom: '4px' }}>Mild cramps</span>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#fce7f3', color: '#be185d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                〰️
+              </div>
+              <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Mon</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 13</span>
+            </div>
+
+            {/* Day 0 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: '#9333ea', fontWeight: '600', marginBottom: '4px' }}>Ovulation window starts</span>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#f3e8ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                ◎
+              </div>
+              <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Tue</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 14</span>
+            </div>
+
+            {/* Today */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#9333ea', marginBottom: '16px', border: '2px solid #fff', boxShadow: '0 0 0 2px #9333ea' }}></div>
+              <div style={{ width: '2px', height: '12px', background: '#9333ea', marginBottom: '6px' }}></div>
+              <span style={{ fontSize: '0.72rem', color: '#9333ea', fontWeight: '700', display: 'block' }}>Today</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#9333ea', display: 'block' }}>May 15</span>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Signal Flow Interpretation Box */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
+            🌊
+          </div>
+          <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: '1.4' }}>
+            <strong>Your recent signal flow:</strong> fatigue and poor sleep appeared together twice this week. Your flow is calmer today.
+            <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: '2px', fontStyle: 'italic' }}>
+              This is a personalized interpretation, not a medical diagnosis.
             </div>
           </div>
-          <Link to="/community" style={{ fontSize: '12px', fontWeight: '600', color: '#166534', background: '#fff', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', border: '1px solid #86efac' }}>
-            Join River &rarr;
-          </Link>
         </div>
       </div>
 
@@ -214,161 +353,96 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* DASHBOARD GRID */}
-      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        
-        {/* DUAL-MODE TRACKER / RECORD CARD */}
-        <div className="card cycle-hero-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
-          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <span className="card-tag phase-tag" style={{ fontSize: '0.8rem', fontWeight: '600' }}>
-              {discreetMode ? 'Phase Active (Masked)' : currentPhase}
-            </span>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <Link to="/tracker" className="card-link" style={{ fontSize: '0.8rem', background: '#fce7f3', padding: '2px 6px', borderRadius: '4px', color: '#be185d', textDecoration: 'none' }}>
-                Tracker
-              </Link>
-              <Link to="/health-story" className="card-link" style={{ fontSize: '0.8rem', background: '#e0f2fe', padding: '2px 6px', borderRadius: '4px', color: '#0369a1', textDecoration: 'none' }} title="My Health Story & Clinical Record">
-                Record 📋
-              </Link>
-            </div>
-          </div>
-
-          <div className="cycle-visual-wrapper" style={{ textAlign: 'center', margin: '16px 0' }}>
-            <div className="cycle-ring-container" style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto' }}>
-              <svg className="cycle-ring" viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                <circle className="ring-bg" cx="50" cy="50" r="42" stroke="#E2E8F0" strokeWidth="8" fill="none" />
-                <circle
-                  className="ring-progress blood-flow-progress"
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  stroke="#ec4899"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeLinecap="round"
-                  style={{
-                    strokeDasharray: 264,
-                    strokeDashoffset: 264 - (264 * Math.min(currentDay, cycleLength)) / cycleLength,
-                  }}
-                />
-              </svg>
-              <div className="ring-content" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                <span className="ring-label" style={{ fontSize: '0.65rem', display: 'block', color: '#64748B' }}>DAY</span>
-                <span className="ring-number" style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1E293B' }}>{loadingLogs ? '...' : (discreetMode ? '••' : currentDay)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="cycle-details-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px', borderTop: '1px solid #F1F5F9', paddingTop: '12px' }}>
-            <div className="detail-item" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-              <span className="detail-icon" style={{ fontSize: '1.1rem' }}>📅</span>
-              <div style={{ fontSize: '0.8rem' }}>
-                <strong>Next Window</strong>
-                <p style={{ margin: 0, color: '#64748B' }}>{discreetMode ? 'Protected' : `~${daysUntilNext} days`}</p>
-              </div>
-            </div>
-            <div className="detail-item" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-              <span className="detail-icon" style={{ fontSize: '1.1rem' }}>🔒</span>
-              <div style={{ fontSize: '0.8rem' }}>
-                <strong>Security</strong>
-                <p style={{ margin: 0, color: '#64748B' }}>Zero-Knowledge</p>
-              </div>
-            </div>
-          </div>
+      {/* TODAY'S FOCUS SECTION */}
+      <section className="section-block" style={{ marginBottom: '24px' }}>
+        <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: '700', color: '#0F172A' }}>Today's Focus</h2>
+          <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#9333ea', textDecoration: 'none', fontWeight: '600' }}>Edit</Link>
         </div>
 
-        {/* DAILY MOOD & CARE CHECK-IN */}
-        <div className="card care-checkin-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
-          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h2 className="card-title" style={{ fontSize: '1.05rem', margin: 0 }}>How is your body feeling?</h2>
-            <span className="points-hint" style={{ fontSize: '0.75rem', background: '#fef3c7', color: '#92400E', padding: '2px 6px', borderRadius: '4px' }}>+10 Pts</span>
-          </div>
-          <p className="card-subtext" style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '12px' }}>Aura adapts real-time guidance to your emotional tone.</p>
-
-          <div className="mood-chips-container" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
-            {moods.map((m) => (
-              <button
-                key={m.label}
-                type="button"
-                className={`mood-chip ${selectedMood === m.label ? 'selected' : ''}`}
-                onClick={() => handleMoodSelect(m.label)}
-                style={{ flex: '1 1 30%', padding: '6px 8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #CBD5E1', background: selectedMood === m.label ? '#fce7f3' : '#fff' }}
-              >
-                <span>{m.icon}</span>
-                <span>{m.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="care-counter-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', padding: '10px', borderRadius: '8px' }}>
-            <div className="care-counter-info" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span className="care-icon" style={{ fontSize: '1.2rem' }}>🍵</span>
-              <div style={{ fontSize: '0.8rem' }}>
-                <strong>Self-Care Hydration</strong>
-                <p style={{ margin: 0, color: '#64748B' }}>{hydrationCount}/8 glasses logged</p>
-              </div>
-            </div>
-            <button type="button" className="hydration-btn" onClick={addHydration} style={{ padding: '6px 10px', fontSize: '0.8rem', cursor: 'pointer' }}>
-              + 💧 Add
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* TELEHEALTH ACCESS & CONSULTIONS & COMMUNITY SECTION */}
-      <section className="section-block" style={{ marginTop: '20px' }}>
-        <div className="section-header" style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0 }}>Consults & Community (Concierge)</h2>
-          <span className="guarantee-badge" style={{ fontSize: '0.75rem', color: '#166534', background: '#DCFCE7', padding: '2px 8px', borderRadius: '4px' }}>🔒 Confidential Tele-Consults</span>
-        </div>
-
-        <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+        <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
           
-          {/* SPECIALIST ACCESS CARD */}
-          <div className="card promo-consult-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
-            <div className="promo-badge" style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0369A1', background: '#E0F2FE', display: 'inline-block', padding: '2px 8px', borderRadius: '4px', marginBottom: '8px' }}>On-Demand Gynecologists</div>
-            <h3 className="promo-title" style={{ fontSize: '1.05rem', margin: '0 0 6px 0' }}>Book a Private Tele-Consult</h3>
-            <p className="promo-desc" style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '12px' }}>
-              Connect with verified regional specialists without long hospital waiting times or public records.
-            </p>
-            
-            <div className="live-slots-container" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-              <span className="live-dot" style={{ width: '8px', height: '8px', background: '#2ecc71', borderRadius: '50%' }}></span>
-              <span className="live-text" style={{ fontSize: '0.8rem', color: '#475569' }}>Next Available:</span>
-              <div className="slot-chips" style={{ display: 'flex', gap: '6px' }}>
-                <Link to="/specialists" className="slot-chip" style={{ fontSize: '0.75rem', padding: '2px 6px', background: '#F1F5F9', borderRadius: '4px', textDecoration: 'none', color: '#334155' }}>4:30 PM ($45)</Link>
-                <Link to="/specialists" className="slot-chip highlighted" style={{ fontSize: '0.75rem', padding: '2px 6px', background: '#fce7f3', color: '#be185d', borderRadius: '4px', textDecoration: 'none' }}>6:00 PM ($45)</Link>
-              </div>
+          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fce7f3', color: '#be185d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+              🩸
             </div>
-            
-            <Link to="/specialists" className="auth-btn consult-btn" style={{ display: 'block', textAlign: 'center', padding: '10px', background: '#ec4899', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>
-              Schedule Instant Consultation 💬
-            </Link>
-          </div>
+            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log symptoms</span>
+          </Link>
 
-          {/* MY HEALTH STORY & SCREENING CARD */}
-          <div className="card screening-reminder-card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
-            <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h3 className="card-title" style={{ fontSize: '1.05rem', margin: 0 }}>My Health Story & Screening</h3>
-              <Link to="/health-story" style={{ fontSize: '0.78rem', color: '#be185d', textDecoration: 'none', fontWeight: '600' }}>View Summary &rarr;</Link>
+          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+              😊
             </div>
-            <p className="card-subtext" style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '12px' }}>
-              Your secure exportable timeline and preventative clinical milestones:
-            </p>
+            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log mood</span>
+          </Link>
 
-            <ul className="screening-list" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '10px' }}>
-              <li className="screening-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', background: '#F8FAFC', padding: '8px', borderRadius: '8px' }}>
-                <div className="screening-icon" style={{ fontSize: '1.2rem' }}>🎀</div>
-                <div className="screening-text" style={{ flex: 1 }}>
-                  <strong style={{ display: 'block', color: '#1E293B' }}>Self Breast Exam Guidance</strong>
-                  <span style={{ color: '#64748B', fontSize: '0.78rem' }}>Recommended monthly post-cycle</span>
-                </div>
-                <span className="screening-check" style={{ color: '#166534', fontWeight: '600', fontSize: '0.78rem' }}>✓ Done</span>
-              </li>
-            </ul>
-          </div>
+          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3e8ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+              🌡️
+            </div>
+            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log BBT</span>
+          </Link>
+
+          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+              💊
+            </div>
+            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log medication</span>
+          </Link>
+
         </div>
       </section>
+
+      {/* UPCOMING SECTION */}
+      <section className="section-block" style={{ marginBottom: '24px' }}>
+        <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: '700', color: '#0F172A' }}>Upcoming</h2>
+          <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#9333ea', textDecoration: 'none', fontWeight: '600' }}>View all</Link>
+        </div>
+
+        <div className="card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f3e8ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+              🟣
+            </div>
+            <div>
+              <strong style={{ display: 'block', fontSize: '0.9rem', color: '#1E293B' }}>Ovulation window</strong>
+              <span style={{ fontSize: '0.8rem', color: '#64748B' }}>May 17 – May 21</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+              🛡️
+            </div>
+            <div>
+              <strong style={{ display: 'block', fontSize: '0.9rem', color: '#1E293B' }}>Cervical screening</strong>
+              <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Due in 10 days</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+              📅
+            </div>
+            <div>
+              <strong style={{ display: 'block', fontSize: '0.9rem', color: '#1E293B' }}>Next check-in</strong>
+              <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Tomorrow</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* FOOTER MOTIVATIONAL BANNER */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, #fce7f3 0%, #ede9fe 100%)', borderRadius: '16px', padding: '20px', border: '1px solid #f5d0fe', position: 'relative', overflow: 'hidden' }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#581c87', margin: '0 0 4px 0' }}>Small steps, big care.</h3>
+        <p style={{ fontSize: '0.9rem', color: '#7e22ce', margin: 0 }}>
+          You're showing up for your health, and that matters. 💜
+        </p>
+      </div>
+
     </div>
   );
 }

@@ -48,6 +48,10 @@ export default function Bookings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Action states for cancelling or modifying consultations
+  const [actionLoading, setActionLoading] = useState(null);
+  const [actionError, setActionError] = useState('');
+
   const fetchConsults = async () => {
     setLoading(true);
     setError('');
@@ -77,6 +81,30 @@ export default function Bookings() {
   useEffect(() => {
     fetchConsults();
   }, []);
+
+  // Handler to cancel a booking request
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this consultation request?')) return;
+    
+    setActionLoading(bookingId);
+    setActionError('');
+    try {
+      if (typeof api.cancelBooking === 'function') {
+        await api.cancelBooking(bookingId);
+      } else if (typeof api.updateBookingStatus === 'function') {
+        await api.updateBookingStatus(bookingId, 'cancelled');
+      } else {
+        // Fallback simulation or direct patch if client supports generic updates
+        throw new Error('Cancellation endpoint is not available on the client API.');
+      }
+      // Refresh list after successful cancellation
+      await fetchConsults();
+    } catch (err) {
+      setActionError(err?.message || 'Failed to cancel consultation.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   return (
     <div
@@ -135,6 +163,23 @@ export default function Bookings() {
         </div>
       )}
 
+      {/* ACTION ERROR BANNER */}
+      {actionError && (
+        <div
+          style={{
+            background: '#FEF2F2',
+            border: '1px solid #EF4444',
+            color: '#991B1B',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            marginBottom: '16px',
+            fontSize: '0.88rem',
+          }}
+        >
+          ⚠️ {actionError}
+        </div>
+      )}
+
       {/* CONTENT STATES */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748B' }}>
@@ -162,14 +207,17 @@ export default function Bookings() {
       ) : (
         <div className="bookings-list" style={{ display: 'grid', gap: '16px' }}>
           {bookings.map((b, index) => {
+            const bookingId = b.id || b._id;
             const specialist = specialists[b.specialistId] || {};
             const specialistName = specialist.name || b.specialistName || 'Specialist';
             const specialty = specialist.specialty;
             const badge = getStatusBadgeStyle(b.status);
+            const normalizedStatus = (b.status || '').toLowerCase();
+            const isCancellable = normalizedStatus === 'pending' || normalizedStatus === 'requested' || normalizedStatus === 'confirmed';
 
             return (
               <div
-                key={b.id || b._id || index}
+                key={bookingId || index}
                 className="card booking-card"
                 style={{
                   background: '#FFFFFF',
@@ -263,12 +311,47 @@ export default function Bookings() {
                   )}
                 </div>
 
-                {/* FOOTER TIMESTAMP */}
-                {b.createdAt && (
-                  <div style={{ fontSize: '0.78rem', color: '#94A3B8', textAlign: 'right' }}>
-                    Requested on {formatDate(b.createdAt)}
+                {/* CARD FOOTER WITH TIMESTAMP & ACTIONS */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    flexWrap: 'wrap',
+                    marginTop: '12px',
+                    borderTop: '1px solid #F1F5F9',
+                    paddingTop: '10px',
+                  }}
+                >
+                  <div>
+                    {isCancellable && bookingId && (
+                      <button
+                        onClick={() => handleCancelBooking(bookingId)}
+                        disabled={actionLoading === bookingId}
+                        style={{
+                          background: 'transparent',
+                          color: '#DC2626',
+                          border: '1px solid #FCA5A5',
+                          borderRadius: '6px',
+                          padding: '5px 10px',
+                          fontSize: '0.78rem',
+                          fontWeight: '600',
+                          cursor: actionLoading === bookingId ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading === bookingId ? 0.6 : 1,
+                        }}
+                      >
+                        {actionLoading === bookingId ? 'Cancelling...' : 'Cancel Request'}
+                      </button>
+                    )}
                   </div>
-                )}
+
+                  {b.createdAt && (
+                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', textAlign: 'right', marginLeft: 'auto' }}>
+                      Requested on {formatDate(b.createdAt)}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}

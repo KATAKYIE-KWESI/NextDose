@@ -16,6 +16,10 @@ export default function MaternalScreeningHub() {
   const [routineNote, setRoutineNote] = useState('');
   const [quickCheckin, setQuickCheckin] = useState('');
 
+  // Screening & Health Story States
+  const [screeningSubTab, setScreeningSubTab] = useState('reminders'); // 'reminders' | 'story' | 'conditions'
+  const [healthStoryRange, setHealthStoryRange] = useState('1M'); // '1M' | '3M' | '6M'
+
   // Screening Reminders States
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,7 +137,7 @@ export default function MaternalScreeningHub() {
             cursor: 'pointer'
           }}
         >
-          🩺 Screening Reminders
+          🩺 Screening & Health Story
         </button>
       </div>
 
@@ -311,153 +315,323 @@ export default function MaternalScreeningHub() {
         </div>
       )}
 
-      {/* VIEW 2: SCREENING REMINDERS */}
+      {/* VIEW 2: SCREENING & HEALTH STORY HUB */}
       {activeMainTab === 'screening' && (
         <div className="screening-page">
-          <div className="screening-header" style={{ marginBottom: '20px' }}>
-            <div 
-              className="disclaimer" 
-              style={{
-                background: '#F8FAFC',
-                borderLeft: '4px solid #64748B',
-                padding: '12px 16px',
-                fontSize: '0.88rem',
-                color: '#475569',
-                borderRadius: '4px',
-                lineHeight: '1.5'
-              }}
-            >
-              These are general awareness reminders based on standard medical screening intervals—not a diagnosis or personalized medical recommendation. Consult your healthcare specialist about your specific health needs.
-            </div>
+          {/* SUB-TABS FOR SCREENING SECTION */}
+          <div 
+            style={{ 
+              display: 'flex', 
+              gap: '8px', 
+              marginBottom: '20px', 
+              borderBottom: '1px solid #E2E8F0', 
+              paddingBottom: '12px',
+              overflowX: 'auto'
+            }}
+          >
+            {[
+              { id: 'reminders', label: '🩺 Preventive Reminders' },
+              { id: 'story', label: '📖 My Health Story' },
+              { id: 'conditions', label: '🛡️ Women’s Health Focus' }
+            ].map((sub) => (
+              <button
+                key={sub.id}
+                onClick={() => setScreeningSubTab(sub.id)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: '6px',
+                  border: screeningSubTab === sub.id ? '1px solid #7c3aed' : '1px solid #CBD5E1',
+                  background: screeningSubTab === sub.id ? '#7c3aed' : '#FFFFFF',
+                  color: screeningSubTab === sub.id ? '#FFFFFF' : '#475569',
+                  fontWeight: '600',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {sub.label}
+              </button>
+            ))}
           </div>
 
-          {/* FEEDBACK BANNERS */}
-          {successMsg && (
-            <div style={{ background: '#ECFDF5', border: '1px solid #10B981', color: '#065F46', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
-              ✨ {successMsg}
+          {/* SUB-VIEW 1: SCREENING REMINDERS */}
+          {screeningSubTab === 'reminders' && (
+            <div>
+              <div className="screening-header" style={{ marginBottom: '20px' }}>
+                <div 
+                  className="disclaimer" 
+                  style={{
+                    background: '#F8FAFC',
+                    borderLeft: '4px solid #64748B',
+                    padding: '12px 16px',
+                    fontSize: '0.88rem',
+                    color: '#475569',
+                    borderRadius: '4px',
+                    lineHeight: '1.5'
+                  }}
+                >
+                  These are general awareness reminders based on standard medical screening intervals—not a diagnosis or personalized medical recommendation. Consult your healthcare specialist about your specific health needs.
+                </div>
+              </div>
+
+              {/* FEEDBACK BANNERS */}
+              {successMsg && (
+                <div style={{ background: '#ECFDF5', border: '1px solid #10B981', color: '#065F46', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
+                  ✨ {successMsg}
+                </div>
+              )}
+
+              {errorMsg && (
+                <div style={{ background: '#FEF2F2', border: '1px solid #EF4444', color: '#991B1B', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
+                  ⚠️ {errorMsg}
+                </div>
+              )}
+
+              {loading ? (
+                <p style={{ color: '#6B7280', fontSize: '0.95rem', textAlign: 'center', padding: '30px 0' }}>Loading schedule from server...</p>
+              ) : reminders.length === 0 ? (
+                <div className="card empty-state" style={{ padding: '32px 16px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
+                  <p style={{ margin: 0, color: '#64748B', fontSize: '1rem' }}>
+                    No screening reminders found in your account profile.
+                  </p>
+                </div>
+              ) : (
+                <div className="reminders-list" style={{ display: 'grid', gap: '16px' }}>
+                  {reminders.map((r) => {
+                    const displayTitle = r.label || formatTypeLabel(r.type);
+                    const isSavingThis = saving === r.type;
+
+                    return (
+                      <div
+                        key={r.type}
+                        className="card"
+                        style={{
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '12px',
+                          padding: '16px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                          overflowWrap: 'break-word'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                          <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1E293B', fontWeight: '600', flex: '1 1 200px' }}>
+                            {displayTitle}
+                          </h3>
+                          <span
+                            className={`pill ${r.due ? 'due' : 'ok'}`}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '999px',
+                              fontSize: '0.75rem',
+                              fontWeight: '700',
+                              background: r.due ? '#FEE2E2' : '#DCFCE7',
+                              color: r.due ? '#991B1B' : '#166534',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {r.due ? 'Due' : 'Up to date'}
+                          </span>
+                        </div>
+
+                        <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#64748B' }}>
+                          Last logged: <strong>{r.lastDate ? r.lastDate : 'Never'}</strong>
+                        </p>
+
+                        {r.guidance && (
+                          <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#334155', lineHeight: '1.4' }}>
+                            {r.guidance}
+                          </p>
+                        )}
+
+                        <div 
+                          style={{ 
+                            display: 'flex', 
+                            gap: '12px', 
+                            alignItems: 'stretch', 
+                            flexWrap: 'wrap',
+                            background: '#F8FAFC',
+                            padding: '12px',
+                            borderRadius: '8px'
+                          }}
+                        >
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 200px' }}>
+                            <label style={{ fontSize: '0.8rem', color: '#475569', fontWeight: '600' }}>
+                              Log completed {displayTitle}
+                            </label>
+                            <input
+                              type="date"
+                              value={dates[r.type] || ''}
+                              onChange={(e) => setDates((d) => ({ ...d, [r.type]: e.target.value }))}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid #CBD5E1',
+                                fontSize: '0.9rem',
+                                boxSizing: 'border-box',
+                                outline: 'none',
+                                background: '#FFFFFF'
+                              }}
+                            />
+                          </div>
+
+                          <button
+                            className="btn secondary small"
+                            onClick={() => logDate(r.type)}
+                            disabled={isSavingThis || !dates[r.type]}
+                            style={{
+                              alignSelf: 'flex-end',
+                              padding: '10px 16px',
+                              borderRadius: '6px',
+                              border: 'none',
+                              background: dates[r.type] ? '#0F172A' : '#94A3B8',
+                              color: '#FFFFFF',
+                              fontWeight: '600',
+                              fontSize: '0.85rem',
+                              cursor: dates[r.type] && !isSavingThis ? 'pointer' : 'not-allowed',
+                              flex: '1 1 auto',
+                              minWidth: '110px'
+                            }}
+                          >
+                            {isSavingThis ? 'Saving…' : 'Save date'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
-          {errorMsg && (
-            <div style={{ background: '#FEF2F2', border: '1px solid #EF4444', color: '#991B1B', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
-              ⚠️ {errorMsg}
-            </div>
-          )}
+          {/* SUB-VIEW 2: MY HEALTH STORY (MATCHING UI REFERENCE) */}
+          {screeningSubTab === 'story' && (
+            <div style={{ display: 'grid', gap: '16px', background: '#FAF5FF', padding: '16px', borderRadius: '16px', border: '1px solid #E9D5FF' }}>
+              
+              {/* TOP HEADER & TIME-RANGE TOGGLES */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#581c87', fontWeight: '700' }}>My Health Story</h2>
+                <button style={{ background: '#FFFFFF', border: '1px solid #D8B4FE', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#7e22ce', fontSize: '0.85rem', fontWeight: '600' }}>
+                  📤 Share Summary
+                </button>
+              </div>
 
-          {/* DYNAMIC CONTENT LOADING */}
-          {loading ? (
-            <p style={{ color: '#6B7280', fontSize: '0.95rem', textAlign: 'center', padding: '30px 0' }}>Loading schedule from server...</p>
-          ) : reminders.length === 0 ? (
-            <div className="card empty-state" style={{ padding: '32px 16px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
-              <p style={{ margin: 0, color: '#64748B', fontSize: '1rem' }}>
-                No screening reminders found in your account profile.
-              </p>
-            </div>
-          ) : (
-            <div className="reminders-list" style={{ display: 'grid', gap: '16px' }}>
-              {reminders.map((r) => {
-                const displayTitle = r.label || formatTypeLabel(r.type);
-                const isSavingThis = saving === r.type;
-
-                return (
-                  <div
-                    key={r.type}
-                    className="card"
+              {/* TIME RANGE SELECTOR */}
+              <div style={{ display: 'flex', background: '#F3E8FF', padding: '4px', borderRadius: '12px', gap: '4px' }}>
+                {['1M', '3M', '6M'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setHealthStoryRange(range)}
                     style={{
-                      background: '#FFFFFF',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                      overflowWrap: 'break-word'
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: healthStoryRange === range ? '#7c3aed' : 'transparent',
+                      color: healthStoryRange === range ? '#FFFFFF' : '#6b21a8',
+                      fontWeight: '600',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer'
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                      <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1E293B', fontWeight: '600', flex: '1 1 200px' }}>
-                        {displayTitle}
-                      </h3>
-                      <span
-                        className={`pill ${r.due ? 'due' : 'ok'}`}
-                        style={{
-                          padding: '4px 10px',
-                          borderRadius: '999px',
-                          fontSize: '0.75rem',
-                          fontWeight: '700',
-                          background: r.due ? '#FEE2E2' : '#DCFCE7',
-                          color: r.due ? '#991B1B' : '#166534',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {r.due ? 'Due' : 'Up to date'}
-                      </span>
-                    </div>
+                    {range === '1M' ? '1 Month' : range === '3M' ? '3 Months' : '6 Months'}
+                  </button>
+                ))}
+              </div>
 
-                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#64748B' }}>
-                      Last logged: <strong>{r.lastDate ? r.lastDate : 'Never'}</strong>
+              {/* SUMMARY CARD */}
+              <div style={{ background: '#FFFFFF', borderRadius: '14px', padding: '18px', border: '1px solid #E9D5FF', boxShadow: '0 2px 6px rgba(124, 58, 237, 0.04)' }}>
+                <div style={{ marginBottom: '14px' }}>
+                  <h3 style={{ margin: '0 0 2px 0', fontSize: '1rem', color: '#1F2937' }}>Summary for May 1 – May 14, 2024</h3>
+                  <span style={{ fontSize: '0.78rem', color: '#9CA3AF' }}>Generated on May 14, 2024</span>
+                </div>
+
+                {/* MAIN CONCERNS */}
+                <div style={{ marginBottom: '16px' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Main concerns</span>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '6px', background: '#FEF2F2', padding: '10px 12px', borderRadius: '10px', border: '1px solid #FCA5A5' }}>
+                    <span style={{ fontSize: '1.1rem' }}>📍</span>
+                    <p style={{ margin: 0, fontSize: '0.88rem', color: '#991B1B', lineHeight: '1.4' }}>
+                      Recurring headaches, fatigue and bloating before your period.
                     </p>
-
-                    {r.guidance && (
-                      <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#334155', lineHeight: '1.4' }}>
-                        {r.guidance}
-                      </p>
-                    )}
-
-                    <div 
-                      style={{ 
-                        display: 'flex', 
-                        gap: '12px', 
-                        alignItems: 'stretch', 
-                        flexWrap: 'wrap',
-                        background: '#F8FAFC',
-                        padding: '12px',
-                        borderRadius: '8px'
-                      }}
-                    >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 200px' }}>
-                        <label style={{ fontSize: '0.8rem', color: '#475569', fontWeight: '600' }}>
-                          Log completed {displayTitle}
-                        </label>
-                        <input
-                          type="date"
-                          value={dates[r.type] || ''}
-                          onChange={(e) => setDates((d) => ({ ...d, [r.type]: e.target.value }))}
-                          style={{
-                            width: '100%',
-                            padding: '8px 12px',
-                            borderRadius: '6px',
-                            border: '1px solid #CBD5E1',
-                            fontSize: '0.9rem',
-                            boxSizing: 'border-box',
-                            outline: 'none',
-                            background: '#FFFFFF'
-                          }}
-                        />
-                      </div>
-
-                      <button
-                        className="btn secondary small"
-                        onClick={() => logDate(r.type)}
-                        disabled={isSavingThis || !dates[r.type]}
-                        style={{
-                          alignSelf: 'flex-end',
-                          padding: '10px 16px',
-                          borderRadius: '6px',
-                          border: 'none',
-                          background: dates[r.type] ? '#0F172A' : '#94A3B8',
-                          color: '#FFFFFF',
-                          fontWeight: '600',
-                          fontSize: '0.85rem',
-                          cursor: dates[r.type] && !isSavingThis ? 'pointer' : 'not-allowed',
-                          flex: '1 1 auto',
-                          minWidth: '110px'
-                        }}
-                      >
-                        {isSavingThis ? 'Saving…' : 'Save date'}
-                      </button>
-                    </div>
                   </div>
-                );
-              })}
+                </div>
+
+                {/* TIMELINE HIGHLIGHTS */}
+                <div style={{ marginBottom: '16px' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Timeline highlights</span>
+                  <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
+                    {[
+                      { icon: '🩸', bg: '#FCE7F3', text: 'May 3 – May 7', desc: 'Menstrual bleeding' },
+                      { icon: '⚡', bg: '#FEF3C7', text: 'May 9, 11, 12', desc: 'Headaches (3 days)' },
+                      { icon: '🌙', bg: '#EDE9FE', text: 'May 8 – May 13', desc: 'Poor sleep on 4 of 6 days' },
+                      { icon: '😊', bg: '#DCFCE7', text: 'May 10 – May 13', desc: 'High fatigue' }
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #F3F4F6', fontSize: '0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ background: item.bg, padding: '4px', borderRadius: '6px', fontSize: '0.9rem' }}>{item.icon}</span>
+                          <div>
+                            <strong style={{ color: '#374151' }}>{item.text}</strong>
+                            <div style={{ color: '#6B7280', fontSize: '0.8rem' }}>{item.desc}</div>
+                          </div>
+                        </div>
+                        <span style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>›</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* PATTERNS WE NOTICED */}
+                <div style={{ background: '#F8FAFC', padding: '12px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Patterns we noticed</span>
+                  <ul style={{ margin: '6px 0 0 16px', padding: 0, fontSize: '0.85rem', color: '#475569', lineHeight: '1.5', display: 'grid', gap: '4px' }}>
+                    <li>Headaches often appear during the late luteal phase.</li>
+                    <li>Poor sleep days are associated with higher fatigue.</li>
+                    <li>Bloating increases in the few days before your period.</li>
+                  </ul>
+                </div>
+
+                {/* PREPARE FOR YOUR APPOINTMENT */}
+                <div style={{ background: '#F3E8FF', borderRadius: '12px', padding: '14px', border: '1px solid #D8B4FE' }}>
+                  <h4 style={{ margin: '0 0 2px 0', fontSize: '0.9rem', color: '#581c87' }}>Prepare for your appointment</h4>
+                  <p style={{ margin: '0 0 10px 0', fontSize: '0.8rem', color: '#7e22ce' }}>Turn this summary into a doctor-friendly report.</p>
+                  <button style={{ width: '100%', background: '#7c3aed', color: '#FFFFFF', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '600', fontSize: '0.88rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
+                    📄 Generate Report ›
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* SUB-VIEW 3: WOMEN'S HEALTH FOCUS & CONDITIONS */}
+          {screeningSubTab === 'conditions' && (
+            <div style={{ display: 'grid', gap: '16px' }}>
+              <div className="card" style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '20px' }}>
+                <h3 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', color: '#1E293B' }}>Conditions & Patterns Supported</h3>
+                <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#64748B', lineHeight: '1.5' }}>
+                  The monitoring page places particular emphasis on common or frequently overlooked women’s health conditions, recognising persistent patterns without making definitive diagnoses.
+                </p>
+
+                <div style={{ display: 'grid', gap: '10px' }}>
+                  {[
+                    { title: 'Breast Conditions & Breast Awareness', desc: 'Self-examination guides, regular check-in schedules, and persistence tracking for lumps or skin changes.' },
+                    { title: 'Cervical Conditions & Screening Awareness', desc: 'HPV & Pap smear intervals, abnormal spotting patterns, and clinician discussion guides.' },
+                    { title: 'Endometrial & Womb Health Awareness', desc: 'Tracking heavy menstrual bleeding, intermenstrual spotting, and pelvic discomfort trends.' },
+                    { title: 'Ovarian Health Awareness', desc: 'Persistent bloating, pelvic pressure tracking, and cycle-correlated symptom flags.' }
+                  ].map((cond, idx) => (
+                    <div key={idx} style={{ padding: '14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#0F172A' }}>🎗️ {cond.title}</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748B', lineHeight: '1.4' }}>{cond.desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ marginTop: '16px', background: '#F1F5F9', padding: '12px', borderRadius: '8px', fontSize: '0.82rem', color: '#475569', lineHeight: '1.4' }}>
+                  <strong>Safety Notice:</strong> Report uploads and AI-assisted explanations are designed to assist dialogue with your doctor. The app does not independently reinterpret images, overrule clinicians, or claim that a normal-looking result excludes disease.
+                </div>
+              </div>
             </div>
           )}
         </div>
