@@ -426,7 +426,7 @@ export default function HerSignalBrand() {
             transition: 'transform 0.2s ease'
           }}
         >
-          Sign In to Your Workspace
+          Sign In to Your Health Hub
         </button>
         <button
           onClick={() => navigate('/signup')}
