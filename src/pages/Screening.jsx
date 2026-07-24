@@ -202,7 +202,8 @@ export default function MaternalScreeningHub() {
                   Next Antenatal Visit Countdown: <strong>5 days remaining</strong> (WHO Contact #4 of 8)
                 </p>
 
-                <div style={{ background: '#F8FAFC', padding: '14px', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                {/* Replace your old check-in input block with this: */}
+                <div style={{ background: '#F8FAFC', padding: '14px', borderRadius: '10px', border: '1px solid #E2E8F0', marginTop: '16px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>
                     How are you feeling today?
                   </label>
@@ -211,8 +212,30 @@ export default function MaternalScreeningHub() {
                     placeholder="e.g. Mild back fatigue, good energy..."
                     value={quickCheckin}
                     onChange={(e) => setQuickCheckin(e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none' }}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '10px' }}
                   />
+                  <button 
+                    onClick={() => {
+                      // TODO: Connect this to your API function (e.g., api.saveCheckin({ note: quickCheckin }))
+                      console.log("Saving check-in:", quickCheckin);
+                      setSuccessMsg("Quick check-in saved successfully!");
+                      setTimeout(() => setSuccessMsg(''), 4000);
+                      setQuickCheckin(''); // Clear input after saving
+                    }}
+                    disabled={!quickCheckin.trim()}
+                    style={{
+                      background: quickCheckin.trim() ? '#0F172A' : '#94A3B8',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      padding: '8px 14px',
+                      borderRadius: '6px',
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      cursor: quickCheckin.trim() ? 'pointer' : 'not-allowed'
+                    }}
+                  >
+                    Save Check-in
+                  </button>
                 </div>
               </div>
             </div>

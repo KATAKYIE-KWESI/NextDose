@@ -19,7 +19,8 @@ function Logo({ size = 40, className = '' }) {
         border: '1px solid #E2E8F0',
         boxSizing: 'border-box',
         padding: `${size * 0.18}px`,
-        flexShrink: 0
+        flexShrink: 0,
+        animation: 'floatPulse 4s ease-in-out infinite'
       }}
     >
       <svg 
@@ -85,6 +86,20 @@ export default function Dashboard() {
     : user?.email 
       ? user.email.split('@')[0] 
       : 'there';
+
+  // Dynamic Time-of-Day Calculation
+  const getGreetingData = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      return { text: 'Good morning', emoji: '🌅' };
+    } else if (hour < 17) {
+      return { text: 'Good afternoon', emoji: '☀️' };
+    } else {
+      return { text: 'Good evening', emoji: '🌙' };
+    }
+  };
+
+  const greetingData = getGreetingData();
 
   // Load user cycle history on mount
   useEffect(() => {
@@ -194,11 +209,33 @@ export default function Dashboard() {
   return (
     <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', color: '#334155', backgroundColor: '#FBFBFA', overflowX: 'hidden' }}>
       
+      {/* Global CSS Inject for Smooth Animations */}
+      <style>{`
+        @keyframes floatPulse {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes softGlow {
+          0%, 100% { boxShadow: '0 8px 24px rgba(34, 197, 94, 0.08)'; }
+          50% { boxShadow: '0 12px 32px rgba(34, 197, 94, 0.18)'; }
+        }
+        .animated-entry {
+          animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animated-glow {
+          animation: softGlow 3s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* HERO / GREETING BANNER */}
-      <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F0F9FF', padding: '20px', borderRadius: '16px', border: '1px solid #BAE6FD', boxSizing: 'border-box' }}>
+      <header className="dashboard-hero animated-entry" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F0F9FF', padding: '20px', borderRadius: '16px', border: '1px solid #BAE6FD', boxSizing: 'border-box' }}>
         <div className="hero-text" style={{ flex: '1 1 250px', minWidth: 0 }}>
           <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '0 0 6px 0', fontWeight: '700', color: '#0369A1', wordBreak: 'break-word' }}>
-            Good morning, {firstName}
+            {greetingData.text}, {firstName}
           </h1>
           <p className="greeting-subtitle" style={{ fontSize: '0.95rem', color: '#0284C7', margin: 0, wordBreak: 'break-word' }}>
             Your body is in the <span style={{ color: '#0369A1', fontWeight: '600' }}>{discreetMode ? 'protected phase' : currentPhase.toLowerCase()}</span>.
@@ -206,13 +243,13 @@ export default function Dashboard() {
         </div>
         <div className="hero-avatar" style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #E0F2FE 100%, #BAE6FD 0%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(3, 105, 161, 0.08)' }}>
-            <span style={{ fontSize: '24px' }}>🌅</span>
+            <span style={{ fontSize: '24px' }}>{greetingData.emoji}</span>
           </div>
         </div>
       </header>
 
       {/* SIGNAL RIVER FEATURED COMPONENT */}
-      <div className="card signal-river-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(100, 116, 139, 0.04)', marginBottom: '20px', padding: '20px', borderRadius: '16px', boxSizing: 'border-box', overflow: 'hidden' }}>
+      <div className="card signal-river-card animated-entry" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(100, 116, 139, 0.04)', marginBottom: '20px', padding: '20px', borderRadius: '16px', boxSizing: 'border-box', overflow: 'hidden', animationDelay: '0.1s' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0, color: '#1E293B' }}>Signal River</h2>
@@ -221,7 +258,6 @@ export default function Dashboard() {
           <span style={{ fontSize: '0.78rem', fontWeight: '600', color: riverTheme.badgeColor, background: riverTheme.badgeBg, padding: '3px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             ✨ Pattern noticed
           </span>
-
         </div>
         <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 16px 0' }}>
           Your body's signals over the last 7 days
@@ -336,9 +372,9 @@ export default function Dashboard() {
       </div>
 
       {/* STANDOUT SUPPORTIVE AURA AI COMPANION BANNER */}
-      <div className="card aura-ai-featured-banner" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', border: '2px solid #BBF7D0', boxShadow: '0 8px 24px rgba(34, 197, 94, 0.08)', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box' }}>
+      <div className="card aura-ai-featured-banner animated-entry animated-glow" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', border: '2px solid #BBF7D0', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box', animationDelay: '0.2s' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
-          <div style={{ background: '#22c55e', color: '#fff', fontSize: '22px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px', flexShrink: 0, boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)' }} title="Supportive Companion">
+          <div style={{ background: '#22c55e', color: '#fff', fontSize: '22px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px', flexShrink: '0', boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)' }} title="Supportive Companion">
             👩‍❤️‍👩
           </div>
           <div style={{ flex: '1 1 250px', minWidth: 0 }}>
@@ -362,7 +398,7 @@ export default function Dashboard() {
       </div>
 
       {/* TODAY'S FOCUS SECTION */}
-      <section className="section-block" style={{ marginBottom: '24px' }}>
+      <section className="section-block animated-entry" style={{ marginBottom: '24px', animationDelay: '0.3s' }}>
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: '700', color: '#1E293B' }}>Today's Focus</h2>
           <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: '600' }}>Edit</Link>
@@ -402,7 +438,7 @@ export default function Dashboard() {
       </section>
 
       {/* UPCOMING SECTION */}
-      <section className="section-block" style={{ marginBottom: '24px' }}>
+      <section className="section-block animated-entry" style={{ marginBottom: '24px', animationDelay: '0.4s' }}>
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: '700', color: '#1E293B' }}>Upcoming</h2>
           <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: '600' }}>View all</Link>
