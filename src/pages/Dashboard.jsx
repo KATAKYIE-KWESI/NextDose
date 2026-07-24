@@ -79,9 +79,6 @@ export default function Dashboard() {
   const [carePoints, setCarePoints] = useState(120);
   const [auraInsight, setAuraInsight] = useState("Analyzing your personal wellness rhythm securely...");
 
-  // Mobile Expandable Nav State
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   // User details
   const firstName = user?.name 
     ? user.name.trim().split(' ')[0] 
@@ -108,11 +105,6 @@ export default function Dashboard() {
     fetchTrackerData();
     return () => { isMounted = false; };
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
 
   // --- Dynamic Cycle Calculations ---
   const cycleLength = 28; 
@@ -202,95 +194,6 @@ export default function Dashboard() {
   return (
     <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', color: '#334155', backgroundColor: '#FBFBFA' }}>
       
-      {/* SINGLE UNIFIED NAVBAR (INCLUDING BRANDING, LINKS, CARE POINTS, PRIVACY SHIELD, & LOGOUT) */}
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px', background: '#FFFFFF', padding: '10px 20px', borderRadius: '14px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(100, 116, 139, 0.04)', position: 'relative', zIndex: 50 }}>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Logo size={38} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#581C87', letterSpacing: '-0.3px' }}>HerSignal</span>
-          </div>
-        </div>
-
-        {/* Desktop Links & Action Badges */}
-        <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <Link to="/" style={{ fontSize: '0.95rem', fontWeight: location.pathname === '/' ? '600' : '400', color: location.pathname === '/' ? '#581C87' : '#475569', textDecoration: 'none', borderBottom: location.pathname === '/' ? '2px solid #581C87' : 'none', paddingBottom: '2px' }}>Dashboard</Link>
-          <Link to="/tracker" style={{ fontSize: '0.95rem', fontWeight: location.pathname === '/tracker' ? '600' : '400', color: location.pathname === '/tracker' ? '#581C87' : '#475569', textDecoration: 'none', borderBottom: location.pathname === '/tracker' ? '2px solid #581C87' : 'none', paddingBottom: '2px' }}>Tracker</Link>
-          <Link to="/maternal" style={{ fontSize: '0.95rem', fontWeight: location.pathname === '/maternal' ? '600' : '400', color: location.pathname === '/maternal' ? '#581C87' : '#475569', textDecoration: 'none', borderBottom: location.pathname === '/maternal' ? '2px solid #581C87' : 'none', paddingBottom: '2px' }}>Maternal Journey</Link>
-          <Link to="/screening" style={{ fontSize: '0.95rem', fontWeight: location.pathname === '/screening' ? '600' : '400', color: location.pathname === '/screening' ? '#581C87' : '#475569', textDecoration: 'none', borderBottom: location.pathname === '/screening' ? '2px solid #581C87' : 'none', paddingBottom: '2px' }}>Screening</Link>
-          <Link to="/specialists" style={{ fontSize: '0.95rem', fontWeight: location.pathname === '/specialists' ? '600' : '400', color: location.pathname === '/specialists' ? '#581C87' : '#475569', textDecoration: 'none', borderBottom: location.pathname === '/specialists' ? '2px solid #581C87' : 'none', paddingBottom: '2px' }}>Specialists</Link>
-
-          {/* Integrated Care Points Badge */}
-          <div className="utility-item care-points-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', background: '#F1F5F9', padding: '4px 10px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-            <span>✨</span>
-            <strong>{carePoints} pts</strong>
-          </div>
-
-          {/* Integrated Privacy Shield Toggle Button */}
-          <button 
-            className={`discreet-toggle-btn ${discreetMode ? 'on' : ''}`}
-            onClick={() => setDiscreetMode(!discreetMode)}
-            title="Shield sensitive cycle details on screen with Zero-Knowledge masking"
-            style={{ padding: '5px 10px', fontSize: '0.8rem', cursor: 'pointer', borderRadius: '8px', border: '1px solid #CBD5E1', background: discreetMode ? '#E2E8F0' : '#fff', color: discreetMode ? '#1E293B' : '#334155', fontWeight: '500' }}
-          >
-            {discreetMode ? '🔒 Shield' : '👁️ Privacy'}
-          </button>
-
-          {user && (
-            <button onClick={logout} style={{ background: 'transparent', border: '1px solid #CBD5E1', padding: '5px 12px', borderRadius: '20px', fontSize: '0.85rem', cursor: 'pointer', color: '#475569', fontWeight: '500' }}>
-              Log out
-            </button>
-          )}
-        </div>
-
-        {/* Mobile Hamburger / Expandable Toggle Button */}
-        <button 
-          className="mobile-menu-toggle"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle Navigation Menu"
-          style={{ display: 'none', background: '#F8FAFC', border: '1px solid #CBD5E1', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', color: '#475569', fontSize: '1rem', fontWeight: '600', alignItems: 'center', gap: '6px' }}
-        >
-          <span>{mobileMenuOpen ? '✕ Close' : '☰ Menu'}</span>
-        </button>
-
-        {/* Expandable Mobile Dropdown Menu Container */}
-        {mobileMenuOpen && (
-          <div className="mobile-dropdown-menu" style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#FFFFFF', border: '1px solid #E2E8F0', borderTop: 'none', borderRadius: '0 0 16px 16px', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 60, animation: 'fadeIn 0.2s ease-in-out' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '8px', borderBottom: '1px solid #F1F5F9' }}>
-              <span style={{ fontSize: '0.85rem', color: '#64748B' }}>✨ {carePoints} Care Points</span>
-              <button 
-                onClick={() => setDiscreetMode(!discreetMode)}
-                style={{ padding: '4px 8px', fontSize: '0.78rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: discreetMode ? '#E2E8F0' : '#fff', color: '#334155' }}
-              >
-                {discreetMode ? '🔒 Shield Active' : '👁️ Privacy Shield'}
-              </button>
-            </div>
-            <Link to="/" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/' ? '#F3E8FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/' ? '600' : '400', color: location.pathname === '/' ? '#581C87' : '#334155', textDecoration: 'none' }}>Dashboard</Link>
-            <Link to="/tracker" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/tracker' ? '#F3E8FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/tracker' ? '600' : '400', color: location.pathname === '/tracker' ? '#581C87' : '#334155', textDecoration: 'none' }}>Tracker</Link>
-            <Link to="/maternal" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/maternal' ? '#F3E8FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/maternal' ? '600' : '400', color: location.pathname === '/maternal' ? '#581C87' : '#334155', textDecoration: 'none' }}>Maternal Journey</Link>
-            <Link to="/screening" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/screening' ? '#F3E8FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/screening' ? '600' : '400', color: location.pathname === '/screening' ? '#581C87' : '#334155', textDecoration: 'none' }}>Screening</Link>
-            <Link to="/specialists" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/specialists' ? '#F3E8FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/specialists' ? '600' : '400', color: location.pathname === '/specialists' ? '#581C87' : '#334155', textDecoration: 'none' }}>Specialists</Link>
-            {user && (
-              <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '10px 12px', borderRadius: '8px', background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', fontWeight: '600', cursor: 'pointer', fontSize: '0.95rem', marginTop: '4px' }}>
-                Log out
-              </button>
-            )}
-          </div>
-        )}
-      </nav>
-
-      {/* CSS injection for responsive mobile view switching */}
-      <style>{`
-        @media (max-width: 860px) {
-          .desktop-nav-links {
-            display: none !important;
-          }
-          .mobile-menu-toggle {
-            display: flex !important;
-          }
-        }
-      `}</style>
-
       {/* HERO / GREETING BANNER */}
       <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F0F9FF', padding: '20px', borderRadius: '16px', border: '1px solid #BAE6FD' }}>
         <div className="hero-text" style={{ flex: '1 1 250px' }}>
@@ -507,18 +410,14 @@ export default function Dashboard() {
 
         <div className="card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
-              📅
-            </div>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>📅</div>
             <div>
               <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B' }}>Next Period Expected</div>
               <div style={{ fontSize: '0.8rem', color: '#64748B' }}>In {daysUntilNext} days ({currentPhase === 'Menstrual Phase' ? 'Active now' : 'On track'})</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
-              🩺
-            </div>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🩺</div>
             <div>
               <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B' }}>Wellness Checkup</div>
               <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Scheduled via Screening Hub</div>
