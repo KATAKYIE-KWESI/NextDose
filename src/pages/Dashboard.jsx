@@ -506,41 +506,24 @@ export default function Dashboard() {
         </div>
 
         <div className="card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-          
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
               📅
             </div>
             <div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#7E22CE', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '2px' }}>
-                Next Period in ~{daysUntilNext} days
-              </span>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#1E293B', margin: '0 0 4px 0' }}>
-                Expected Window
-              </h3>
-              <p style={{ fontSize: '0.82rem', color: '#64748B', margin: 0 }}>
-                Estimated start based on your recent 28-day cycle rhythm.
-              </p>
+              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B' }}>Next Period Expected</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>In {daysUntilNext} days ({currentPhase === 'Menstrual Phase' ? 'Active now' : 'On track'})</div>
             </div>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
               🩺
             </div>
             <div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#0369A1', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '2px' }}>
-                Wellness Check
-              </span>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#1E293B', margin: '0 0 4px 0' }}>
-                Specialist Consultation
-              </h3>
-              <p style={{ fontSize: '0.82rem', color: '#64748B', margin: 0 }}>
-                Explore verified gynecologists or mental wellness experts anytime.
-              </p>
+              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B' }}>Wellness Checkup</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Scheduled via Screening Hub</div>
             </div>
           </div>
-
         </div>
       </section>
 
