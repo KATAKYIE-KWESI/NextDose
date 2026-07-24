@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { api } from '../api/client.js';
 
@@ -18,7 +18,8 @@ function Logo({ size = 40, className = '' }) {
         boxShadow: '0 2px 6px rgba(100, 116, 139, 0.08)',
         border: '1px solid #E2E8F0',
         boxSizing: 'border-box',
-        padding: `${size * 0.18}px`
+        padding: `${size * 0.18}px`,
+        flexShrink: 0
       }}
     >
       <svg 
@@ -65,7 +66,8 @@ function Logo({ size = 40, className = '' }) {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const location = useLocation();
   
   // Dynamic Health Data States
   const [logs, setLogs] = useState([]);
@@ -77,6 +79,9 @@ export default function Dashboard() {
   const [discreetMode, setDiscreetMode] = useState(false);
   const [carePoints, setCarePoints] = useState(120);
   const [auraInsight, setAuraInsight] = useState("Analyzing your personal wellness rhythm securely...");
+
+  // Mobile Expandable Nav State
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // User details
   const firstName = user?.name 
@@ -104,6 +109,11 @@ export default function Dashboard() {
     fetchTrackerData();
     return () => { isMounted = false; };
   }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   // --- Dynamic Cycle Calculations ---
   const cycleLength = 28; 
@@ -154,14 +164,6 @@ export default function Dashboard() {
     setAuraInsight(copy);
   }, [currentPhase, logs, selectedMood]);
 
-  const moods = [
-    { label: 'Energized', icon: '✨' },
-    { label: 'Calm', icon: '🌸' },
-    { label: 'Sensitive', icon: '🌧️' },
-    { label: 'Tired', icon: '😴' },
-    { label: 'Crampy', icon: '🍫' },
-  ];
-
   const handleMoodSelect = async (label) => {
     const newMood = selectedMood === label ? null : label;
     setSelectedMood(newMood);
@@ -181,14 +183,7 @@ export default function Dashboard() {
     }
   };
 
-  const addHydration = () => {
-    if (hydrationCount < 8) {
-      setHydrationCount((c) => c + 1);
-      setCarePoints((prev) => prev + 5);
-    }
-  };
-
-  // Determine dynamic river gradient/accent colors using modern palette (sage green, soft blue, pale teal, lavender-grey, amber/coral)
+  // Determine dynamic river gradient/accent colors using modern palette
   const getRiverTheme = () => {
     switch (currentPhase) {
       case 'Menstrual Phase':
@@ -227,32 +222,84 @@ export default function Dashboard() {
   return (
     <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', color: '#334155', backgroundColor: '#FBFBFA' }}>
       
-      {/* BRAND LOGO & HEADER INTEGRATION */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Logo size={42} />
-          <div>
-            <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0284C7', textTransform: 'uppercase', letterSpacing: '0.5px' }}>HerSignal</span>
-            <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#1E293B' }}>Wellness Hub</div>
+      {/* BRAND LOGO & EXPANDABLE MOBILE NAVIGATION BAR */}
+      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px', background: '#FFFFFF', padding: '10px 16px', borderRadius: '14px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(100, 116, 139, 0.04)', position: 'relative', zIndex: 50 }}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Logo size={38} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0284C7', letterSpacing: '-0.3px' }}>HerSignal</span>
           </div>
         </div>
 
-        {/* TOP UTILITY BAR: CARE POINTS & PRIVACY SHIELD */}
-        <div className="top-utility-bar" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div className="utility-item care-points-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', background: '#F1F5F9', padding: '6px 12px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-            <span className="star-icon">✨</span>
-            <strong>{carePoints} Care Points</strong>
-          </div>
-
-          <button 
-            className={`discreet-toggle-btn ${discreetMode ? 'on' : ''}`}
-            onClick={() => setDiscreetMode(!discreetMode)}
-            title="Shield sensitive cycle details on screen with Zero-Knowledge masking"
-            style={{ padding: '6px 12px', fontSize: '0.82rem', cursor: 'pointer', borderRadius: '8px', border: '1px solid #CBD5E1', background: discreetMode ? '#E2E8F0' : '#fff', color: discreetMode ? '#1E293B' : '#334155', fontWeight: '500' }}
-          >
-            {discreetMode ? '🔒 Shield Active' : '👁️ Privacy Shield'}
-          </button>
+        {/* Desktop Links (Hidden on small screens) */}
+        <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Link to="/" style={{ fontSize: '0.9rem', fontWeight: location.pathname === '/' ? '700' : '500', color: location.pathname === '/' ? '#0284C7' : '#64748B', textDecoration: 'none' }}>Dashboard</Link>
+          <Link to="/tracker" style={{ fontSize: '0.9rem', fontWeight: location.pathname === '/tracker' ? '700' : '500', color: location.pathname === '/tracker' ? '#0284C7' : '#64748B', textDecoration: 'none' }}>Tracker</Link>
+          <Link to="/maternal" style={{ fontSize: '0.9rem', fontWeight: location.pathname === '/maternal' ? '700' : '500', color: location.pathname === '/maternal' ? '#0284C7' : '#64748B', textDecoration: 'none' }}>Maternal Journey</Link>
+          <Link to="/screening" style={{ fontSize: '0.9rem', fontWeight: location.pathname === '/screening' ? '700' : '500', color: location.pathname === '/screening' ? '#0284C7' : '#64748B', textDecoration: 'none' }}>Screening</Link>
+          <Link to="/specialists" style={{ fontSize: '0.9rem', fontWeight: location.pathname === '/specialists' ? '700' : '500', color: location.pathname === '/specialists' ? '#0284C7' : '#64748B', textDecoration: 'none' }}>Specialists</Link>
+          {user && (
+            <button onClick={logout} style={{ background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', color: '#475569', fontWeight: '600' }}>
+              Log out
+            </button>
+          )}
         </div>
+
+        {/* Mobile Hamburger / Expandable Toggle Button */}
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle Navigation Menu"
+          style={{ display: 'none', background: '#F0F9FF', border: '1px solid #BAE6FD', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', color: '#0369A1', fontSize: '1rem', fontWeight: '600', alignItems: 'center', gap: '6px' }}
+        >
+          <span>{mobileMenuOpen ? '✕ Close' : '☰ Menu'}</span>
+        </button>
+
+        {/* Expandable Mobile Dropdown Menu Container */}
+        {mobileMenuOpen && (
+          <div className="mobile-dropdown-menu" style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#FFFFFF', border: '1px solid #E2E8F0', borderTop: 'none', borderRadius: '0 0 16px 16px', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 60, animation: 'fadeIn 0.2s ease-in-out' }}>
+            <Link to="/" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/' ? '#F0F9FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/' ? '700' : '500', color: location.pathname === '/' ? '#0284C7' : '#334155', textDecoration: 'none' }}>🏠 Dashboard</Link>
+            <Link to="/tracker" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/tracker' ? '#F0F9FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/tracker' ? '700' : '500', color: location.pathname === '/tracker' ? '#0284C7' : '#334155', textDecoration: 'none' }}>🩸 Tracker</Link>
+            <Link to="/maternal" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/maternal' ? '#F0F9FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/maternal' ? '700' : '500', color: location.pathname === '/maternal' ? '#0284C7' : '#334155', textDecoration: 'none' }}>🤰 Maternal Journey</Link>
+            <Link to="/screening" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/screening' ? '#F0F9FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/screening' ? '700' : '500', color: location.pathname === '/screening' ? '#0284C7' : '#334155', textDecoration: 'none' }}>🛡️ Screening</Link>
+            <Link to="/specialists" style={{ padding: '10px 12px', borderRadius: '8px', background: location.pathname === '/specialists' ? '#F0F9FF' : 'transparent', fontSize: '0.95rem', fontWeight: location.pathname === '/specialists' ? '700' : '500', color: location.pathname === '/specialists' ? '#0284C7' : '#334155', textDecoration: 'none' }}>👩‍⚕️ Specialists</Link>
+            {user && (
+              <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '10px 12px', borderRadius: '8px', background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', fontWeight: '600', cursor: 'pointer', fontSize: '0.95rem', marginTop: '4px' }}>
+                🚪 Log out
+              </button>
+            )}
+          </div>
+        )}
+      </nav>
+
+      {/* CSS injection for responsive mobile view switching */}
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav-links {
+            display: none !important;
+          }
+          .mobile-menu-toggle {
+            display: flex !important;
+          }
+        }
+      `}</style>
+
+      {/* TOP UTILITY BAR: CARE POINTS & PRIVACY SHIELD */}
+      <div className="top-utility-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginBottom: '16px' }}>
+        <div className="utility-item care-points-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', background: '#F1F5F9', padding: '6px 12px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
+          <span className="star-icon">✨</span>
+          <strong>{carePoints} Care Points</strong>
+        </div>
+
+        <button 
+          className={`discreet-toggle-btn ${discreetMode ? 'on' : ''}`}
+          onClick={() => setDiscreetMode(!discreetMode)}
+          title="Shield sensitive cycle details on screen with Zero-Knowledge masking"
+          style={{ padding: '6px 12px', fontSize: '0.82rem', cursor: 'pointer', borderRadius: '8px', border: '1px solid #CBD5E1', background: discreetMode ? '#E2E8F0' : '#fff', color: discreetMode ? '#1E293B' : '#334155', fontWeight: '500' }}
+        >
+          {discreetMode ? '🔒 Shield Active' : '👁️ Privacy Shield'}
+        </button>
       </div>
 
       {/* HERO / GREETING BANNER */}
@@ -503,7 +550,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* FOOTER MOTIVATIONAL BANNER with Amber / Coral emphasis */}
+      {/* FOOTER MOTIVATIONAL BANNER */}
       <div className="card" style={{ background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)', borderRadius: '16px', padding: '20px', border: '1px solid #BAE6FD', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '12px', right: '16px', fontSize: '1.1rem' }}>
           <span title="Care Highlight" style={{ color: '#F43F5E' }}>✦</span>

@@ -1,599 +1,368 @@
-import { useState, useEffect } from 'react';
-import { api } from '../api/client.js';
+import { useState } from 'react';
 
 export default function CycleTracker() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDateStr, setSelectedDateStr] = useState(
-    new Date().toISOString().split('T')[0]
-  );
-  const [activeTab, setActiveTab] = useState('menstruation'); // menstruation, pregnancy, parenting
-  const [userPersona, setUserPersona] = useState('adolescent'); // adolescent, trying, pregnant, parent
-  const [logs, setLogs] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  // Navigation & Life Stage state
+  const [activeTab, setActiveTab] = useState('tracker'); // 'tracker', 'analytics', etc.
+  const [lifeStage, setLifeStage] = useState('expectant'); // 'adolescent', 'conceiving', 'expectant', 'postpartum'
 
-  // Visibility toggles for optional/sensitive categories
-  const [showSexualHealth, setShowSexualHealth] = useState(true);
-  const [showBreastAwareness, setShowBreastAwareness] = useState(true);
-
-  // Complete state matching every section in your specification
-  const [activeLog, setActiveLog] = useState({
-    flow: '',
-    symptoms: [],
-    mood: '',
-    painSeverity: '',
-    painLocation: '',
-    painMedication: '',
-    sexualActivity: false,
-    contraception: '',
-    libido: '',
-    pregnancyTest: '',
-    ovulationTest: '',
-    conceivingStatus: '',
-    breastChange: '',
-    breastChangeDetails: '',
-    notes: '',
+  // Collapsible section toggles state
+  const [collapsedSections, setCollapsedSections] = useState({
+    calendar: false,
+    overview: false,
+    urgent: false,
+    symptoms: false,
+    vitals: false,
+    fetal: false,
   });
 
-  const fetchLogs = async () => {
-    try {
-      const res = api.getCycleLogs ? await api.getCycleLogs() : { logs: [] };
-      setLogs(res?.logs || []);
-    } catch (err) {
-      setErrorMsg(err?.message || 'Failed to fetch cycle logs.');
-    }
+  const toggleSection = (section) => {
+    setCollapsedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
+  // Calendar Mock State
+  const [selectedDate, setSelectedDate] = useState('2026-07-24');
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const firstDayIndex = new Date(year, month, 1).getDay();
-  const totalDays = new Date(year, month + 1, 0).getDate();
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+  // Maternal / Expectant Journey State
+  const [pregnancyData, setPregnancyData] = useState({
+    currentWeek: '24',
+    trimester: '2nd Trimester',
+    dueDate: '2026-11-12',
+    babySize: 'Corn Ear (~30cm, 600g)',
+    pregnancyType: 'Singleton',
+    nextAntenatal: '2026-07-28',
+    hospitalProvider: 'Korle-Bu Teaching Hospital',
+    emergencyContact: '+233 30 266 5011'
+  });
+
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const [symptomSeverity, setSymptomSeverity] = useState('Mild');
+  const [symptomDuration, setSymptomDuration] = useState('Today');
+  const [symptomNote, setSymptomNote] = useState('');
+  const [selectedUrgentFlags, setSelectedUrgentFlags] = useState([]);
+
+  // Vitals State
+  const [weight, setWeight] = useState('72.5');
+  const [bpSystolic, setBpSystolic] = useState('120');
+  const [bpDiastolic, setBpDiastolic] = useState('80');
+  const [bloodSugar, setBloodSugar] = useState('5.4');
+  const [temperature, setTemperature] = useState('36.6');
+
+  // Fetal & Contraction State
+  const [fetalStatus, setFetalStatus] = useState('Movement feels normal');
+  const [movementCount, setMovementCount] = useState('');
+  const [contractions, setContractions] = useState([]);
+  const [isContractionActive, setIsContractionActive] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [watersBreaking, setWatersBreaking] = useState(false);
+  const [hospitalContacted, setHospitalContacted] = useState(false);
+
+  const routineSymptomsList = [
+    'Nausea', 'Fatigue', 'Headache', 'Back/Pelvic pain', 
+    'Heartburn', 'Constipation', 'Leg cramps', 'Sleep issues', 'Discharge', 'Mood shifts'
   ];
 
-  const handleDayClick = (dayNum) => {
-    const formattedMonth = String(month + 1).padStart(2, '0');
-    const formattedDay = String(dayNum).padStart(2, '0');
-    const dateStr = `${year}-${formattedMonth}-${formattedDay}`;
-    setSelectedDateStr(dateStr);
-
-    const existing = logs.find((l) => l.date === dateStr);
-    if (existing) {
-      setActiveLog({
-        flow: existing.flow || '',
-        symptoms: existing.symptoms || [],
-        mood: existing.mood || '',
-        painSeverity: existing.painSeverity || '',
-        painLocation: existing.painLocation || '',
-        painMedication: existing.painMedication || '',
-        sexualActivity: existing.sexualActivity || false,
-        contraception: existing.contraception || '',
-        libido: existing.libido || '',
-        pregnancyTest: existing.pregnancyTest || '',
-        ovulationTest: existing.ovulationTest || '',
-        conceivingStatus: existing.conceivingStatus || '',
-        breastChange: existing.breastChange || '',
-        breastChangeDetails: existing.breastChangeDetails || '',
-        notes: existing.notes || '',
-      });
-    } else {
-      setActiveLog({
-        flow: '',
-        symptoms: [],
-        mood: '',
-        painSeverity: '',
-        painLocation: '',
-        painMedication: '',
-        sexualActivity: false,
-        contraception: '',
-        libido: '',
-        pregnancyTest: '',
-        ovulationTest: '',
-        conceivingStatus: '',
-        breastChange: '',
-        breastChangeDetails: '',
-        notes: '',
-      });
-    }
-  };
-
-  const toggleItem = (item) => {
-    setActiveLog((prev) => {
-      const exists = prev.symptoms.includes(item);
-      return {
-        ...prev,
-        symptoms: exists
-          ? prev.symptoms.filter((s) => s !== item)
-          : [...prev.symptoms, item],
-      };
-    });
-  };
-
-  const handleSave = async () => {
-    try {
-      await api.addCycleLog({
-        date: selectedDateStr,
-        type: 'cycle_entry',
-        persona: userPersona,
-        ...activeLog,
-      });
-      await fetchLogs();
-      setSuccessMsg(`Successfully saved record for ${selectedDateStr}!`);
-      setTimeout(() => setSuccessMsg(''), 4000);
-    } catch (err) {
-      setErrorMsg(err?.message || 'Failed to save entry.');
-    }
-  };
-
-  const physicalSymptomsList = [
-    { name: 'no symptoms', icon: '👍' },
-    { name: 'Backache', icon: '👤' },
-    { name: 'stomach ache', icon: '⚡' },
-    { name: 'Lower abdominal discomfort', icon: '❗' },
-    { name: 'breast tenderness', icon: '👙' },
-    { name: 'body aches', icon: '🔴' },
-    { name: 'Headache', icon: '🧠' },
-    { name: 'dizziness', icon: '💫' },
-    { name: 'Insomnia', icon: '🌙' },
-    { name: 'acne', icon: '✨' },
-    { name: 'dry skin', icon: '💧' },
-    { name: 'Loss of appetite', icon: '🍽️' },
-    { name: 'Heavy or cold limbs', icon: '❄️' },
-    { name: 'diarrhea', icon: '🧻' },
-    { name: 'constipation', icon: '🌀' },
-    { name: 'exhausted', icon: '🔋' },
+  const urgentSignsList = [
+    'Vaginal bleeding', 'Leaking fluid', 'Severe abdominal pain', 
+    'Persistent headache', 'Vision changes', 'Sudden swelling', 
+    'Fever', 'Chest pain / Breathing diff.', 'Reduced fetal movement', 'Early labour signs'
   ];
 
-  const dischargeIconsList = [
-    { name: 'Normal discharge', colorBg: '#93c5fd' },
-    { name: 'Dryness', colorBg: '#60a5fa' },
-    { name: 'Watery, creamy or stretchy discharge', colorBg: '#3b82f6' },
-    { name: 'Unusual colour or smell', colorBg: '#2563eb' },
-    { name: 'Itching, irritation or burning', colorBg: '#1d4ed8' },
-    { name: 'Possible infection symptoms', colorBg: '#1e40af', urgent: true },
-    { name: 'brown discharge', colorBg: '#1e3a8a' },
-    { name: 'Bleeding', colorBg: '#f43f5e', urgent: true },
-    { name: 'There is blood clot', colorBg: '#e11d48', urgent: true },
-    { name: 'Increased leucorrhea', colorBg: '#3b82f6' },
-  ];
+  const toggleSymptom = (symptom) => {
+    setSelectedSymptoms(prev => prev.includes(symptom) ? prev.filter(s => s !== symptom) : [...prev, symptom]);
+  };
+
+  const toggleUrgentFlag = (flag) => {
+    setSelectedUrgentFlags(prev => prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag]);
+  };
+
+  const startContractionTimer = () => {
+    setStartTime(new Date());
+    setIsContractionActive(true);
+  };
+
+  const stopContractionTimer = () => {
+    if (!startTime) return;
+    const durationSecs = Math.round((new Date() - startTime) / 1000);
+    setContractions([{
+      id: Date.now(),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      duration: `${durationSecs}s`,
+      intensity: 'Moderate'
+    }, ...contractions]);
+    setIsContractionActive(false);
+    setStartTime(null);
+  };
 
   return (
-    <div style={{ width: '100%', maxWidth: '850px', margin: '0 auto', padding: '20px 16px', boxSizing: 'border-box', color: '#1e293b', fontFamily: 'system-ui, sans-serif', backgroundColor: '#f8fafc', borderRadius: '24px' }}>
-      
-      {/* PERSONA SELECTION SELECTOR */}
-      <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(30,41,59,0.04)' }}>
-        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Select Your Current Life Stage Experience:
-        </label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
-          {[
-            { id: 'adolescent', label: 'Adolescent / Young Girl', icon: '🌱' },
-            { id: 'trying', label: 'Preparing to Conceive', icon: '🌸' },
-            { id: 'pregnant', label: 'Expectant Mother', icon: '🤰' },
-            { id: 'parent', label: 'Parenting / Postpartum', icon: '👶' },
-          ].map((persona) => {
-            const isSelected = userPersona === persona.id;
-            return (
-              <button
-                key={persona.id}
-                onClick={() => setUserPersona(persona.id)}
-                style={{
-                  background: isSelected ? '#e0f2fe' : '#f8fafc',
-                  border: isSelected ? '2px solid #3b82f6' : '1px solid #cbd5e1',
-                  color: isSelected ? '#1d4ed8' : '#334155',
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  fontSize: '0.82rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '1rem' }}>{persona.icon}</span>
-                <span>{persona.label}</span>
-              </button>
-            );
-          })}
-        </div>
+    <div 
+      style={{
+        width: '100%',
+        maxWidth: '750px',
+        margin: '0 auto',
+        padding: '12px 10px',
+        boxSizing: 'border-box',
+        fontFamily: 'system-ui, sans-serif',
+        color: '#1E293B',
+        background: '#F8FAFC',
+        minHeight: '100vh',
+        overflowX: 'hidden'
+      }}
+    >
+      {/* HEADER & LIFE STAGE SELECTOR */}
+      <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+        <h1 style={{ margin: '0 0 4px 0', fontSize: '1.4rem', fontWeight: '800' }}>Health & Cycle Tracker</h1>
+        <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748B' }}>Select your current stage to customize your dashboard.</p>
       </div>
 
-      {/* TOP SUB-NAV BAR */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-        <button 
-          onClick={() => setActiveTab('menstruation')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'menstruation' ? '#1d4ed8' : '#334155', fontWeight: activeTab === 'menstruation' ? '700' : '500', borderBottom: activeTab === 'menstruation' ? '2px solid #1d4ed8' : 'none', paddingBottom: '4px' }}
-        >
-          menstruation & cycle
-        </button>
-        <button 
-          onClick={() => setActiveTab('pregnancy')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'pregnancy' ? '#1d4ed8' : '#334155', fontWeight: activeTab === 'pregnancy' ? '700' : '500', borderBottom: activeTab === 'pregnancy' ? '2px solid #1d4ed8' : 'none', paddingBottom: '4px' }}
-        >
-          pregnancy wellness
-        </button>
-        <button 
-          onClick={() => setActiveTab('parenting')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'parenting' ? '#1d4ed8' : '#334155', fontWeight: activeTab === 'parenting' ? '700' : '500', borderBottom: activeTab === 'parenting' ? '2px solid #1d4ed8' : 'none', paddingBottom: '4px' }}
-        >
-          postpartum & parenting
-        </button>
-      </div>
-
-      {/* DYNAMIC CONTENT BASED ON STAGE */}
-      {userPersona === 'pregnant' && (
-        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '16px', borderRadius: '16px', marginBottom: '20px', fontSize: '0.9rem' }}>
-          <span style={{ fontWeight: '700' }}>🤰 Expectant Mother View Active:</span> Tracking features optimized for pregnancy vitals, fetal movement, and clinical check-ins.
-        </div>
-      )}
-
-      {userPersona === 'parent' && (
-        <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', color: '#5b21b6', padding: '16px', borderRadius: '16px', marginBottom: '20px', fontSize: '0.9rem' }}>
-          <span style={{ fontWeight: '700' }}>👶 Postpartum & Parenting View Active:</span> Focused on recovery tracking, infant feeding schedules, and maternal well-being.
-        </div>
-      )}
-
-      {/* MONTH HEADER & CALENDAR */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-        <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '800', color: '#1e293b' }}>
-          &lt; {monthNames[month]} {year}
-        </h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#FFF', cursor: 'pointer', color: '#1e293b' }}>&lt;</button>
-          <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#FFF', cursor: 'pointer', color: '#1e293b' }}>&gt;</button>
-        </div>
-      </div>
-
-      <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px', marginBottom: '24px', boxShadow: '0 2px 4px rgba(30,41,59,0.02)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', fontWeight: '700', color: '#3b82f6', fontSize: '0.8rem', marginBottom: '10px' }}>
-          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
-          {Array.from({ length: firstDayIndex }).map((_, i) => <div key={`e-${i}`} />)}
-          {Array.from({ length: totalDays }).map((_, i) => {
-            const dayNum = i + 1;
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-            const isSelected = selectedDateStr === dateStr;
-            const hasLog = logs.some((l) => l.date === dateStr);
-
-            return (
-              <button
-                key={dayNum}
-                onClick={() => handleDayClick(dayNum)}
-                style={{
-                  aspectRatio: '1',
-                  borderRadius: '12px',
-                  border: isSelected ? '2px solid #3b82f6' : '1px solid #e2e8f0',
-                  background: isSelected ? '#e0f2fe' : hasLog ? '#f1f5f9' : '#f8fafc',
-                  color: isSelected ? '#1d4ed8' : '#1e293b',
-                  fontWeight: '700',
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span>{dayNum}</span>
-                {hasLog && <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#3b82f6', marginTop: '2px' }} />}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* CALENDAR LEGEND */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '16px', fontSize: '0.72rem', color: '#334155', flexWrap: 'wrap' }}>
-          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#3b82f6', borderRadius: '50%' }} /> Menstrual days</span>
-          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#93c5fd', borderRadius: '50%' }} /> Fertile window</span>
-          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#60a5fa', borderRadius: '50%' }} /> Ovulation day</span>
-        </div>
-      </div>
-
-      {successMsg && <div style={{ background: '#f0fdf4', color: '#166534', padding: '10px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem' }}>{successMsg}</div>}
-      {errorMsg && <div style={{ background: '#fef2f2', color: '#991b1b', padding: '10px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem' }}>{errorMsg}</div>}
-
-      {/* RECORDING SECTIONS DIVIDED INTO CLEAR CATEGORIES */}
-      <div style={{ display: 'grid', gap: '20px' }}>
-        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#1e293b' }}>
-          Recording Options for: <span style={{ color: '#3b82f6' }}>{selectedDateStr}</span>
-        </h3>
-
-        {/* 1. PERIOD AND BLEEDING */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Period and bleeding</h4>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => setActiveLog(p => ({ ...p, flow: 'Period started today' }))}
-              style={{ background: activeLog.flow === 'Period started today' ? '#3b82f6' : '#e0f2fe', color: activeLog.flow === 'Period started today' ? '#FFF' : '#1d4ed8', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
-            >
-              + Period started today
-            </button>
-            <button 
-              onClick={() => setActiveLog(p => ({ ...p, flow: 'Period ended today' }))}
-              style={{ background: activeLog.flow === 'Period ended today' ? '#1e40af' : '#f8fafc', color: activeLog.flow === 'Period ended today' ? '#FFF' : '#334155', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
-            >
-              + Period ended today
-            </button>
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {['Spotting', 'Light flow', 'Medium flow', 'Heavy flow', 'Blood clots', 'Bleeding between periods', 'Bleeding after sex'].map((item) => {
-              const active = activeLog.flow === item;
-              const isUrgent = item.includes('Bleeding') || item.includes('clots');
-              return (
-                <button
-                  key={item}
-                  onClick={() => setActiveLog(p => ({ ...p, flow: active ? '' : item }))}
-                  style={{
-                    padding: '8px 14px',
-                    borderRadius: '20px',
-                    border: isUrgent ? '1px solid #ef4444' : active ? '1px solid #3b82f6' : '1px solid #cbd5e1',
-                    background: isUrgent && active ? '#ef4444' : active ? '#3b82f6' : '#f8fafc',
-                    color: active ? '#FFF' : isUrgent ? '#b91c1c' : '#1e293b',
-                    fontSize: '0.82rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {isUrgent ? '⚠️ ' : '+ '}{item}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 2. PAIN AND PHYSICAL SYMPTOMS */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Pain and physical symptoms</h4>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(85px, 1fr))', gap: '14px', marginBottom: '16px' }}>
-            {physicalSymptomsList.map((item) => {
-              const isSelected = activeLog.symptoms.includes(item.name);
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => toggleItem(item.name)}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
-                >
-                  <div 
-                    style={{
-                      width: '52px',
-                      height: '52px',
-                      borderRadius: '50%',
-                      background: isSelected ? '#e0f2fe' : '#f8fafc',
-                      border: isSelected ? '2px solid #3b82f6' : '1px solid #e2e8f0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.2rem',
-                      marginBottom: '6px'
-                    }}
-                  >
-                    {item.icon}
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: isSelected ? '#1d4ed8' : '#334155', textAlign: 'center', fontWeight: isSelected ? '700' : '500', lineHeight: '1.1' }}>
-                    {item.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '14px', borderTop: '1px solid #e2e8f0', paddingTop: '14px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#334155', marginBottom: '4px' }}>Pain severity and location</label>
-              <input
-                type="text"
-                placeholder="e.g., Mild, Lower abdomen"
-                value={activeLog.painLocation}
-                onChange={(e) => setActiveLog(p => ({ ...p, painLocation: e.target.value }))}
-                style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box' }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#334155', marginBottom: '4px' }}>Pain medication & effectiveness</label>
-              <input
-                type="text"
-                placeholder="e.g., Ibuprofen - Effective"
-                value={activeLog.painMedication}
-                onChange={(e) => setActiveLog(p => ({ ...p, painMedication: e.target.value }))}
-                style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box' }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 3. VAGINAL DISCHARGE AND REPRODUCTIVE SYMPTOMS */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Vaginal discharge and reproductive symptoms</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(95px, 1fr))', gap: '14px' }}>
-            {dischargeIconsList.map((item) => {
-              const isSelected = activeLog.symptoms.includes(item.name);
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => toggleItem(item.name)}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
-                >
-                  <div 
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      background: item.colorBg,
-                      border: isSelected ? '3px solid #1e293b' : item.urgent ? '2px dashed #ef4444' : 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#FFF',
-                      fontSize: '0.9rem',
-                      fontWeight: '700',
-                      marginBottom: '6px'
-                    }}
-                  >
-                    {item.urgent ? '⚠️' : isSelected ? '✓' : ''}
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: isSelected ? '#1e293b' : '#334155', textAlign: 'center', fontWeight: isSelected ? '700' : '500', lineHeight: '1.1' }}>
-                    {item.name} {item.urgent && '(Urgent)'}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 4. MOOD AND MENTAL WELLBEING */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Mood and mental wellbeing</h4>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {['Happy or calm', 'Energetic or motivated', 'Sensitive or irritable', 'Anxious or stressed', 'Low mood', 'Difficulty concentrating', 'Mood swings'].map((m) => {
-              const active = activeLog.mood === m;
-              return (
-                <button
-                  key={m}
-                  onClick={() => setActiveLog(p => ({ ...p, mood: active ? '' : m }))}
-                  style={{
-                    padding: '8px 14px',
-                    borderRadius: '20px',
-                    border: active ? '1px solid #3b82f6' : '1px solid #cbd5e1',
-                    background: active ? '#3b82f6' : '#f8fafc',
-                    color: active ? '#FFF' : '#1e293b',
-                    fontSize: '0.82rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
-                >
-                  + {m}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 5. OPTIONAL: SEXUAL AND FERTILITY INFORMATION */}
-        {showSexualHealth && (
-          <div style={{ background: '#FFFFFF', border: '1px dashed #cbd5e1', borderRadius: '16px', padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Sexual and fertility information</h4>
-              <button 
-                onClick={() => setShowSexualHealth(false)}
-                style={{ background: 'none', border: 'none', color: '#334155', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
-              >
-                Remove category ✕
-              </button>
-            </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {['Sexual activity', 'Protection or contraception used', 'Libido', 'Pain during sex', 'Pregnancy test result', 'Ovulation test result', 'Trying to conceive status'].map((item) => {
-                const isSelected = activeLog.symptoms.includes(item);
-                return (
-                  <button
-                    key={item}
-                    onClick={() => toggleItem(item)}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: '20px',
-                      border: isSelected ? '1px solid #3b82f6' : '1px solid #cbd5e1',
-                      background: isSelected ? '#3b82f6' : '#f8fafc',
-                      color: isSelected ? '#FFF' : '#1e293b',
-                      fontSize: '0.82rem',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    + {item}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* 6. OPTIONAL: BREAST AWARENESS */}
-        {showBreastAwareness && (
-          <div style={{ background: '#FFFFFF', border: '1px dashed #cbd5e1', borderRadius: '16px', padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Breast awareness</h4>
-              <button 
-                onClick={() => setShowBreastAwareness(false)}
-                style={{ background: 'none', border: 'none', color: '#334155', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
-              >
-                Remove category ✕
-              </button>
-            </div>
-            <p style={{ margin: '0 0 12px 0', fontSize: '0.75rem', color: '#475569', fontStyle: 'italic' }}>
-              Identifies persistent or unusual changes and recommends professional assessment.
-            </p>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {['Breast tenderness or pain', 'New lump or thickening', 'Swelling or skin changes', 'Nipple changes or discharge', 'Change in breast shape or size'].map((item) => {
-                const isSelected = activeLog.symptoms.includes(item);
-                const isUrgent = item.includes('lump') || item.includes('discharge');
-                return (
-                  <button
-                    key={item}
-                    onClick={() => toggleItem(item)}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: '20px',
-                      border: isUrgent ? '1px solid #ef4444' : isSelected ? '1px solid #3b82f6' : '1px solid #cbd5e1',
-                      background: isUrgent && isSelected ? '#ef4444' : isSelected ? '#3b82f6' : '#f8fafc',
-                      color: isSelected ? '#FFF' : isUrgent ? '#b91c1c' : '#1e293b',
-                      fontSize: '0.82rem',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {isUrgent ? '⚠️ ' : '+ '}{item}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* 7. NOTES AND ATTACHMENTS */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>Notes and attachments</h4>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#334155' }}>
-            <span>✓ Written note</span>
-            <span>✓ Voice note</span>
-            <span>✓ Photo</span>
-            <span>✓ Medical report</span>
-          </div>
-          <textarea
-            rows="3"
-            placeholder="Add a written note, voice note reference, or laboratory report details..."
-            value={activeLog.notes}
-            onChange={(e) => setActiveLog(p => ({ ...p, notes: e.target.value }))}
-            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '16px' }}
-          />
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
+        {[
+          { id: 'adolescent', label: 'Adolescent' },
+          { id: 'conceiving', label: 'Conceiving' },
+          { id: 'expectant', label: 'Expectant Mother' },
+          { id: 'postpartum', label: 'Postpartum' }
+        ].map((stage) => (
           <button
-            onClick={handleSave}
+            key={stage.id}
+            onClick={() => setLifeStage(stage.id)}
             style={{
-              background: '#3b82f6',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '14px 24px',
-              borderRadius: '12px',
+              flex: '1 0 auto',
+              padding: '8px 10px',
+              borderRadius: '8px',
+              border: lifeStage === stage.id ? '1px solid #0284c7' : '1px solid #CBD5E1',
+              background: lifeStage === stage.id ? '#0284c7' : '#FFFFFF',
+              color: lifeStage === stage.id ? '#FFFFFF' : '#475569',
               fontWeight: '700',
-              fontSize: '0.95rem',
+              fontSize: '0.75rem',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)',
-              width: '100%'
+              whiteSpace: 'nowrap'
             }}
           >
-            Save Day's Record
+            {stage.label}
+          </button>
+        ))}
+      </div>
+
+      {/* STANDARD TRACKER CALENDAR */}
+      <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: '700' }}>July 2026 Calendar</h2>
+          <button onClick={() => toggleSection('calendar')} style={{ background: 'none', border: 'none', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', color: '#0284c7' }}>
+            {collapsedSections.calendar ? '+' : '−'}
           </button>
         </div>
 
+        {!collapsedSections.calendar && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', textAlign: 'center', fontSize: '0.75rem', fontWeight: '700', color: '#64748B', marginBottom: '6px' }}>
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
+                const isSelected = day === 24;
+                return (
+                  <button
+                    key={day}
+                    onClick={() => setSelectedDate(`2026-07-${day < 10 ? '0' + day : day}`)}
+                    style={{
+                      aspectRatio: '1',
+                      borderRadius: '8px',
+                      border: isSelected ? '2px solid #0284c7' : '1px solid #F1F5F9',
+                      background: isSelected ? '#E0F2FE' : '#F8FAFC',
+                      color: isSelected ? '#0369a1' : '#334155',
+                      fontSize: '0.78rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* EXPECTANT MOTHER / MATERNAL JOURNEY INTEGRATED VIEWS */}
+      {lifeStage === 'expectant' && (
+        <div style={{ display: 'grid', gap: '14px' }}>
+          
+          {/* 1. Pregnancy Overview */}
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div>
+                <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#0284c7', textTransform: 'uppercase' }}>Pregnancy Overview</span>
+                <h3 style={{ margin: '2px 0 0 0', fontSize: '1rem' }}>Week {pregnancyData.currentWeek} • {pregnancyData.trimester}</h3>
+              </div>
+              <button onClick={() => toggleSection('overview')} style={{ background: 'none', border: 'none', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', color: '#0284c7' }}>
+                {collapsedSections.overview ? '+' : '−'}
+              </button>
+            </div>
+
+            {!collapsedSections.overview && (
+              <div style={{ display: 'grid', gap: '8px', fontSize: '0.8rem' }}>
+                <div style={{ background: '#F8FAFC', padding: '10px', borderRadius: '8px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Baby Size: <strong>{pregnancyData.babySize}</strong></span>
+                  <span>Due Date: <strong>{pregnancyData.dueDate}</strong></span>
+                </div>
+                <div style={{ background: '#FEF2F2', padding: '10px', borderRadius: '8px', border: '1px solid #FCA5A5', color: '#991B1B', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Hospital: {pregnancyData.hospitalProvider}</span>
+                  <span>Emergency: {pregnancyData.emergencyContact}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. Urgent Signs */}
+          <div style={{ background: '#FEF2F2', borderRadius: '14px', border: '2px solid #EF4444', padding: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>🚨</span>
+                <h3 style={{ margin: 0, fontSize: '0.95rem', color: '#991B1B' }}>Urgent Signs</h3>
+              </div>
+              <button onClick={() => toggleSection('urgent')} style={{ background: 'none', border: 'none', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', color: '#991B1B' }}>
+                {collapsedSections.urgent ? '+' : '−'}
+              </button>
+            </div>
+
+            {!collapsedSections.urgent && (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                  {urgentSignsList.map((sign) => {
+                    const isSelected = selectedUrgentFlags.includes(sign);
+                    return (
+                      <button
+                        key={sign}
+                        onClick={() => toggleUrgentFlag(sign)}
+                        style={{
+                          padding: '8px',
+                          borderRadius: '8px',
+                          border: isSelected ? '1px solid #991B1B' : '1px solid #FCA5A5',
+                          background: isSelected ? '#991B1B' : '#FFFFFF',
+                          color: isSelected ? '#FFFFFF' : '#991B1B',
+                          fontSize: '0.72rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {isSelected ? '⚠️ ' : '⭕ '}{sign}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedUrgentFlags.length > 0 && (
+                  <a href={`tel:${pregnancyData.emergencyContact}`} style={{ display: 'block', textAlign: 'center', background: '#EF4444', color: '#FFFFFF', textDecoration: 'none', padding: '8px', borderRadius: '8px', fontWeight: '700', fontSize: '0.8rem' }}>
+                    📞 Call Emergency Contact Now
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 3. Routine Symptoms */}
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Routine Symptoms</h3>
+              <button onClick={() => toggleSection('symptoms')} style={{ background: 'none', border: 'none', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', color: '#0284c7' }}>
+                {collapsedSections.symptoms ? '+' : '−'}
+              </button>
+            </div>
+
+            {!collapsedSections.symptoms && (
+              <div>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                  {routineSymptomsList.map((symptom) => {
+                    const isSelected = selectedSymptoms.includes(symptom);
+                    return (
+                      <button
+                        key={symptom}
+                        onClick={() => toggleSymptom(symptom)}
+                        style={{
+                          padding: '6px 10px',
+                          borderRadius: '16px',
+                          border: isSelected ? '1px solid #0284c7' : '1px solid #CBD5E1',
+                          background: isSelected ? '#E0F2FE' : '#F8FAFC',
+                          color: isSelected ? '#0369a1' : '#334155',
+                          fontSize: '0.72rem',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {isSelected ? '✓ ' : '+ '}{symptom}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedSymptoms.length > 0 && (
+                  <button onClick={() => alert('Saved routine symptoms!')} style={{ background: '#0284c7', color: '#FFFFFF', border: 'none', padding: '8px 14px', borderRadius: '6px', fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer' }}>
+                    Save Symptoms
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 4. Clinical Vitals */}
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Clinical Vitals</h3>
+              <button onClick={() => toggleSection('vitals')} style={{ background: 'none', border: 'none', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', color: '#0284c7' }}>
+                {collapsedSections.vitals ? '+' : '−'}
+              </button>
+            </div>
+
+            {!collapsedSections.vitals && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                <div style={{ background: '#F8FAFC', padding: '8px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <label style={{ fontSize: '0.68rem', fontWeight: '700', color: '#64748B' }}>Weight (kg)</label>
+                  <input type="number" step="0.1" value={weight} onChange={(e) => setWeight(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }} />
+                </div>
+                <div style={{ background: '#F8FAFC', padding: '8px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <label style={{ fontSize: '0.68rem', fontWeight: '700', color: '#64748B' }}>Blood Sugar</label>
+                  <input type="number" step="0.1" value={bloodSugar} onChange={(e) => setBloodSugar(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 5. Fetal & Contractions */}
+          <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Fetal Movement & Contractions</h3>
+              <button onClick={() => toggleSection('fetal')} style={{ background: 'none', border: 'none', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', color: '#0284c7' }}>
+                {collapsedSections.fetal ? '+' : '−'}
+              </button>
+            </div>
+
+            {!collapsedSections.fetal && (
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '10px' }}>Status: <strong>{fetalStatus}</strong></p>
+                {!isContractionActive ? (
+                  <button onClick={startContractionTimer} style={{ background: '#0284c7', color: '#FFFFFF', border: 'none', width: '90px', height: '90px', borderRadius: '50%', fontWeight: '700', fontSize: '0.7rem', cursor: 'pointer', margin: '0 auto' }}>
+                    START CONTRACTION
+                  </button>
+                ) : (
+                  <button onClick={stopContractionTimer} style={{ background: '#EF4444', color: '#FFFFFF', border: 'none', width: '90px', height: '90px', borderRadius: '50%', fontWeight: '700', fontSize: '0.7rem', cursor: 'pointer', margin: '0 auto' }}>
+                    STOP TIMER
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
+
+      {/* NON-EXPECTANT LIFE STAGE FALLBACK */}
+      {lifeStage !== 'expectant' && (
+        <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '24px', textAlign: 'center', color: '#64748B', fontSize: '0.85rem' }}>
+          Standard cycle and symptom tracking logs for the selected life stage are active. Switch to <strong>Expectant Mother</strong> to view maternal tools.
+        </div>
+      )}
     </div>
   );
 }

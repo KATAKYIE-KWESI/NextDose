@@ -8,7 +8,6 @@ import Screening from './pages/Screening.jsx';
 import Specialists from './pages/Specialists.jsx';
 import Bookings from './pages/Bookings.jsx';
 import HerSignalBrand from './pages/HerSignalBrand.jsx';
-import MaternalJourney from './pages/MaternalJourney.jsx';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -44,7 +43,6 @@ function Topbar() {
         <nav className="nav-links">
           <NavLink to="/">Dashboard</NavLink>
           <NavLink to="/tracker">Tracker</NavLink>
-          <NavLink to="/maternal">Maternal Journey</NavLink>
           <NavLink to="/screening">Screening</NavLink>
           <NavLink to="/specialists">Specialists</NavLink>
           <NavLink to="/bookings">My Consults</NavLink>
@@ -95,15 +93,6 @@ export default function App() {
             element={
               <PrivateRoute>
                 <CycleTracker />
-              </PrivateRoute>
-            }
-          />
-          
-          <Route
-            path="/maternal"
-            element={
-              <PrivateRoute>
-                <MaternalJourney />
               </PrivateRoute>
             }
           />
