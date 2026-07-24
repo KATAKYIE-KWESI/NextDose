@@ -192,19 +192,19 @@ export default function Dashboard() {
   const riverTheme = getRiverTheme();
 
   return (
-    <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', color: '#334155', backgroundColor: '#FBFBFA' }}>
+    <div className={`dashboard-container dashboard-rich ${discreetMode ? 'discreet-active' : ''}`} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '16px 12px', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', color: '#334155', backgroundColor: '#FBFBFA', overflowX: 'hidden' }}>
       
       {/* HERO / GREETING BANNER */}
-      <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F0F9FF', padding: '20px', borderRadius: '16px', border: '1px solid #BAE6FD' }}>
-        <div className="hero-text" style={{ flex: '1 1 250px' }}>
-          <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '0 0 6px 0', fontWeight: '700', color: '#0369A1' }}>
+      <header className="dashboard-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F0F9FF', padding: '20px', borderRadius: '16px', border: '1px solid #BAE6FD', boxSizing: 'border-box' }}>
+        <div className="hero-text" style={{ flex: '1 1 250px', minWidth: 0 }}>
+          <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '0 0 6px 0', fontWeight: '700', color: '#0369A1', wordBreak: 'break-word' }}>
             Good morning, {firstName}
           </h1>
-          <p className="greeting-subtitle" style={{ fontSize: '0.95rem', color: '#0284C7', margin: 0 }}>
+          <p className="greeting-subtitle" style={{ fontSize: '0.95rem', color: '#0284C7', margin: 0, wordBreak: 'break-word' }}>
             Your body is in the <span style={{ color: '#0369A1', fontWeight: '600' }}>{discreetMode ? 'protected phase' : currentPhase.toLowerCase()}</span>.
           </p>
         </div>
-        <div className="hero-avatar" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div className="hero-avatar" style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #E0F2FE 100%, #BAE6FD 0%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(3, 105, 161, 0.08)' }}>
             <span style={{ fontSize: '24px' }}>🌅</span>
           </div>
@@ -212,7 +212,7 @@ export default function Dashboard() {
       </header>
 
       {/* SIGNAL RIVER FEATURED COMPONENT */}
-      <div className="card signal-river-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(100, 116, 139, 0.04)', marginBottom: '20px', padding: '20px', borderRadius: '16px', boxSizing: 'border-box' }}>
+      <div className="card signal-river-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(100, 116, 139, 0.04)', marginBottom: '20px', padding: '20px', borderRadius: '16px', boxSizing: 'border-box', overflow: 'hidden' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0, color: '#1E293B' }}>Signal River</h2>
@@ -228,105 +228,105 @@ export default function Dashboard() {
         </p>
 
         {/* Graphical River Wave UI Simulation */}
-        <div style={{ position: 'relative', background: riverTheme.gradient, borderRadius: '12px', padding: '20px 10px 16px 10px', marginBottom: '16px', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', background: riverTheme.gradient, borderRadius: '12px', padding: '20px 8px 16px 8px', marginBottom: '16px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           
           {/* SVG Wave Line Overlay */}
-          <div style={{ position: 'absolute', top: '35px', left: 0, right: 0, height: '40px', pointerEvents: 'none', opacity: 0.4 }}>
+          <div style={{ position: 'absolute', top: '35px', left: 0, right: 0, height: '40px', pointerEvents: 'none', opacity: 0.4, minWidth: '320px' }}>
             <svg viewBox="0 0 500 50" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
               <path d="M 0,25 Q 60,5 125,25 T 250,25 T 375,15 T 500,25" fill="none" stroke={riverTheme.waveStroke} strokeWidth="4" strokeLinecap="round" />
             </svg>
           </div>
 
           {/* Timeline Nodes / Markers */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2, textAlign: 'center', gap: '4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2, textAlign: 'center', gap: '6px', minWidth: '320px' }}>
             
             {/* Day -5 */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: '#0ea5e9', fontWeight: '600', marginBottom: '4px' }}>Fatigue</span>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: '#0ea5e9', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>Fatigue</span>
+              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                 ⚡
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Thu</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 9</span>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>Thu</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>May 9</span>
             </div>
 
             {/* Day -4 */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: '600', marginBottom: '4px' }}>Poor sleep</span>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: '#16a34a', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>Poor sleep</span>
+              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                 🌙
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Fri</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 10</span>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>Fri</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>May 10</span>
             </div>
 
             {/* Day -3 (Headache below) */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
-              <div style={{ height: '28px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
+              <div style={{ height: '26px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
               <div style={{ width: '2px', height: '8px', background: 'transparent', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Sat</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 11</span>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>Sat</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>May 11</span>
               {/* Lower node for Headache */}
               <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#F1F5F9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', border: '1px solid #CBD5E1' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#F1F5F9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', border: '1px solid #CBD5E1' }}>
                   👤
                 </div>
-                <span style={{ fontSize: '0.68rem', color: '#475569', marginTop: '2px' }}>Headache</span>
+                <span style={{ fontSize: '0.6rem', color: '#475569', marginTop: '2px', whiteSpace: 'nowrap' }}>Headache</span>
               </div>
             </div>
 
             {/* Day -2 */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
-              <div style={{ height: '28px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
+              <div style={{ height: '26px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Sun</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 12</span>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>Sun</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>May 12</span>
             </div>
 
             {/* Day -1 */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: '#15803d', fontWeight: '600', marginBottom: '4px' }}>Mild cramps</span>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: '#15803d', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>Mild cramps</span>
+              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                 〰️
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Mon</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 13</span>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>Mon</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>May 13</span>
             </div>
 
             {/* Day 0 */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: '#0d9488', fontWeight: '600', marginBottom: '4px' }}>Ovulation window starts</span>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#ccfbf1', color: '#115e59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: '#0d9488', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>Ovulation window</span>
+              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#ccfbf1', color: '#115e59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                 ◎
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>Tue</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#334155', display: 'block' }}>May 14</span>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>Tue</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>May 14</span>
             </div>
 
             {/* Today */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#0ea5e9', marginBottom: '16px', border: '2px solid #fff', boxShadow: '0 0 0 2px #0ea5e9' }}></div>
+            <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.65rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#0ea5e9', marginBottom: '14px', border: '2px solid #fff', boxShadow: '0 0 0 2px #0ea5e9' }}></div>
               <div style={{ width: '2px', height: '12px', background: '#0ea5e9', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.72rem', color: '#0ea5e9', fontWeight: '700', display: 'block' }}>Today</span>
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#0ea5e9', display: 'block' }}>May 15</span>
+              <span style={{ fontSize: '0.68rem', color: '#0ea5e9', fontWeight: '700', display: 'block' }}>Today</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#0ea5e9', display: 'block', whiteSpace: 'nowrap' }}>May 15</span>
             </div>
 
           </div>
         </div>
 
         {/* Signal Flow Interpretation Box */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#F0F9FF', padding: '12px 14px', borderRadius: '10px', border: '1px solid #BAE6FD' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#F0F9FF', padding: '12px 14px', borderRadius: '10px', border: '1px solid #BAE6FD', boxSizing: 'border-box' }}>
           <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
             🌊
           </div>
-          <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: '1.4' }}>
+          <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: '1.4', overflowWrap: 'break-word', minWidth: 0, flex: 1 }}>
             <strong>Your recent signal flow:</strong> fatigue and poor sleep appeared together twice this week. Your flow is calmer today.
             <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: '2px', fontStyle: 'italic' }}>
               This is a personalized interpretation, not a medical diagnosis.
@@ -341,7 +341,7 @@ export default function Dashboard() {
           <div style={{ background: '#22c55e', color: '#fff', fontSize: '22px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px', flexShrink: 0, boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)' }} title="Supportive Companion">
             👩‍❤️‍👩
           </div>
-          <div style={{ flex: '1 1 250px' }}>
+          <div style={{ flex: '1 1 250px', minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
               <span style={{ background: '#fff', color: '#15803D', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #BBF7D0' }}>
                 Aura AI · Supportive Sisterhood
@@ -354,7 +354,7 @@ export default function Dashboard() {
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#166534', marginBottom: '4px' }}>
               Your Safe Space Guidance
             </h2>
-            <p style={{ fontSize: '14px', color: '#166534', lineHeight: '1.4', fontStyle: 'italic', margin: 0, overflowWrap: 'break-word' }}>
+            <p style={{ fontSize: '14px', color: '#166534', lineHeight: '1.4', fontStyle: 'italic', margin: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
               "{auraInsight}"
             </p>
           </div>
@@ -368,34 +368,34 @@ export default function Dashboard() {
           <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: '600' }}>Edit</Link>
         </div>
 
-        <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+        <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
           
-          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
               🩸
             </div>
-            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log symptoms</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>Log symptoms</span>
           </Link>
 
-          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#F8FAFC', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
               😊
             </div>
-            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log mood</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>Log mood</span>
           </Link>
 
-          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#ccfbf1', color: '#115e59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
               🌡️
             </div>
-            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log BBT</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>Log BBT</span>
           </Link>
 
-          <Link to="/tracker" className="card" style={{ padding: '16px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
               💊
             </div>
-            <span style={{ fontSize: '0.88rem', fontWeight: '600' }}>Log medication</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>Log medication</span>
           </Link>
 
         </div>
@@ -408,19 +408,19 @@ export default function Dashboard() {
           <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: '600' }}>View all</Link>
         </div>
 
-        <div className="card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>📅</div>
-            <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B' }}>Next Period Expected</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>In {daysUntilNext} days ({currentPhase === 'Menstrual Phase' ? 'Active now' : 'On track'})</div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B', wordBreak: 'break-word' }}>Next Period Expected</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>In {daysUntilNext} days ({currentPhase === 'Menstrual Phase' ? 'Active now' : 'On track'})</div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🩺</div>
-            <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B' }}>Wellness Checkup</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Scheduled via Screening Hub</div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B', wordBreak: 'break-word' }}>Wellness Checkup</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>Scheduled via Screening Hub</div>
             </div>
           </div>
         </div>

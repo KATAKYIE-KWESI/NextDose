@@ -107,8 +107,8 @@ function Topbar() {
   if (!user) return null;
 
   return (
-    <header className="navbar" style={{ position: 'relative' }}>
-      <div className="nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', position: 'relative' }}>
+    <header className="navbar" style={{ position: 'sticky', top: 0, zIndex: 1000, background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', width: '100%', boxSizing: 'border-box' }}>
+      <div className="nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '12px 16px', boxSizing: 'border-box' }}>
         
         {/* Brand Logo & Name */}
         <Link to="/" className="nav-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
@@ -166,7 +166,7 @@ function Topbar() {
             position: 'absolute',
             top: '100%',
             left: 0,
-            right: 0,
+            width: '100%',
             background: '#FFFFFF',
             borderBottom: '1px solid #E2E8F0',
             boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
@@ -174,7 +174,8 @@ function Topbar() {
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
-            zIndex: 100
+            zIndex: 99,
+            boxSizing: 'border-box'
           }}
         >
           <NavLink to="/" onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
@@ -216,9 +217,9 @@ export default function App() {
   const { user } = useAuth();
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
       <Topbar />
-      <main className="app-content">
+      <main className="app-content" style={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
