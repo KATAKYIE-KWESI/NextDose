@@ -2,6 +2,67 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 
+function Logo({ size = 40, className = '' }) {
+  return (
+    <div 
+      className={className}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '50%',
+        background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
+        boxShadow: '0 2px 6px rgba(3, 105, 161, 0.08)',
+        border: '1px solid #BAE6FD',
+        boxSizing: 'border-box',
+        padding: `${size * 0.18}px`
+      }}
+    >
+      <svg 
+        viewBox="0 0 100 100" 
+        width="100%" 
+        height="100%" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0369A1" />
+            <stop offset="50%" stopColor="#2E7D32" />
+            <stop offset="100%" stopColor="#7C3AED" />
+          </linearGradient>
+        </defs>
+        <circle 
+          cx="50" 
+          cy="50" 
+          r="44" 
+          stroke="url(#waveGradient)" 
+          strokeWidth="5" 
+          strokeLinecap="round" 
+          strokeDasharray="220"
+          strokeDashoffset="30"
+          opacity="0.85"
+        />
+        <path 
+          d="M 18 52 C 30 38, 40 62, 52 50 C 64 38, 74 62, 82 48" 
+          stroke="url(#waveGradient)" 
+          strokeWidth="6" 
+          strokeLinecap="round" 
+        />
+        <path 
+          d="M 22 66 C 34 52, 44 76, 56 64 C 68 52, 76 72, 84 60" 
+          stroke="url(#waveGradient)" 
+          strokeWidth="4" 
+          strokeLinecap="round" 
+          opacity="0.5"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export default function Signup() {
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -35,7 +96,8 @@ export default function Signup() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        backgroundColor: '#F9F8F6'
       }}
     >
       <div 
@@ -54,21 +116,7 @@ export default function Signup() {
         
         {/* Circular Logo Monogram Area */}
         <div className="auth-avatar-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-          <div 
-            className="auth-logo-ring"
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              background: '#fce7f3',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '2px solid #fbcfe8'
-            }}
-          >
-            <span className="auth-logo-initials" style={{ fontWeight: '700', color: '#be185d', fontSize: '1.1rem' }}>HS</span>
-          </div>
+          <Logo size={56} />
         </div>
 
         {/* Brand & Heading Header */}
@@ -79,8 +127,8 @@ export default function Signup() {
               display: 'inline-block',
               fontSize: '0.85rem',
               fontWeight: '700',
-              color: '#be185d',
-              background: '#fce7f3',
+              color: '#2B6CB0',
+              background: '#E0F2FE',
               padding: '2px 10px',
               borderRadius: '20px',
               marginBottom: '8px'
@@ -132,7 +180,8 @@ export default function Signup() {
                 border: '1px solid #CBD5E1',
                 fontSize: '0.95rem',
                 boxSizing: 'border-box',
-                outline: 'none'
+                outline: 'none',
+                backgroundColor: '#FAFAF9'
               }}
             />
           </div>
@@ -155,7 +204,8 @@ export default function Signup() {
                 border: '1px solid #CBD5E1',
                 fontSize: '0.95rem',
                 boxSizing: 'border-box',
-                outline: 'none'
+                outline: 'none',
+                backgroundColor: '#FAFAF9'
               }}
             />
           </div>
@@ -179,7 +229,8 @@ export default function Signup() {
                 border: '1px solid #CBD5E1',
                 fontSize: '0.95rem',
                 boxSizing: 'border-box',
-                outline: 'none'
+                outline: 'none',
+                backgroundColor: '#FAFAF9'
               }}
             />
           </div>
@@ -201,7 +252,8 @@ export default function Signup() {
                 border: '1px solid #CBD5E1',
                 fontSize: '0.95rem',
                 boxSizing: 'border-box',
-                outline: 'none'
+                outline: 'none',
+                backgroundColor: '#FAFAF9'
               }}
             />
           </div>
@@ -215,12 +267,13 @@ export default function Signup() {
               padding: '12px',
               borderRadius: '8px',
               border: 'none',
-              background: '#ec4899',
+              background: '#319795',
               color: '#FFFFFF',
               fontWeight: '600',
               fontSize: '0.95rem',
               cursor: busy ? 'not-allowed' : 'pointer',
-              marginTop: '6px'
+              marginTop: '6px',
+              boxShadow: '0 2px 4px rgba(49, 151, 149, 0.2)'
             }}
           >
             {busy ? 'Creating account…' : 'Sign up'}
@@ -229,7 +282,7 @@ export default function Signup() {
 
         <p className="auth-footer" style={{ textAlign: 'center', marginTop: '20px', fontSize: '0.88rem', color: '#64748B' }}>
           Already have an account?{' '}
-          <Link to="/login" className="auth-link" style={{ color: '#be185d', fontWeight: '600', textDecoration: 'none' }}>
+          <Link to="/login" className="auth-link" style={{ color: '#3B82F6', fontWeight: '600', textDecoration: 'none' }}>
             Log in
           </Link>
         </p>

@@ -7,6 +7,7 @@ export default function CycleTracker() {
     new Date().toISOString().split('T')[0]
   );
   const [activeTab, setActiveTab] = useState('menstruation'); // menstruation, pregnancy, parenting
+  const [userPersona, setUserPersona] = useState('adolescent'); // adolescent, trying, pregnant, parent
   const [logs, setLogs] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -14,12 +15,11 @@ export default function CycleTracker() {
   // Visibility toggles for optional/sensitive categories
   const [showSexualHealth, setShowSexualHealth] = useState(true);
   const [showBreastAwareness, setShowBreastAwareness] = useState(true);
-  const [showNotesAttachments, setShowNotesAttachments] = useState(true);
 
   // Complete state matching every section in your specification
   const [activeLog, setActiveLog] = useState({
-    flow: '', // e.g., 'Period started today', 'Light flow', etc.
-    symptoms: [], // array of selected items from physical, vaginal discharge, mood, etc.
+    flow: '',
+    symptoms: [],
     mood: '',
     painSeverity: '',
     painLocation: '',
@@ -120,6 +120,7 @@ export default function CycleTracker() {
       await api.addCycleLog({
         date: selectedDateStr,
         type: 'cycle_entry',
+        persona: userPersona,
         ...activeLog,
       });
       await fetchLogs();
@@ -130,7 +131,6 @@ export default function CycleTracker() {
     }
   };
 
-  // Icon definitions matching the UI image style
   const physicalSymptomsList = [
     { name: 'no symptoms', icon: '👍' },
     { name: 'Backache', icon: '👤' },
@@ -151,56 +151,109 @@ export default function CycleTracker() {
   ];
 
   const dischargeIconsList = [
-    { name: 'Normal discharge', colorBg: '#e2e8f0' },
-    { name: 'Dryness', colorBg: '#cbd5e1' },
-    { name: 'Watery, creamy or stretchy discharge', colorBg: '#f472b6' },
-    { name: 'Unusual colour or smell', colorBg: '#fb923c' },
-    { name: 'Itching, irritation or burning', colorBg: '#f87171' },
-    { name: 'Possible infection symptoms', colorBg: '#ef4444' },
-    { name: 'brown discharge', colorBg: '#b45309' },
-    { name: 'Bleeding', colorBg: '#be185d' },
-    { name: 'There is blood clot', colorBg: '#991b1b' },
-    { name: 'Increased leucorrhea', colorBg: '#fbcfe8' },
+    { name: 'Normal discharge', colorBg: '#fed7aa' },
+    { name: 'Dryness', colorBg: '#fdba74' },
+    { name: 'Watery, creamy or stretchy discharge', colorBg: '#fb923c' },
+    { name: 'Unusual colour or smell', colorBg: '#f97316' },
+    { name: 'Itching, irritation or burning', colorBg: '#ea580c' },
+    { name: 'Possible infection symptoms', colorBg: '#c2410c', urgent: true },
+    { name: 'brown discharge', colorBg: '#9a3412' },
+    { name: 'Bleeding', colorBg: '#f43f5e', urgent: true },
+    { name: 'There is blood clot', colorBg: '#e11d48', urgent: true },
+    { name: 'Increased leucorrhea', colorBg: '#fb923c' },
   ];
 
   return (
-    <div style={{ width: '100%', maxWidth: '850px', margin: '0 auto', padding: '20px 16px', boxSizing: 'border-box', color: '#1E293B', fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ width: '100%', maxWidth: '850px', margin: '0 auto', padding: '20px 16px', boxSizing: 'border-box', color: '#431407', fontFamily: 'system-ui, sans-serif', backgroundColor: '#FFF7ED', borderRadius: '24px' }}>
       
-      {/* TOP SUB-NAV BAR */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', fontSize: '0.9rem', fontWeight: '600', color: '#64748B', marginBottom: '20px', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px' }}>
-        <button 
-          onClick={() => setActiveTab('menstruation')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'menstruation' ? '#be185d' : '#64748B', fontWeight: activeTab === 'menstruation' ? '700' : '500', borderBottom: activeTab === 'menstruation' ? '2px solid #be185d' : 'none', paddingBottom: '4px' }}
-        >
-          menstruation
-        </button>
-        <button 
-          onClick={() => setActiveTab('pregnancy')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'pregnancy' ? '#be185d' : '#64748B', fontWeight: activeTab === 'pregnancy' ? '700' : '500', borderBottom: activeTab === 'pregnancy' ? '2px solid #be185d' : 'none', paddingBottom: '4px' }}
-        >
-          Preparing for pregnancy
-        </button>
-        <button 
-          onClick={() => setActiveTab('parenting')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'parenting' ? '#be185d' : '#64748B', fontWeight: activeTab === 'parenting' ? '700' : '500', borderBottom: activeTab === 'parenting' ? '2px solid #be185d' : 'none', paddingBottom: '4px' }}
-        >
-          parenting
-        </button>
-      </div>
-
-      {/* MONTH HEADER & CALENDAR */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-        <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', color: '#1E293B' }}>
-          &lt; {monthNames[month]} {year}
-        </h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF', cursor: 'pointer' }}>&lt;</button>
-          <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF', cursor: 'pointer' }}>&gt;</button>
+      {/* PERSONA SELECTION SELECTOR */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '16px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(234,88,12,0.04)' }}>
+        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#9A3412', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Select Your Current Life Stage Experience:
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
+          {[
+            { id: 'adolescent', label: 'Adolescent / Young Girl', icon: '🌱' },
+            { id: 'trying', label: 'Preparing to Conceive', icon: '🌸' },
+            { id: 'pregnant', label: 'Expectant Mother', icon: '🤰' },
+            { id: 'parent', label: 'Parenting / Postpartum', icon: '👶' },
+          ].map((persona) => {
+            const isSelected = userPersona === persona.id;
+            return (
+              <button
+                key={persona.id}
+                onClick={() => setUserPersona(persona.id)}
+                style={{
+                  background: isSelected ? '#FFEDD5' : '#FFF7ED',
+                  border: isSelected ? '2px solid #F97316' : '1px solid #FED7AA',
+                  color: isSelected ? '#C2410C' : '#9A3412',
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  textAlign: 'left'
+                }}
+              >
+                <span style={{ fontSize: '1rem' }}>{persona.icon}</span>
+                <span>{persona.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '16px', marginBottom: '24px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', fontWeight: '700', color: '#94A3B8', fontSize: '0.8rem', marginBottom: '10px' }}>
+      {/* TOP SUB-NAV BAR */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', fontSize: '0.9rem', fontWeight: '600', color: '#9A3412', marginBottom: '20px', borderBottom: '1px solid #FFEDD5', paddingBottom: '12px' }}>
+        <button 
+          onClick={() => setActiveTab('menstruation')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'menstruation' ? '#C2410C' : '#9A3412', fontWeight: activeTab === 'menstruation' ? '700' : '500', borderBottom: activeTab === 'menstruation' ? '2px solid #C2410C' : 'none', paddingBottom: '4px' }}
+        >
+          menstruation & cycle
+        </button>
+        <button 
+          onClick={() => setActiveTab('pregnancy')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'pregnancy' ? '#C2410C' : '#9A3412', fontWeight: activeTab === 'pregnancy' ? '700' : '500', borderBottom: activeTab === 'pregnancy' ? '2px solid #C2410C' : 'none', paddingBottom: '4px' }}
+        >
+          pregnancy wellness
+        </button>
+        <button 
+          onClick={() => setActiveTab('parenting')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'parenting' ? '#C2410C' : '#9A3412', fontWeight: activeTab === 'parenting' ? '700' : '500', borderBottom: activeTab === 'parenting' ? '2px solid #C2410C' : 'none', paddingBottom: '4px' }}
+        >
+          postpartum & parenting
+        </button>
+      </div>
+
+      {/* DYNAMIC CONTENT BASED ON STAGE */}
+      {userPersona === 'pregnant' && (
+        <div style={{ background: '#FFF1F2', border: '1px solid #FECDD3', color: '#9F1239', padding: '16px', borderRadius: '16px', marginBottom: '20px', fontSize: '0.9rem' }}>
+          <span style={{ fontWeight: '700' }}>🤰 Expectant Mother View Active:</span> Tracking features optimized for pregnancy vitals, fetal movement, and clinical check-ins.
+        </div>
+      )}
+
+      {userPersona === 'parent' && (
+        <div style={{ background: '#FAF5FF', border: '1px solid #F3E8FF', color: '#6B21A8', padding: '16px', borderRadius: '16px', marginBottom: '20px', fontSize: '0.9rem' }}>
+          <span style={{ fontWeight: '700' }}>👶 Postpartum & Parenting View Active:</span> Focused on recovery tracking, infant feeding schedules, and maternal well-being.
+        </div>
+      )}
+
+      {/* MONTH HEADER & CALENDAR */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+        <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '800', color: '#7C2D12' }}>
+          &lt; {monthNames[month]} {year}
+        </h2>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #FED7AA', background: '#FFF', cursor: 'pointer', color: '#7C2D12' }}>&lt;</button>
+          <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #FED7AA', background: '#FFF', cursor: 'pointer', color: '#7C2D12' }}>&gt;</button>
+        </div>
+      </div>
+
+      <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '16px', marginBottom: '24px', boxShadow: '0 2px 4px rgba(234,88,12,0.02)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', fontWeight: '700', color: '#C2410C', fontSize: '0.8rem', marginBottom: '10px' }}>
           <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
@@ -218,9 +271,9 @@ export default function CycleTracker() {
                 style={{
                   aspectRatio: '1',
                   borderRadius: '12px',
-                  border: isSelected ? '2px solid #be185d' : '1px solid #F1F5F9',
-                  background: isSelected ? '#fce7f3' : hasLog ? '#fdf2f8' : '#F8FAFC',
-                  color: isSelected ? '#be185d' : '#334155',
+                  border: isSelected ? '2px solid #F97316' : '1px solid #FFEDD5',
+                  background: isSelected ? '#FFEDD5' : hasLog ? '#FFFAF0' : '#FFF7ED',
+                  color: isSelected ? '#C2410C' : '#431407',
                   fontWeight: '700',
                   fontSize: '0.88rem',
                   cursor: 'pointer',
@@ -231,17 +284,17 @@ export default function CycleTracker() {
                 }}
               >
                 <span>{dayNum}</span>
-                {hasLog && <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#be185d', marginTop: '2px' }} />}
+                {hasLog && <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#EA580C', marginTop: '2px' }} />}
               </button>
             );
           })}
         </div>
 
         {/* CALENDAR LEGEND */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '16px', fontSize: '0.72rem', color: '#64748B', flexWrap: 'wrap' }}>
-          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#be185d', borderRadius: '50%' }} /> Confirmed/predicted menstrual days</span>
-          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#f472b6', borderRadius: '50%' }} /> Fertile window</span>
-          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#9333ea', borderRadius: '50%' }} /> Predicted ovulation day</span>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '16px', fontSize: '0.72rem', color: '#9A3412', flexWrap: 'wrap' }}>
+          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#F97316', borderRadius: '50%' }} /> Menstrual days</span>
+          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#FDBA74', borderRadius: '50%' }} /> Fertile window</span>
+          <span><span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#FB923C', borderRadius: '50%' }} /> Ovulation day</span>
         </div>
       </div>
 
@@ -250,23 +303,23 @@ export default function CycleTracker() {
 
       {/* RECORDING SECTIONS DIVIDED INTO CLEAR CATEGORIES */}
       <div style={{ display: 'grid', gap: '20px' }}>
-        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#1E293B' }}>
-          Recording Options for: <span style={{ color: '#be185d' }}>{selectedDateStr}</span>
+        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#7C2D12' }}>
+          Recording Options for: <span style={{ color: '#F97316' }}>{selectedDateStr}</span>
         </h3>
 
         {/* 1. PERIOD AND BLEEDING */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Period and bleeding</h4>
+        <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '20px' }}>
+          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Period and bleeding</h4>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
             <button 
               onClick={() => setActiveLog(p => ({ ...p, flow: 'Period started today' }))}
-              style={{ background: activeLog.flow === 'Period started today' ? '#be185d' : '#fce7f3', color: activeLog.flow === 'Period started today' ? '#FFF' : '#be185d', border: '1px solid #fbcfe8', padding: '8px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
+              style={{ background: activeLog.flow === 'Period started today' ? '#F97316' : '#FFEDD5', color: activeLog.flow === 'Period started today' ? '#FFF' : '#C2410C', border: '1px solid #FED7AA', padding: '8px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
             >
               + Period started today
             </button>
             <button 
               onClick={() => setActiveLog(p => ({ ...p, flow: 'Period ended today' }))}
-              style={{ background: activeLog.flow === 'Period ended today' ? '#475569' : '#F1F5F9', color: activeLog.flow === 'Period ended today' ? '#FFF' : '#475569', border: '1px solid #CBD5E1', padding: '8px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
+              style={{ background: activeLog.flow === 'Period ended today' ? '#9A3412' : '#FFF7ED', color: activeLog.flow === 'Period ended today' ? '#FFF' : '#9A3412', border: '1px solid #FED7AA', padding: '8px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
             >
               + Period ended today
             </button>
@@ -274,6 +327,7 @@ export default function CycleTracker() {
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {['Spotting', 'Light flow', 'Medium flow', 'Heavy flow', 'Blood clots', 'Bleeding between periods', 'Bleeding after sex'].map((item) => {
               const active = activeLog.flow === item;
+              const isUrgent = item.includes('Bleeding') || item.includes('clots');
               return (
                 <button
                   key={item}
@@ -281,15 +335,15 @@ export default function CycleTracker() {
                   style={{
                     padding: '8px 14px',
                     borderRadius: '20px',
-                    border: active ? '1px solid #be185d' : '1px solid #CBD5E1',
-                    background: active ? '#be185d' : '#F8FAFC',
-                    color: active ? '#FFF' : '#334155',
+                    border: isUrgent ? '1px solid #EF4444' : active ? '1px solid #F97316' : '1px solid #FED7AA',
+                    background: isUrgent && active ? '#EF4444' : active ? '#F97316' : '#FFF7ED',
+                    color: active ? '#FFF' : isUrgent ? '#B91C1C' : '#431407',
                     fontSize: '0.82rem',
                     fontWeight: '600',
                     cursor: 'pointer'
                   }}
                 >
-                  + {item}
+                  {isUrgent ? '⚠️ ' : '+ '}{item}
                 </button>
               );
             })}
@@ -297,8 +351,8 @@ export default function CycleTracker() {
         </div>
 
         {/* 2. PAIN AND PHYSICAL SYMPTOMS */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Pain and physical symptoms</h4>
+        <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '20px' }}>
+          <h4 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Pain and physical symptoms</h4>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(85px, 1fr))', gap: '14px', marginBottom: '16px' }}>
             {physicalSymptomsList.map((item) => {
@@ -314,8 +368,8 @@ export default function CycleTracker() {
                       width: '52px',
                       height: '52px',
                       borderRadius: '50%',
-                      background: isSelected ? '#fce7f3' : '#F8FAFC',
-                      border: isSelected ? '2px solid #be185d' : '1px solid #E2E8F0',
+                      background: isSelected ? '#FFEDD5' : '#FFF7ED',
+                      border: isSelected ? '2px solid #F97316' : '1px solid #FFEDD5',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -325,7 +379,7 @@ export default function CycleTracker() {
                   >
                     {item.icon}
                   </div>
-                  <span style={{ fontSize: '0.7rem', color: isSelected ? '#be185d' : '#64748B', textAlign: 'center', fontWeight: isSelected ? '700' : '500', lineHeight: '1.1' }}>
+                  <span style={{ fontSize: '0.7rem', color: isSelected ? '#C2410C' : '#9A3412', textAlign: 'center', fontWeight: isSelected ? '700' : '500', lineHeight: '1.1' }}>
                     {item.name}
                   </span>
                 </button>
@@ -333,34 +387,33 @@ export default function CycleTracker() {
             })}
           </div>
 
-          {/* Sub-inputs for Pain Severity & Medication */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '14px', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '14px', borderTop: '1px solid #FFEDD5', paddingTop: '14px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#64748B', marginBottom: '4px' }}>Pain severity and location</label>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#9A3412', marginBottom: '4px' }}>Pain severity and location</label>
               <input
                 type="text"
                 placeholder="e.g., Mild, Lower abdomen"
                 value={activeLog.painLocation}
                 onChange={(e) => setActiveLog(p => ({ ...p, painLocation: e.target.value }))}
-                style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #FED7AA', fontSize: '0.85rem', boxSizing: 'border-box' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#64748B', marginBottom: '4px' }}>Pain medication & effectiveness</label>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#9A3412', marginBottom: '4px' }}>Pain medication & effectiveness</label>
               <input
                 type="text"
                 placeholder="e.g., Ibuprofen - Effective"
                 value={activeLog.painMedication}
                 onChange={(e) => setActiveLog(p => ({ ...p, painMedication: e.target.value }))}
-                style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #FED7AA', fontSize: '0.85rem', boxSizing: 'border-box' }}
               />
             </div>
           </div>
         </div>
 
         {/* 3. VAGINAL DISCHARGE AND REPRODUCTIVE SYMPTOMS */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Vaginal discharge and reproductive symptoms</h4>
+        <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '20px' }}>
+          <h4 style={{ margin: '0 0 16px 0', fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Vaginal discharge and reproductive symptoms</h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(95px, 1fr))', gap: '14px' }}>
             {dischargeIconsList.map((item) => {
               const isSelected = activeLog.symptoms.includes(item.name);
@@ -376,7 +429,7 @@ export default function CycleTracker() {
                       height: '48px',
                       borderRadius: '50%',
                       background: item.colorBg,
-                      border: isSelected ? '3px solid #be185d' : 'none',
+                      border: isSelected ? '3px solid #7C2D12' : item.urgent ? '2px dashed #EF4444' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -386,10 +439,10 @@ export default function CycleTracker() {
                       marginBottom: '6px'
                     }}
                   >
-                    {isSelected ? '✓' : ''}
+                    {item.urgent ? '⚠️' : isSelected ? '✓' : ''}
                   </div>
-                  <span style={{ fontSize: '0.7rem', color: isSelected ? '#be185d' : '#64748B', textAlign: 'center', fontWeight: isSelected ? '700' : '500', lineHeight: '1.1' }}>
-                    {item.name}
+                  <span style={{ fontSize: '0.7rem', color: isSelected ? '#7C2D12' : '#9A3412', textAlign: 'center', fontWeight: isSelected ? '700' : '500', lineHeight: '1.1' }}>
+                    {item.name} {item.urgent && '(Urgent)'}
                   </span>
                 </button>
               );
@@ -398,8 +451,8 @@ export default function CycleTracker() {
         </div>
 
         {/* 4. MOOD AND MENTAL WELLBEING */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Mood and mental wellbeing</h4>
+        <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '20px' }}>
+          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Mood and mental wellbeing</h4>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {['Happy or calm', 'Energetic or motivated', 'Sensitive or irritable', 'Anxious or stressed', 'Low mood', 'Difficulty concentrating', 'Mood swings'].map((m) => {
               const active = activeLog.mood === m;
@@ -410,9 +463,9 @@ export default function CycleTracker() {
                   style={{
                     padding: '8px 14px',
                     borderRadius: '20px',
-                    border: active ? '1px solid #be185d' : '1px solid #CBD5E1',
-                    background: active ? '#be185d' : '#F8FAFC',
-                    color: active ? '#FFF' : '#334155',
+                    border: active ? '1px solid #F97316' : '1px solid #FED7AA',
+                    background: active ? '#F97316' : '#FFF7ED',
+                    color: active ? '#FFF' : '#431407',
                     fontSize: '0.82rem',
                     fontWeight: '600',
                     cursor: 'pointer'
@@ -425,19 +478,19 @@ export default function CycleTracker() {
           </div>
         </div>
 
-        {/* 5. OPTIONAL: SEXUAL AND FERTILITY INFORMATION (Removable) */}
+        {/* 5. OPTIONAL: SEXUAL AND FERTILITY INFORMATION */}
         {showSexualHealth && (
-          <div style={{ background: '#FFFFFF', border: '1px dashed #be185d', borderRadius: '16px', padding: '20px', position: 'relative' }}>
+          <div style={{ background: '#FFFFFF', border: '1px dashed #FED7AA', borderRadius: '16px', padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Sexual and fertility information</h4>
+              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Sexual and fertility information</h4>
               <button 
                 onClick={() => setShowSexualHealth(false)}
-                style={{ background: 'none', border: 'none', color: '#94A3B8', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
+                style={{ background: 'none', border: 'none', color: '#9A3412', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
               >
                 Remove category ✕
               </button>
             </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {['Sexual activity', 'Protection or contraception used', 'Libido', 'Pain during sex', 'Pregnancy test result', 'Ovulation test result', 'Trying to conceive status'].map((item) => {
                 const isSelected = activeLog.symptoms.includes(item);
                 return (
@@ -447,9 +500,9 @@ export default function CycleTracker() {
                     style={{
                       padding: '8px 14px',
                       borderRadius: '20px',
-                      border: isSelected ? '1px solid #be185d' : '1px solid #CBD5E1',
-                      background: isSelected ? '#be185d' : '#F8FAFC',
-                      color: isSelected ? '#FFF' : '#334155',
+                      border: isSelected ? '1px solid #F97316' : '1px solid #FED7AA',
+                      background: isSelected ? '#F97316' : '#FFF7ED',
+                      color: isSelected ? '#FFF' : '#431407',
                       fontSize: '0.82rem',
                       fontWeight: '600',
                       cursor: 'pointer'
@@ -463,24 +516,25 @@ export default function CycleTracker() {
           </div>
         )}
 
-        {/* 6. OPTIONAL: BREAST AWARENESS (Removable & Clinical Safeguard) */}
+        {/* 6. OPTIONAL: BREAST AWARENESS */}
         {showBreastAwareness && (
-          <div style={{ background: '#FFFFFF', border: '1px dashed #be185d', borderRadius: '16px', padding: '20px' }}>
+          <div style={{ background: '#FFFFFF', border: '1px dashed #FED7AA', borderRadius: '16px', padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Breast awareness</h4>
+              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Breast awareness</h4>
               <button 
                 onClick={() => setShowBreastAwareness(false)}
-                style={{ background: 'none', border: 'none', color: '#94A3B8', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
+                style={{ background: 'none', border: 'none', color: '#9A3412', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
               >
                 Remove category ✕
               </button>
             </div>
-            <p style={{ margin: '0 0 12px 0', fontSize: '0.75rem', color: '#64748B', fontStyle: 'italic' }}>
-              The app should not diagnose breast disease. It should identify persistent or unusual changes and recommend professional assessment.
+            <p style={{ margin: '0 0 12px 0', fontSize: '0.75rem', color: '#9A3412', fontStyle: 'italic' }}>
+              Identifies persistent or unusual changes and recommends professional assessment.
             </p>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {['Breast tenderness or pain', 'New lump or thickening', 'Swelling or skin changes', 'Nipple changes or discharge', 'Change in breast shape or size'].map((item) => {
                 const isSelected = activeLog.symptoms.includes(item);
+                const isUrgent = item.includes('lump') || item.includes('discharge');
                 return (
                   <button
                     key={item}
@@ -488,15 +542,15 @@ export default function CycleTracker() {
                     style={{
                       padding: '8px 14px',
                       borderRadius: '20px',
-                      border: isSelected ? '1px solid #be185d' : '1px solid #CBD5E1',
-                      background: isSelected ? '#be185d' : '#F8FAFC',
-                      color: isSelected ? '#FFF' : '#334155',
+                      border: isUrgent ? '1px solid #EF4444' : isSelected ? '1px solid #F97316' : '1px solid #FED7AA',
+                      background: isUrgent && isSelected ? '#EF4444' : isSelected ? '#F97316' : '#FFF7ED',
+                      color: isSelected ? '#FFF' : isUrgent ? '#B91C1C' : '#431407',
                       fontSize: '0.82rem',
                       fontWeight: '600',
                       cursor: 'pointer'
                     }}
                   >
-                    + {item}
+                    {isUrgent ? '⚠️ ' : '+ '}{item}
                   </button>
                 );
               })}
@@ -505,27 +559,25 @@ export default function CycleTracker() {
         )}
 
         {/* 7. NOTES AND ATTACHMENTS */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px' }}>
-          <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: '700', color: '#1E293B' }}>Notes and attachments</h4>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#64748B' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #FFEDD5', borderRadius: '16px', padding: '20px' }}>
+          <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: '700', color: '#7C2D12' }}>Notes and attachments</h4>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#9A3412' }}>
             <span>✓ Written note</span>
             <span>✓ Voice note</span>
             <span>✓ Photo</span>
-            <span>✓ Medical report / Lab result</span>
-            <span>✓ Prescription</span>
-            <span>✓ Consultation note</span>
+            <span>✓ Medical report</span>
           </div>
           <textarea
             rows="3"
             placeholder="Add a written note, voice note reference, or laboratory report details..."
             value={activeLog.notes}
             onChange={(e) => setActiveLog(p => ({ ...p, notes: e.target.value }))}
-            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '16px' }}
+            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #FED7AA', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '16px' }}
           />
           <button
             onClick={handleSave}
             style={{
-              background: '#be185d',
+              background: '#F97316',
               color: '#FFFFFF',
               border: 'none',
               padding: '14px 24px',
@@ -533,7 +585,7 @@ export default function CycleTracker() {
               fontWeight: '700',
               fontSize: '0.95rem',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(190, 24, 93, 0.25)',
+              boxShadow: '0 4px 12px rgba(249, 115, 22, 0.2)',
               width: '100%'
             }}
           >

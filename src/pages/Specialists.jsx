@@ -137,7 +137,8 @@ export default function Specialists() {
         maxWidth: '850px',
         margin: '0 auto',
         padding: '16px 12px',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        backgroundColor: '#F9F8F6'
       }}
     >
       {/* HEADER SECTION */}
@@ -148,8 +149,8 @@ export default function Specialists() {
             display: 'inline-block',
             fontSize: '0.8rem',
             fontWeight: '700',
-            color: '#be185d',
-            background: '#fce7f3',
+            color: '#2B6CB0',
+            background: '#E0F2FE',
             padding: '4px 12px',
             borderRadius: '20px',
             marginBottom: '10px'
@@ -157,7 +158,7 @@ export default function Specialists() {
         >
           ✨ Top-Rated Regional Experts
         </span>
-        <h1 style={{ margin: '0 0 8px 0', fontSize: 'clamp(1.5rem, 4vw, 1.9rem)', color: '#2C3E50', fontWeight: '700' }}>
+        <h1 style={{ margin: '0 0 8px 0', fontSize: 'clamp(1.5rem, 4vw, 1.9rem)', color: '#1E293B', fontWeight: '700' }}>
           Top-Rated Specialists in the Middle East
         </h1>
         <p className="muted-text" style={{ margin: 0, fontSize: '0.92rem', color: '#64748B', lineHeight: '1.5' }}>
@@ -170,8 +171,8 @@ export default function Specialists() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            background: '#ffffff',
-            border: '1px solid #EFE2E9',
+            background: '#FFFFFF',
+            border: '1px solid #CBD5E1',
             borderRadius: '12px',
             padding: '10px 14px',
             marginTop: '16px',
@@ -180,7 +181,7 @@ export default function Specialists() {
             boxSizing: 'border-box'
           }}
         >
-          <span style={{ fontSize: '1.1rem', marginRight: '10px', color: '#8C7B88' }}>🔍</span>
+          <span style={{ fontSize: '1.1rem', marginRight: '10px', color: '#64748B' }}>🔍</span>
           <input
             type="text"
             placeholder="Search doctor, city, or condition (PCOS, IVF)..."
@@ -191,7 +192,7 @@ export default function Specialists() {
               outline: 'none',
               width: '100%',
               fontSize: '0.92rem',
-              color: '#2C3E50',
+              color: '#1E293B',
               background: 'transparent'
             }}
           />
@@ -202,7 +203,7 @@ export default function Specialists() {
                 background: 'transparent',
                 border: 'none',
                 fontSize: '0.9rem',
-                color: '#8C7B88',
+                color: '#64748B',
                 cursor: 'pointer',
                 padding: '0 4px'
               }}
@@ -218,9 +219,9 @@ export default function Specialists() {
         <div 
           className="alert-banner alert-success"
           style={{
-            background: '#ECFDF5',
-            border: '1px solid #10B981',
-            color: '#065F46',
+            background: '#F0FDF4',
+            border: '1px solid #38A169',
+            color: '#22543D',
             padding: '14px',
             borderRadius: '10px',
             marginBottom: '20px',
@@ -284,7 +285,7 @@ export default function Specialists() {
                 className={`card specialist-card ${isSelected ? 'active-booking' : ''}`}
                 style={{
                   background: '#FFFFFF',
-                  border: isSelected ? '2px solid #ec4899' : '1px solid #E2E8F0',
+                  border: isSelected ? '2px solid #319795' : '1px solid #E2E8F0',
                   borderRadius: '14px',
                   padding: '16px',
                   boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
@@ -329,7 +330,7 @@ export default function Specialists() {
                         position: 'absolute',
                         bottom: '0',
                         right: '0',
-                        background: '#10B981',
+                        background: '#38A169',
                         color: '#FFFFFF',
                         width: '20px',
                         height: '20px',
@@ -371,13 +372,13 @@ export default function Specialists() {
                       <span 
                         className="specialty-pill"
                         style={{
-                          background: '#F8FAFC',
-                          color: '#334155',
+                          background: '#E6FFFA',
+                          color: '#234E52',
                           padding: '4px 10px',
                           borderRadius: '6px',
                           fontSize: '0.78rem',
                           fontWeight: '600',
-                          border: '1px solid #E2E8F0',
+                          border: '1px solid #B2F5EA',
                           whiteSpace: 'nowrap'
                         }}
                       >
@@ -450,7 +451,8 @@ export default function Specialists() {
                             border: '1px solid #CBD5E1',
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
-                            outline: 'none'
+                            outline: 'none',
+                            backgroundColor: '#FAFAF9'
                           }}
                         />
                       </div>
@@ -470,7 +472,8 @@ export default function Specialists() {
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
                             outline: 'none',
-                            resize: 'vertical'
+                            resize: 'vertical',
+                            backgroundColor: '#FAFAF9'
                           }}
                         />
                       </div>
@@ -490,7 +493,8 @@ export default function Specialists() {
                             border: '1px solid #CBD5E1',
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
-                            outline: 'none'
+                            outline: 'none',
+                            backgroundColor: '#FAFAF9'
                           }}
                         />
                       </div>
@@ -513,7 +517,7 @@ export default function Specialists() {
                             padding: '10px 16px',
                             borderRadius: '6px',
                             border: 'none',
-                            background: '#ec4899',
+                            background: '#319795',
                             color: '#FFFFFF',
                             fontWeight: '600',
                             fontSize: '0.88rem',
@@ -561,9 +565,9 @@ export default function Specialists() {
                         width: '100%',
                         padding: '10px',
                         borderRadius: '8px',
-                        border: '1px solid #ec4899',
-                        background: '#fdf2f8',
-                        color: '#be185d',
+                        border: '1px solid #319795',
+                        background: '#E6FFFA',
+                        color: '#234E52',
                         fontWeight: '600',
                         fontSize: '0.88rem',
                         cursor: 'pointer'

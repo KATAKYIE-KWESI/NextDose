@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
 
-// Helper to determine badge styling based on booking status
+// Helper to determine badge styling based on booking status (calmer/modern palette)
 const getStatusBadgeStyle = (status = '') => {
   const normalized = status.toLowerCase();
   switch (normalized) {
     case 'confirmed':
     case 'approved':
-      return { background: '#DCFCE7', color: '#166534', label: 'Confirmed' };
+      return { background: '#E8F5E9', color: '#2E7D32', label: 'Confirmed' }; // Sage green vibe
     case 'pending':
     case 'requested':
-      return { background: '#FEF3C7', color: '#92400E', label: 'Pending Review' };
+      return { background: '#FFF8E1', color: '#B7791F', label: 'Pending Review' }; // Amber emphasis
     case 'completed':
-      return { background: '#E0F2FE', color: '#0369A1', label: 'Completed' };
+      return { background: '#E0F2FE', color: '#0369A1', label: 'Completed' }; // Soft blue
     case 'cancelled':
     case 'declined':
-      return { background: '#FEE2E2', color: '#991B1B', label: 'Cancelled' };
+      return { background: '#F1F5F9', color: '#475569', label: 'Cancelled' }; // Lavender-grey neutral
     default:
       return { background: '#F1F5F9', color: '#475569', label: status || 'Pending' };
   }
@@ -94,10 +94,8 @@ export default function Bookings() {
       } else if (typeof api.updateBookingStatus === 'function') {
         await api.updateBookingStatus(bookingId, 'cancelled');
       } else {
-        // Fallback simulation or direct patch if client supports generic updates
         throw new Error('Cancellation endpoint is not available on the client API.');
       }
-      // Refresh list after successful cancellation
       await fetchConsults();
     } catch (err) {
       setActionError(err?.message || 'Failed to cancel consultation.');
@@ -115,27 +113,29 @@ export default function Bookings() {
         margin: '0 auto',
         padding: '16px 12px',
         boxSizing: 'border-box',
+        backgroundColor: '#FAF8F5', // Warm off-white
+        minHeight: '100vh',
       }}
     >
       {/* PAGE HEADER */}
       <div className="bookings-header" style={{ marginBottom: '20px' }}>
-        <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', color: '#1E293B', fontWeight: '700' }}>
+        <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', color: '#2C3E50', fontWeight: '700' }}>
           My Consultations
         </h1>
-        <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748B' }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', color: '#5A6E7F' }}>
           Track and manage your requested private appointments and specialist sessions.
         </p>
       </div>
 
-      {/* ERROR BANNER */}
+      {/* ERROR BANNER - Urgent Medical Red */}
       {error && (
         <div
           style={{
-            background: '#FEF2F2',
-            border: '1px solid #EF4444',
+            background: '#FEE2E2',
+            border: '1px solid #DC2626',
             color: '#991B1B',
             padding: '12px 16px',
-            borderRadius: '8px',
+            borderRadius: '12px',
             marginBottom: '20px',
             display: 'flex',
             flexDirection: 'row',
@@ -149,13 +149,14 @@ export default function Bookings() {
           <button
             onClick={fetchConsults}
             style={{
-              background: '#991B1B',
+              background: '#DC2626',
               color: '#FFFFFF',
               border: 'none',
-              borderRadius: '4px',
+              borderRadius: '6px',
               padding: '6px 12px',
               fontSize: '0.8rem',
               cursor: 'pointer',
+              fontWeight: '600',
             }}
           >
             Retry
@@ -163,15 +164,15 @@ export default function Bookings() {
         </div>
       )}
 
-      {/* ACTION ERROR BANNER */}
+      {/* ACTION ERROR BANNER - Urgent Medical Red */}
       {actionError && (
         <div
           style={{
-            background: '#FEF2F2',
-            border: '1px solid #EF4444',
+            background: '#FEE2E2',
+            border: '1px solid #DC2626',
             color: '#991B1B',
             padding: '10px 14px',
-            borderRadius: '8px',
+            borderRadius: '12px',
             marginBottom: '16px',
             fontSize: '0.88rem',
           }}
@@ -182,7 +183,7 @@ export default function Bookings() {
 
       {/* CONTENT STATES */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748B' }}>
+        <div style={{ textAlign: 'center', padding: '40px 0', color: '#5A6E7F' }}>
           <p style={{ fontSize: '0.95rem' }}>Fetching your consult requests...</p>
         </div>
       ) : bookings.length === 0 ? (
@@ -191,16 +192,16 @@ export default function Bookings() {
           style={{
             background: '#FFFFFF',
             border: '1px dashed #CBD5E1',
-            borderRadius: '12px',
+            borderRadius: '16px',
             padding: '30px 16px',
             textAlign: 'center',
           }}
         >
           <div style={{ fontSize: '2rem', marginBottom: '8px' }}>💬</div>
-          <h3 style={{ margin: '0 0 6px 0', color: '#334155', fontSize: '1.1rem' }}>
+          <h3 style={{ margin: '0 0 6px 0', color: '#2C3E50', fontSize: '1.1rem' }}>
             No Consultations Found
           </h3>
-          <p style={{ margin: 0, color: '#64748B', fontSize: '0.9rem' }}>
+          <p style={{ margin: 0, color: '#5A6E7F', fontSize: '0.9rem' }}>
             You haven't submitted any consultation requests yet.
           </p>
         </div>
@@ -222,9 +223,9 @@ export default function Bookings() {
                 style={{
                   background: '#FFFFFF',
                   border: '1px solid #E2E8F0',
-                  borderRadius: '12px',
+                  borderRadius: '16px',
                   padding: '16px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)',
+                  boxShadow: '0 2px 6px rgba(44, 62, 80, 0.03)',
                   overflowWrap: 'break-word',
                 }}
               >
@@ -244,14 +245,14 @@ export default function Bookings() {
                       style={{
                         margin: '0 0 4px 0',
                         fontSize: '1.05rem',
-                        color: '#0F172A',
+                        color: '#2C3E50',
                         fontWeight: '600',
                       }}
                     >
                       {specialistName}
                     </h3>
                     {specialty && (
-                      <span style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: '500' }}>
+                      <span style={{ fontSize: '0.85rem', color: '#5A6E7F', fontWeight: '500' }}>
                         {specialty}
                       </span>
                     )}
@@ -263,7 +264,7 @@ export default function Bookings() {
                     style={{
                       background: badge.background,
                       color: badge.color,
-                      padding: '4px 10px',
+                      padding: '4px 12px',
                       borderRadius: '999px',
                       fontSize: '0.75rem',
                       fontWeight: '700',
@@ -276,37 +277,38 @@ export default function Bookings() {
                   </span>
                 </div>
 
-                {/* DETAILS SECTION */}
+                {/* DETAILS SECTION - Pale Teal / Soft Blue background accent */}
                 <div
                   style={{
                     display: 'grid',
                     gap: '8px',
                     fontSize: '0.88rem',
                     color: '#334155',
-                    background: '#F8FAFC',
+                    background: '#F0F9FF',
                     padding: '12px',
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     marginBottom: '12px',
+                    border: '1px solid #E0F2FE',
                   }}
                 >
                   {b.preferredTimes && (
                     <div>
-                      <strong style={{ color: '#475569' }}>Preferred Schedule: </strong>
+                      <strong style={{ color: '#0369A1' }}>Preferred Schedule: </strong>
                       <span>{b.preferredTimes}</span>
                     </div>
                   )}
 
                   {b.contact && (
                     <div>
-                      <strong style={{ color: '#475569' }}>Contact Info: </strong>
+                      <strong style={{ color: '#0369A1' }}>Contact Info: </strong>
                       <span>{b.contact}</span>
                     </div>
                   )}
 
                   {b.reason && (
                     <div>
-                      <strong style={{ color: '#475569' }}>Reason for Visit: </strong>
-                      <span style={{ color: '#1E293B' }}>{b.reason}</span>
+                      <strong style={{ color: '#0369A1' }}>Reason for Visit: </strong>
+                      <span style={{ color: '#2C3E50' }}>{b.reason}</span>
                     </div>
                   )}
                 </div>
@@ -331,10 +333,10 @@ export default function Bookings() {
                         disabled={actionLoading === bookingId}
                         style={{
                           background: 'transparent',
-                          color: '#DC2626',
+                          color: '#DC2626', // Urgent Medical Red for cancellation button emphasis
                           border: '1px solid #FCA5A5',
-                          borderRadius: '6px',
-                          padding: '5px 10px',
+                          borderRadius: '8px',
+                          padding: '6px 12px',
                           fontSize: '0.78rem',
                           fontWeight: '600',
                           cursor: actionLoading === bookingId ? 'not-allowed' : 'pointer',
@@ -347,7 +349,7 @@ export default function Bookings() {
                   </div>
 
                   {b.createdAt && (
-                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', textAlign: 'right', marginLeft: 'auto' }}>
+                    <div style={{ fontSize: '0.78rem', color: '#7E8C9D', textAlign: 'right', marginLeft: 'auto' }}>
                       Requested on {formatDate(b.createdAt)}
                     </div>
                   )}
