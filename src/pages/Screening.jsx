@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { api } from '../api/client.js';
+// Import your global language/translation context provider path if different
+import { useLanguage } from '../context/LanguageContext';
 
 // Helper to automatically turn 'pap_smear' or 'breast_exam' into 'Pap Smear' dynamically
 const formatTypeLabel = (type = '') => {
@@ -9,6 +11,9 @@ const formatTypeLabel = (type = '') => {
 };
 
 export default function MaternalScreeningHub() {
+  // Pull translation state, current language, and RTL utilities from global context
+  const { t, language, isRTL } = useLanguage ? useLanguage() : { t: (key, fallback) => fallback, language: 'en', isRTL: false };
+
   const [activeMainTab, setActiveMainTab] = useState('journey'); // 'journey' | 'screening'
 
   // Maternal Journey States
@@ -33,7 +38,7 @@ export default function MaternalScreeningHub() {
       const res = await api.getReminders();
       setReminders(res?.reminders || []);
     } catch (err) {
-      setErrorMsg(err?.message || 'Failed to fetch screening reminders from backend.');
+      setErrorMsg(err?.message || t('screening.error_fetch', 'Failed to fetch screening reminders from backend.'));
     }
   };
 
@@ -44,7 +49,7 @@ export default function MaternalScreeningHub() {
   const logDate = async (type) => {
     const selectedDate = dates[type];
     if (!selectedDate) {
-      setErrorMsg(`Please select a valid date for ${formatTypeLabel(type)}.`);
+      setErrorMsg(t('screening.error_date', `Please select a valid date for ${formatTypeLabel(type)}.`));
       return;
     }
 
@@ -55,10 +60,10 @@ export default function MaternalScreeningHub() {
       await api.updateScreening({ type, date: selectedDate });
       await loadReminders(); 
       setDates((prev) => ({ ...prev, [type]: '' }));
-      setSuccessMsg(`Successfully updated record for ${formatTypeLabel(type)}!`);
+      setSuccessMsg(t('screening.success_update', `Successfully updated record for ${formatTypeLabel(type)}!`));
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch (err) {
-      setErrorMsg(err?.message || 'Failed to update screening date.');
+      setErrorMsg(err?.message || t('screening.error_update', 'Failed to update screening date.'));
     } finally {
       setSaving('');
     }
@@ -67,12 +72,14 @@ export default function MaternalScreeningHub() {
   return (
     <div 
       className="maternal-screening-hub"
+      dir={isRTL ? 'rtl' : 'ltr'}
       style={{
         width: '100%',
         maxWidth: '850px',
         margin: '0 auto',
         padding: '20px 16px',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        textAlign: isRTL ? 'right' : 'left'
       }}
     >
       {/* MODULE HEADER */}
@@ -89,13 +96,13 @@ export default function MaternalScreeningHub() {
             marginBottom: '10px'
           }}
         >
-          High-Stakes Life Stage & Preventive Care
+          {t('hub.badge', 'High-Stakes Life Stage & Preventive Care')}
         </span>
         <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.5rem, 4vw, 2rem)', color: '#1E293B', fontWeight: '700' }}>
-          Maternal & Women's Health Hub
+          {t('hub.title', "Maternal & Women's Health Hub")}
         </h1>
         <p style={{ margin: 0, fontSize: '0.92rem', color: '#64748B', lineHeight: '1.5' }}>
-          Structured clinical tracking built around WHO antenatal standards, intelligent symptom segmentation, and preventive health reminders.
+          {t('hub.subtitle', 'Structured clinical tracking built around WHO antenatal standards, intelligent symptom segmentation, and preventive health reminders.')}
         </p>
       </div>
 
@@ -106,7 +113,8 @@ export default function MaternalScreeningHub() {
           gap: '10px', 
           marginBottom: '24px', 
           borderBottom: '2px solid #E2E8F0',
-          paddingBottom: '12px'
+          paddingBottom: '12px',
+          flexDirection: isRTL ? 'row-reverse' : 'row'
         }}
       >
         <button
@@ -122,7 +130,7 @@ export default function MaternalScreeningHub() {
             cursor: 'pointer'
           }}
         >
-          🤱 Maternal Journey
+          {t('tabs.maternal_journey', '🤱 Maternal Journey')}
         </button>
         <button
           onClick={() => setActiveMainTab('screening')}
@@ -137,7 +145,7 @@ export default function MaternalScreeningHub() {
             cursor: 'pointer'
           }}
         >
-          🩺 Screening & Health Story
+          {t('tabs.screening_story', '🩺 Screening & Health Story')}
         </button>
       </div>
 
@@ -151,14 +159,15 @@ export default function MaternalScreeningHub() {
               gap: '8px', 
               marginBottom: '20px', 
               overflowX: 'auto', 
-              paddingBottom: '4px' 
+              paddingBottom: '4px',
+              flexDirection: isRTL ? 'row-reverse' : 'row'
             }}
           >
             {[
-              { id: 'dashboard', label: '1. Pregnancy Dashboard' },
-              { id: 'antenatal', label: '2. Antenatal Visits' },
-              { id: 'symptoms', label: '3. Symptom Tracker' },
-              { id: 'education', label: '4. Trimester Guide' }
+              { id: 'dashboard', label: t('journey.tab_dashboard', '1. Pregnancy Dashboard') },
+              { id: 'antenatal', label: t('journey.tab_antenatal', '2. Antenatal Visits') },
+              { id: 'symptoms', label: t('journey.tab_symptoms', '3. Symptom Tracker') },
+              { id: 'education', label: t('journey.tab_education', '4. Trimester Guide') }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -184,43 +193,46 @@ export default function MaternalScreeningHub() {
           {journeyTab === 'dashboard' && (
             <div style={{ display: 'grid', gap: '16px' }}>
               <div className="card" style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '20px', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                   <div>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#0284c7', textTransform: 'uppercase' }}>Current Progress</span>
-                    <h2 style={{ margin: '2px 0 0 0', fontSize: '1.4rem', color: '#1E293B' }}>Week 24 • 2nd Trimester</h2>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#0284c7', textTransform: 'uppercase' }}>
+                      {t('dashboard.current_progress', 'Current Progress')}
+                    </span>
+                    <h2 style={{ margin: '2px 0 0 0', fontSize: '1.4rem', color: '#1E293B' }}>
+                      {t('dashboard.week_info', 'Week 24 • 2nd Trimester')}
+                    </h2>
                   </div>
                   <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '8px 14px', borderRadius: '8px', color: '#166534', fontSize: '0.85rem', fontWeight: '600' }}>
-                    👶 Baby size: Corn Ear (~30cm, 600g)
+                    {t('dashboard.baby_size', '👶 Baby size: Corn Ear (~30cm, 600g)')}
                   </div>
                 </div>
 
                 <div style={{ width: '100%', background: '#F1F5F9', height: '10px', borderRadius: '5px', overflow: 'hidden', marginBottom: '16px' }}>
-                  <div style={{ width: '60%', background: '#0284c7', height: '100%', borderRadius: '5px' }}></div>
+                  <div style={{ width: '60%', background: '#0284c7', height: '100%', borderRadius: '5px', float: isRTL ? 'right' : 'left' }}></div>
                 </div>
 
                 <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#64748B' }}>
-                  Next Antenatal Visit Countdown: <strong>5 days remaining</strong> (WHO Contact #4 of 8)
+                  {t('dashboard.countdown', 'Next Antenatal Visit Countdown:')} <strong>{t('dashboard.days_remaining', '5 days remaining')}</strong> ({t('dashboard.who_contact', 'WHO Contact #4 of 8')})
                 </p>
 
-                {/* Replace your old check-in input block with this: */}
+                {/* Check-in input block */}
                 <div style={{ background: '#F8FAFC', padding: '14px', borderRadius: '10px', border: '1px solid #E2E8F0', marginTop: '16px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>
-                    How are you feeling today?
+                    {t('dashboard.feeling_prompt', 'How are you feeling today?')}
                   </label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Mild back fatigue, good energy..."
+                    placeholder={t('dashboard.feeling_placeholder', 'e.g. Mild back fatigue, good energy...')}
                     value={quickCheckin}
                     onChange={(e) => setQuickCheckin(e.target.value)}
-                    style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '10px' }}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '10px', textAlign: isRTL ? 'right' : 'left' }}
                   />
                   <button 
                     onClick={() => {
-                      // TODO: Connect this to your API function (e.g., api.saveCheckin({ note: quickCheckin }))
                       console.log("Saving check-in:", quickCheckin);
-                      setSuccessMsg("Quick check-in saved successfully!");
+                      setSuccessMsg(t('dashboard.checkin_saved', 'Quick check-in saved successfully!'));
                       setTimeout(() => setSuccessMsg(''), 4000);
-                      setQuickCheckin(''); // Clear input after saving
+                      setQuickCheckin('');
                     }}
                     disabled={!quickCheckin.trim()}
                     style={{
@@ -234,7 +246,7 @@ export default function MaternalScreeningHub() {
                       cursor: quickCheckin.trim() ? 'pointer' : 'not-allowed'
                     }}
                   >
-                    Save Check-in
+                    {t('dashboard.save_checkin', 'Save Check-in')}
                   </button>
                 </div>
               </div>
@@ -245,21 +257,23 @@ export default function MaternalScreeningHub() {
           {journeyTab === 'antenatal' && (
             <div style={{ display: 'grid', gap: '16px' }}>
               <div className="card" style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '20px', boxSizing: 'border-box' }}>
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', color: '#1E293B' }}>WHO 8-Contact Schedule Checklist</h3>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', color: '#1E293B' }}>
+                  {t('antenatal.schedule_title', 'WHO 8-Contact Schedule Checklist')}
+                </h3>
                 <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: '#64748B' }}>
-                  Track completed vs. upcoming clinical milestones to ensure optimal maternal health.
+                  {t('antenatal.schedule_desc', 'Track completed vs. upcoming clinical milestones to ensure optimal maternal health.')}
                 </p>
 
                 <div style={{ display: 'grid', gap: '8px', marginBottom: '20px' }}>
                   {[
-                    { contact: 'Contact 1 (Up to 12 weeks)', status: 'Completed', date: '14 Mar 2026' },
-                    { contact: 'Contact 2 (20 weeks)', status: 'Completed', date: '12 May 2026' },
-                    { contact: 'Contact 3 (26 weeks)', status: 'Upcoming', date: '28 Jul 2026' },
-                    { contact: 'Contact 4 (30 weeks)', status: 'Scheduled', date: '25 Aug 2026' }
+                    { contact: t('antenatal.c1', 'Contact 1 (Up to 12 weeks)'), status: t('antenatal.completed', 'Completed'), date: '14 Mar 2026' },
+                    { contact: t('antenatal.c2', 'Contact 2 (20 weeks)'), status: t('antenatal.completed', 'Completed'), date: '12 May 2026' },
+                    { contact: t('antenatal.c3', 'Contact 3 (26 weeks)'), status: t('antenatal.upcoming', 'Upcoming'), date: '28 Jul 2026' },
+                    { contact: t('antenatal.c4', 'Contact 4 (30 weeks)'), status: t('antenatal.scheduled', 'Scheduled'), date: '25 Aug 2026' }
                   ].map((item, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '0.88rem' }}>
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '0.88rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                       <span style={{ fontWeight: '600', color: '#334155' }}>{item.contact}</span>
-                      <span style={{ fontSize: '0.78rem', padding: '3px 8px', borderRadius: '12px', background: item.status === 'Completed' ? '#DCFCE7' : '#FEF3C7', color: item.status === 'Completed' ? '#166534' : '#92400E', fontWeight: '700' }}>
+                      <span style={{ fontSize: '0.78rem', padding: '3px 8px', borderRadius: '12px', background: item.status.includes('Completed') ? '#DCFCE7' : '#FEF3C7', color: item.status.includes('Completed') ? '#166534' : '#92400E', fontWeight: '700' }}>
                         {item.status} ({item.date})
                       </span>
                     </div>
@@ -267,13 +281,15 @@ export default function MaternalScreeningHub() {
                 </div>
 
                 <div style={{ background: '#fdf2f8', border: '1px solid #fbcfe8', padding: '14px', borderRadius: '10px' }}>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#be185d' }}>✨ Pre-Visit AI Consultation Summary</h4>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#be185d' }}>
+                    {t('antenatal.ai_title', '✨ Pre-Visit AI Consultation Summary')}
+                  </h4>
                   <p style={{ margin: '0 0 10px 0', fontSize: '0.82rem', color: '#831843' }}>
-                    Your logged symptoms and questions are auto-organized into a clear brief for your doctor.
+                    {t('antenatal.ai_desc', 'Your logged symptoms and questions are auto-organized into a clear brief for your doctor.')}
                   </p>
                   <div style={{ background: '#FFFFFF', padding: '10px', borderRadius: '6px', fontSize: '0.85rem', color: '#475569', border: '1px dashed #f472b6', lineHeight: '1.5' }}>
-                    • Frequency of mild lower back pain increased over past 4 days.<br />
-                    • Question for clinician: Safe stretching routines for third trimester?
+                    {t('antenatal.ai_bullet1', '• Frequency of mild lower back pain increased over past 4 days.')}<br />
+                    {t('antenatal.ai_bullet2', '• Question for clinician: Safe stretching routines for third trimester?')}
                   </div>
                 </div>
               </div>
@@ -284,34 +300,38 @@ export default function MaternalScreeningHub() {
           {journeyTab === 'symptoms' && (
             <div style={{ display: 'grid', gap: '16px' }}>
               <div className="card" style={{ background: '#FEF2F2', borderRadius: '14px', border: '2px solid #EF4444', padding: '20px', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                   <span style={{ fontSize: '1.2rem' }}>🚨</span>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#991B1B' }}>Urgent Flags (Immediate Action Required)</h3>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#991B1B' }}>
+                    {t('symptoms.urgent_title', 'Urgent Flags (Immediate Action Required)')}
+                  </h3>
                 </div>
                 <p style={{ margin: '0 0 14px 0', fontSize: '0.85rem', color: '#B91C1C' }}>
-                  Severe headache, vision changes, sudden swelling, reduced fetal movement, bleeding, or fever. Never blended with routine logging.
+                  {t('symptoms.urgent_desc', 'Severe headache, vision changes, sudden swelling, reduced fetal movement, bleeding, or fever. Never blended with routine logging.')}
                 </p>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <button style={{ background: '#EF4444', color: '#FFFFFF', border: 'none', padding: '10px 16px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer' }}>
-                    📞 Call Doctor / Emergency Now
+                    {t('symptoms.call_emergency', '📞 Call Doctor / Emergency Now')}
                   </button>
                 </div>
               </div>
 
               <div className="card" style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '20px', boxSizing: 'border-box' }}>
-                <h3 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', color: '#1E293B' }}>Routine Log</h3>
+                <h3 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', color: '#1E293B' }}>
+                  {t('symptoms.routine_title', 'Routine Log')}
+                </h3>
                 <p style={{ margin: '0 0 14px 0', fontSize: '0.85rem', color: '#64748B' }}>
-                  Nausea, fatigue, mild back pain, sleep quality — logged casually with no alarm styling.
+                  {t('symptoms.routine_desc', 'Nausea, fatigue, mild back pain, sleep quality — logged casually with no alarm styling.')}
                 </p>
                 <textarea 
                   rows="3" 
-                  placeholder="Log daily routine symptoms..."
+                  placeholder={t('symptoms.routine_placeholder', 'Log daily routine symptoms...')}
                   value={routineNote}
                   onChange={(e) => setRoutineNote(e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '10px' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.9rem', boxSizing: 'border-box', outline: 'none', marginBottom: '10px', textAlign: isRTL ? 'right' : 'left' }}
                 />
                 <button style={{ background: '#0F172A', color: '#FFFFFF', border: 'none', padding: '8px 14px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>
-                  Save Routine Entry
+                  {t('symptoms.save_routine', 'Save Routine Entry')}
                 </button>
               </div>
             </div>
@@ -321,12 +341,18 @@ export default function MaternalScreeningHub() {
           {journeyTab === 'education' && (
             <div style={{ display: 'grid', gap: '16px' }}>
               <div className="card" style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '20px', boxSizing: 'border-box' }}>
-                <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem', color: '#1E293B' }}>Trimester-by-Trimester Guides</h3>
+                <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem', color: '#1E293B' }}>
+                  {t('education.title', 'Trimester-by-Trimester Guides')}
+                </h3>
                 <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#64748B', lineHeight: '1.5' }}>
-                  Short, non-alarming explainers curated to help you understand what is normal and expected at each specific stage of your pregnancy journey.
+                  {t('education.desc', 'Short, non-alarming explainers curated to help you understand what is normal and expected at each specific stage of your pregnancy journey.')}
                 </p>
                 <div style={{ display: 'grid', gap: '10px' }}>
-                  {['First Trimester: Early development & managing fatigue', 'Second Trimester: Movement, nutrition, & body changes', 'Third Trimester: Preparation, birth signs, & postpartum planning'].map((guide, idx) => (
+                  {[
+                    t('education.g1', 'First Trimester: Early development & managing fatigue'), 
+                    t('education.g2', 'Second Trimester: Movement, nutrition, & body changes'), 
+                    t('education.g3', 'Third Trimester: Preparation, birth signs, & postpartum planning')
+                  ].map((guide, idx) => (
                     <div key={idx} style={{ padding: '12px 14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '0.9rem', fontWeight: '600', color: '#334155' }}>
                       📖 {guide}
                     </div>
@@ -338,71 +364,44 @@ export default function MaternalScreeningHub() {
         </div>
       )}
 
-      {/* VIEW 2: SCREENING, HEALTH STORY & SAFE SPACE HUB */}
+      {/* VIEW 2: SCREENING & HEALTH STORY HUB */}
       {activeMainTab === 'screening' && (
         <div className="screening-page">
           {/* SUB-TABS FOR SCREENING SECTION */}
           <div 
             style={{ 
               display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
               gap: '8px', 
               marginBottom: '20px', 
               borderBottom: '1px solid #E2E8F0', 
               paddingBottom: '12px',
-              flexWrap: 'wrap'
+              overflowX: 'auto',
+              flexDirection: isRTL ? 'row-reverse' : 'row'
             }}
           >
-            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', flex: 1 }}>
-              {[
-                { id: 'reminders', label: '🩺 Preventive Reminders' },
-                { id: 'story', label: '📖 My Health Story' },
-                { id: 'conditions', label: '🛡️ Women’s Health Focus' },
-                { id: 'safespace', label: '🔒 Safe Space & Community' }
-              ].map((sub) => (
-                <button
-                  key={sub.id}
-                  onClick={() => setScreeningSubTab(sub.id)}
-                  style={{
-                    padding: '8px 14px',
-                    borderRadius: '6px',
-                    border: screeningSubTab === sub.id ? '1px solid #7c3aed' : '1px solid #CBD5E1',
-                    background: screeningSubTab === sub.id ? '#7c3aed' : '#FFFFFF',
-                    color: screeningSubTab === sub.id ? '#FFFFFF' : '#475569',
-                    fontWeight: '600',
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
-
-            {/* LANGUAGE SELECTOR DROPDOWN */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#F8FAFC', border: '1px solid #CBD5E1', borderRadius: '6px', padding: '4px 8px' }}>
-              <span style={{ fontSize: '0.85rem' }}>🌐</span>
-              <select
-                value={currentLanguage || 'en'}
-                onChange={(e) => setCurrentLanguage && setCurrentLanguage(e.target.value)}
+            {[
+              { id: 'reminders', label: t('screening.sub_reminders', '🩺 Preventive Reminders') },
+              { id: 'story', label: t('screening.sub_story', '📖 My Health Story') },
+              { id: 'conditions', label: t('screening.sub_conditions', '🛡️ Women’s Health Focus') }
+            ].map((sub) => (
+              <button
+                key={sub.id}
+                onClick={() => setScreeningSubTab(sub.id)}
                 style={{
-                  border: 'none',
-                  background: 'transparent',
-                  fontSize: '0.85rem',
+                  padding: '8px 14px',
+                  borderRadius: '6px',
+                  border: screeningSubTab === sub.id ? '1px solid #7c3aed' : '1px solid #CBD5E1',
+                  background: screeningSubTab === sub.id ? '#7c3aed' : '#FFFFFF',
+                  color: screeningSubTab === sub.id ? '#FFFFFF' : '#475569',
                   fontWeight: '600',
-                  color: '#334155',
-                  outline: 'none',
-                  cursor: 'pointer'
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <option value="en">English</option>
-                <option value="tw">Twi (Akan)</option>
-                <option value="fr">Français</option>
-                <option value="pidgin">Ghana Pidgin</option>
-              </select>
-            </div>
+                {sub.label}
+              </button>
+            ))}
           </div>
 
           {/* SUB-VIEW 1: SCREENING REMINDERS */}
@@ -413,7 +412,7 @@ export default function MaternalScreeningHub() {
                   className="disclaimer" 
                   style={{
                     background: '#F8FAFC',
-                    borderLeft: '4px solid #64748B',
+                    [isRTL ? 'borderRight' : 'borderLeft']: '4px solid #64748B',
                     padding: '12px 16px',
                     fontSize: '0.88rem',
                     color: '#475569',
@@ -421,7 +420,7 @@ export default function MaternalScreeningHub() {
                     lineHeight: '1.5'
                   }}
                 >
-                  These are general awareness reminders based on standard medical screening intervals—not a diagnosis or personalized medical recommendation. Consult your healthcare specialist about your specific health needs.
+                  {t('screening.disclaimer', 'These are general awareness reminders based on standard medical screening intervals—not a diagnosis or personalized medical recommendation. Consult your healthcare specialist about your specific health needs.')}
                 </div>
               </div>
 
@@ -439,11 +438,13 @@ export default function MaternalScreeningHub() {
               )}
 
               {loading ? (
-                <p style={{ color: '#6B7280', fontSize: '0.95rem', textAlign: 'center', padding: '30px 0' }}>Loading schedule from server...</p>
+                <p style={{ color: '#6B7280', fontSize: '0.95rem', textAlign: 'center', padding: '30px 0' }}>
+                  {t('screening.loading', 'Loading schedule from server...')}
+                </p>
               ) : reminders.length === 0 ? (
                 <div className="card empty-state" style={{ padding: '32px 16px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
                   <p style={{ margin: 0, color: '#64748B', fontSize: '1rem' }}>
-                    No screening reminders found in your account profile.
+                    {t('screening.empty', 'No screening reminders found in your account profile.')}
                   </p>
                 </div>
               ) : (
@@ -465,7 +466,7 @@ export default function MaternalScreeningHub() {
                           overflowWrap: 'break-word'
                         }}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                           <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1E293B', fontWeight: '600', flex: '1 1 200px' }}>
                             {displayTitle}
                           </h3>
@@ -481,12 +482,12 @@ export default function MaternalScreeningHub() {
                               whiteSpace: 'nowrap'
                             }}
                           >
-                            {r.due ? 'Due' : 'Up to date'}
+                            {r.due ? t('screening.due', 'Due') : t('screening.up_to_date', 'Up to date')}
                           </span>
                         </div>
 
                         <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#64748B' }}>
-                          Last logged: <strong>{r.lastDate ? r.lastDate : 'Never'}</strong>
+                          {t('screening.last_logged', 'Last logged:')} <strong>{r.lastDate ? r.lastDate : t('screening.never', 'Never')}</strong>
                         </p>
 
                         {r.guidance && (
@@ -503,12 +504,13 @@ export default function MaternalScreeningHub() {
                             flexWrap: 'wrap',
                             background: '#F8FAFC',
                             padding: '12px',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            flexDirection: isRTL ? 'row-reverse' : 'row'
                           }}
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 200px' }}>
                             <label style={{ fontSize: '0.8rem', color: '#475569', fontWeight: '600' }}>
-                              Log completed {displayTitle}
+                              {t('screening.log_completed', 'Log completed')} {displayTitle}
                             </label>
                             <input
                               type="date"
@@ -522,7 +524,8 @@ export default function MaternalScreeningHub() {
                                 fontSize: '0.9rem',
                                 boxSizing: 'border-box',
                                 outline: 'none',
-                                background: '#FFFFFF'
+                                background: '#FFFFFF',
+                                textAlign: isRTL ? 'right' : 'left'
                               }}
                             />
                           </div>
@@ -545,7 +548,7 @@ export default function MaternalScreeningHub() {
                               minWidth: '110px'
                             }}
                           >
-                            {isSavingThis ? 'Saving…' : 'Save date'}
+                            {isSavingThis ? t('screening.saving', 'Saving…') : t('screening.save_date', 'Save date')}
                           </button>
                         </div>
                       </div>
@@ -559,17 +562,17 @@ export default function MaternalScreeningHub() {
           {/* SUB-VIEW 2: MY HEALTH STORY */}
           {screeningSubTab === 'story' && (
             <div style={{ display: 'grid', gap: '16px', background: '#FAF5FF', padding: '16px', borderRadius: '16px', border: '1px solid #E9D5FF' }}>
-              
-              {/* TOP HEADER & TIME-RANGE TOGGLES */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#581c87', fontWeight: '700' }}>My Health Story</h2>
-                <button style={{ background: '#FFFFFF', border: '1px solid #D8B4FE', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#7e22ce', fontSize: '0.85rem', fontWeight: '600' }}>
-                  📤 Share Summary
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#581c87', fontWeight: '700' }}>
+                  {t('story.title', 'My Health Story')}
+                </h2>
+                <button style={{ background: '#FFFFFF', border: '1px solid #D8B4FE', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#7e22ce', fontSize: '0.85rem', fontWeight: '600', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+                  📤 {t('story.share_summary', 'Share Summary')}
                 </button>
               </div>
 
               {/* TIME RANGE SELECTOR */}
-              <div style={{ display: 'flex', background: '#F3E8FF', padding: '4px', borderRadius: '12px', gap: '4px' }}>
+              <div style={{ display: 'flex', background: '#F3E8FF', padding: '4px', borderRadius: '12px', gap: '4px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                 {['1M', '3M', '6M'].map((range) => (
                   <button
                     key={range}
@@ -586,7 +589,7 @@ export default function MaternalScreeningHub() {
                       cursor: 'pointer'
                     }}
                   >
-                    {range === '1M' ? '1 Month' : range === '3M' ? '3 Months' : '6 Months'}
+                    {range === '1M' ? t('story.range_1m', '1 Month') : range === '3M' ? t('story.range_3m', '3 Months') : t('story.range_6m', '6 Months')}
                   </button>
                 ))}
               </div>
@@ -594,133 +597,68 @@ export default function MaternalScreeningHub() {
               {/* SUMMARY CARD */}
               <div style={{ background: '#FFFFFF', borderRadius: '14px', padding: '18px', border: '1px solid #E9D5FF', boxShadow: '0 2px 6px rgba(124, 58, 237, 0.04)' }}>
                 <div style={{ marginBottom: '14px' }}>
-                  <h3 style={{ margin: '0 0 2px 0', fontSize: '1rem', color: '#1F2937' }}>Summary for May 1 – May 14, 2024</h3>
-                  <span style={{ fontSize: '0.78rem', color: '#9CA3AF' }}>Generated on May 14, 2024</span>
+                  <h3 style={{ margin: '0 0 2px 0', fontSize: '1rem', color: '#1F2937' }}>
+                    {t('story.summary_header', 'Summary for May 1 – May 14, 2024')}
+                  </h3>
+                  <span style={{ fontSize: '0.78rem', color: '#9CA3AF' }}>
+                    {t('story.generated_on', 'Generated on May 14, 2024')}
+                  </span>
                 </div>
 
                 {/* MAIN CONCERNS */}
                 <div style={{ marginBottom: '16px' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Main concerns</span>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '6px', background: '#FEF2F2', padding: '10px 12px', borderRadius: '10px', border: '1px solid #FCA5A5' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    {t('story.main_concerns', 'Main concerns')}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '6px', background: '#FEF2F2', padding: '10px 12px', borderRadius: '10px', border: '1px solid #FCA5A5', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                     <span style={{ fontSize: '1.1rem' }}>📍</span>
                     <p style={{ margin: 0, fontSize: '0.88rem', color: '#991B1B', lineHeight: '1.4' }}>
-                      Recurring headaches, fatigue and bloating before your period.
+                      {t('story.concerns_text', 'Frequent lower back fatigue and intermittent sleep disruptions reported during the current period.')}
                     </p>
                   </div>
                 </div>
 
-                {/* TIMELINE HIGHLIGHTS */}
-                <div style={{ marginBottom: '16px' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Timeline highlights</span>
-                  <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
-                    {[
-                      { icon: '🩸', bg: '#FCE7F3', text: 'May 3 – May 7', desc: 'Menstrual bleeding' },
-                      { icon: '⚡', bg: '#FEF3C7', text: 'May 9, 11, 12', desc: 'Headaches (3 days)' },
-                      { icon: '🌙', bg: '#EDE9FE', text: 'May 8 – May 13', desc: 'Poor sleep on 4 of 6 days' },
-                      { icon: '😊', bg: '#DCFCE7', text: 'May 10 – May 13', desc: 'High fatigue' }
-                    ].map((item, idx) => (
-                      <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #F3F4F6', fontSize: '0.85rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ background: item.bg, padding: '4px', borderRadius: '6px', fontSize: '0.9rem' }}>{item.icon}</span>
-                          <div>
-                            <strong style={{ color: '#374151' }}>{item.text}</strong>
-                            <div style={{ color: '#6B7280', fontSize: '0.8rem' }}>{item.desc}</div>
-                          </div>
-                        </div>
-                        <span style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>›</span>
-                      </div>
-                    ))}
+                {/* KEY INSIGHTS */}
+                <div>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    {t('story.key_insights', 'Key Insights')}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '6px', background: '#F5F3FF', padding: '10px 12px', borderRadius: '10px', border: '1px solid #DDD6FE', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+                    <span style={{ fontSize: '1.1rem' }}>💡</span>
+                    <p style={{ margin: 0, fontSize: '0.88rem', color: '#5B21B6', lineHeight: '1.4' }}>
+                      {t('story.insights_text', 'Consistent tracking helps flag patterns early. Consider discussing stretching techniques during your next scheduled clinical visit.')}
+                    </p>
                   </div>
                 </div>
-
-                {/* PATTERNS WE NOTICED */}
-                <div style={{ background: '#F8FAFC', padding: '12px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', marginBottom: '16px' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Patterns we noticed</span>
-                  <ul style={{ margin: '6px 0 0 16px', padding: 0, fontSize: '0.85rem', color: '#475569', lineHeight: '1.5', display: 'grid', gap: '4px' }}>
-                    <li>Headaches often appear during the late luteal phase.</li>
-                    <li>Poor sleep days are associated with higher fatigue.</li>
-                    <li>Bloating increases in the few days before your period.</li>
-                  </ul>
-                </div>
-
-                {/* PREPARE FOR YOUR APPOINTMENT */}
-                <div style={{ background: '#F3E8FF', borderRadius: '12px', padding: '14px', border: '1px solid #D8B4FE' }}>
-                  <h4 style={{ margin: '0 0 2px 0', fontSize: '0.9rem', color: '#581c87' }}>Prepare for your appointment</h4>
-                  <p style={{ margin: '0 0 10px 0', fontSize: '0.8rem', color: '#7e22ce' }}>Turn this summary into a doctor-friendly report.</p>
-                  <button style={{ width: '100%', background: '#7c3aed', color: '#FFFFFF', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '600', fontSize: '0.88rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
-                    📄 Generate Report ›
-                  </button>
-                </div>
-
               </div>
             </div>
           )}
 
-          {/* SUB-VIEW 3: WOMEN'S HEALTH FOCUS & CONDITIONS */}
+          {/* SUB-VIEW 3: WOMEN'S HEALTH CONDITIONS FOCUS */}
           {screeningSubTab === 'conditions' && (
             <div style={{ display: 'grid', gap: '16px' }}>
-              <div className="card" style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '20px' }}>
-                <h3 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', color: '#1E293B' }}>Conditions & Patterns Supported</h3>
+              <div className="card" style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '20px', boxSizing: 'border-box' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', color: '#1E293B' }}>
+                  {t('conditions.title', 'Targeted Women’s Health Focus')}
+                </h3>
                 <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#64748B', lineHeight: '1.5' }}>
-                  The monitoring page places particular emphasis on common or frequently overlooked women’s health conditions, recognising persistent patterns without making definitive diagnoses.
+                  {t('conditions.desc', 'Explore educational overviews and foundational awareness guides regarding key conditions affecting women’s wellness.')}
                 </p>
-
-                <div style={{ display: 'grid', gap: '10px' }}>
+                <div style={{ display: 'grid', gap: '12px' }}>
                   {[
-                    { title: 'Breast Conditions & Early Detection Support', desc: 'Self-examination guides, regular check-in schedules, and early detection support for tracking lumps, skin changes, or tenderness.' },
-                    { title: 'Cervical Conditions & Screening Awareness', desc: 'HPV & Pap smear intervals, abnormal spotting patterns, and clinician discussion guides.' },
-                    { title: 'Endometrial & Womb Health Awareness', desc: 'Tracking heavy menstrual bleeding, intermenstrual spotting, and pelvic discomfort trends.' },
-                    { title: 'Ovarian Health Awareness', desc: 'Persistent bloating, pelvic pressure tracking, and cycle-correlated symptom flags.' }
+                    { title: t('conditions.c1_title', 'PCOS (Polycystic Ovary Syndrome)'), desc: t('conditions.c1_desc', 'Understanding hormonal balance, cycle monitoring, and lifestyle management approaches.') },
+                    { title: t('conditions.c2_title', 'Endometriosis Awareness'), desc: t('conditions.c2_desc', 'Recognizing pelvic discomfort patterns and partnering effectively with specialists.') },
+                    { title: t('conditions.c3_title', 'Bone Density & Calcium Health'), desc: t('conditions.c3_desc', 'Long-term nutritional support and preventive strategies across different life stages.') }
                   ].map((cond, idx) => (
-                    <div key={idx} style={{ padding: '14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#0F172A' }}>🎗️ {cond.title}</h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748B', lineHeight: '1.4' }}>{cond.desc}</p>
+                    <div key={idx} style={{ padding: '14px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#0F172A', fontWeight: '600' }}>
+                        {cond.title}
+                      </h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748B', lineHeight: '1.4' }}>
+                        {cond.desc}
+                      </p>
                     </div>
                   ))}
-                </div>
-
-                <div style={{ marginTop: '16px', background: '#F1F5F9', padding: '12px', borderRadius: '8px', fontSize: '0.82rem', color: '#475569', lineHeight: '1.4' }}>
-                  <strong>Safety Notice:</strong> Report uploads and AI-assisted explanations are designed to assist dialogue with your doctor. The app does not independently reinterpret images, overrule clinicians, or claim that a normal-looking result excludes disease.
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* SUB-VIEW 4: SAFE SPACE & COMMUNITY HUB */}
-          {screeningSubTab === 'safespace' && (
-            <div style={{ display: 'grid', gap: '16px' }}>
-              <div className="card" style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '20px' }}>
-                <div style={{ marginBottom: '16px' }}>
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#1E293B' }}>🔒 Safe Space & Community Hub</h3>
-                  <p style={{ margin: 0, fontSize: '0.88rem', color: '#64748B', lineHeight: '1.5' }}>
-                    A safe, private, and anonymous space to ask questions normally kept hidden, and connect with a supportive community sharing experiences through similar life stages.
-                  </p>
-                </div>
-
-                <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
-                  <div style={{ padding: '16px', background: '#FAF5FF', borderRadius: '10px', border: '1px solid #E9D5FF' }}>
-                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#581c87' }}>💬 Anonymous Q&A Sanctuary</h4>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#6B21A8', lineHeight: '1.4' }}>
-                      Ask sensitive questions about intimate symptoms, cycles, or bodily changes completely anonymously without any identity attachment.
-                    </p>
-                  </div>
-
-                  <div style={{ padding: '16px', background: '#F0FDF4', borderRadius: '10px', border: '1px solid #BBF7D0' }}>
-                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#166534' }}>🌱 Shared Life Stages Community</h4>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#15803D', lineHeight: '1.4' }}>
-                      Exchange lived experiences, coping strategies, and encouragement with other women navigating parallel hormonal or reproductive health journeys.
-                    </p>
-                  </div>
-                </div>
-
-                <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                  <h4 style={{ margin: '0 0 6px 0', fontSize: '0.95rem', color: '#1E293B' }}>Ready to join the conversation?</h4>
-                  <p style={{ margin: '0 0 12px 0', fontSize: '0.82rem', color: '#64748B' }}>
-                    Your privacy and anonymity are protected end-to-end within community channels.
-                  </p>
-                  <button style={{ background: '#7c3aed', color: '#FFFFFF', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
-                    Enter Anonymous Community ›
-                  </button>
                 </div>
               </div>
             </div>

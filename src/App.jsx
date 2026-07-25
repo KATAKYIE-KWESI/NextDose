@@ -10,6 +10,7 @@ import Screening from './pages/Screening.jsx';
 import Specialists from './pages/Specialists.jsx';
 import Bookings from './pages/Bookings.jsx';
 import HerSignalBrand from './pages/HerSignalBrand.jsx';
+import HerSignalCommunityAndCare from './pages/HerSignalCommunityAndCare.jsx';
 
 function Logo({ size = 32, className = '' }) {
   return (
@@ -77,7 +78,7 @@ function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) {
     return (
-      <div className="auth-page">
+      <div className="auth-page" style={{ padding: '40px', textAlign: 'center' }}>
         <p className="greeting-date">Loading workspace…</p>
       </div>
     );
@@ -101,8 +102,8 @@ function Topbar({ currentLang, setCurrentLang }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Load language strings for navigation items
-  const t = translations[currentLang] || translations.en;
+  // Load language strings for navigation items (falls back to English 'en' if key is missing)
+  const t = translations[currentLang] || translations.en || translations.English;
 
   useEffect(() => {
     setMenuOpen(false);
@@ -122,11 +123,12 @@ function Topbar({ currentLang, setCurrentLang }) {
 
         {/* Desktop Nav Links */}
         <nav className="nav-links desktop-only-nav" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: 'auto', marginRight: '16px' }}>
-          <NavLink to="/">{t.dashboard}</NavLink>
-          <NavLink to="/tracker">{t.tracker}</NavLink>
-          <NavLink to="/screening">{t.screening}</NavLink>
-          <NavLink to="/specialists">{t.specialists}</NavLink>
-          <NavLink to="/bookings">{t.bookings}</NavLink>
+          <NavLink to="/">{t.dashboard || 'Dashboard'}</NavLink>
+          <NavLink to="/tracker">{t.tracker || 'Tracker'}</NavLink>
+          <NavLink to="/screening">{t.screening || 'Screening'}</NavLink>
+          <NavLink to="/specialists">{t.specialists || 'Specialists'}</NavLink>
+          <NavLink to="/bookings">{t.bookings || 'Bookings'}</NavLink>
+          <NavLink to="/community">{t.community || 'Community & Care'}</NavLink>
         </nav>
 
         {/* Language Selector, Desktop Logout & Mobile Hamburger Toggle */}
@@ -147,8 +149,8 @@ function Topbar({ currentLang, setCurrentLang }) {
           </div>
 
           <div className="desktop-only-action">
-            <button className="nav-logout-btn" onClick={logout}>
-              {t.logout}
+            <button className="nav-logout-btn" onClick={logout} style={{ padding: '6px 12px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#fff' }}>
+              {t.logout || 'Logout'}
             </button>
           </div>
 
@@ -197,19 +199,20 @@ function Topbar({ currentLang, setCurrentLang }) {
             boxSizing: 'border-box'
           }}
         >
-          <NavLink to="/" onClick={() => setMenuOpen(false)}>{t.dashboard}</NavLink>
-          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>{t.tracker}</NavLink>
-          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>{t.screening}</NavLink>
-          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>{t.specialists}</NavLink>
-          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>{t.bookings}</NavLink>
+          <NavLink to="/" onClick={() => setMenuOpen(false)}>{t.dashboard || 'Dashboard'}</NavLink>
+          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>{t.tracker || 'Tracker'}</NavLink>
+          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>{t.screening || 'Screening'}</NavLink>
+          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>{t.specialists || 'Specialists'}</NavLink>
+          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>{t.bookings || 'Bookings'}</NavLink>
+          <NavLink to="/community" onClick={() => setMenuOpen(false)}>{t.community || 'Community & Care'}</NavLink>
           
           <div style={{ paddingTop: '12px', borderTop: '1px solid #F1F5F9', marginTop: '4px' }}>
             <button 
               className="nav-logout-btn" 
               onClick={() => { setMenuOpen(false); logout(); }}
-              style={{ width: '100%', padding: '10px', textAlign: 'center' }}
+              style={{ width: '100%', padding: '10px', textAlign: 'center', cursor: 'pointer' }}
             >
-              {t.logout}
+              {t.logout || 'Logout'}
             </button>
           </div>
         </div>
@@ -235,6 +238,12 @@ function Topbar({ currentLang, setCurrentLang }) {
 export default function App() {
   const { user } = useAuth();
   const [currentLang, setCurrentLang] = useState('en');
+
+  // Automatically adjust document text direction (RTL for Arabic and Darija)
+  useEffect(() => {
+    const isRtl = currentLang === 'ar' || currentLang === 'darija';
+    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+  }, [currentLang]);
 
   return (
     <div className="app-shell" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
@@ -294,6 +303,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <Bookings currentLang={currentLang} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/community"
+            element={
+              <PrivateRoute>
+                <HerSignalCommunityAndCare currentLang={currentLang} />
               </PrivateRoute>
             }
           />

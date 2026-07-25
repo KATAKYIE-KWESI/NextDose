@@ -656,20 +656,20 @@ export default function CycleTracker() {
             </div>
 
             {!collapsedSections.vitals && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div style={{ background: '#F8FAFC', padding: '10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
                   <label style={{ fontSize: '0.68rem', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>{currentStrings.weightKg}</label>
-                  <input type="number" step="0.1" value={weight} onChange={(e) => setWeight(e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }} />
+                  <input type="number" step="0.1" value={weight} onChange={(e) => setWeight(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }} />
                 </div>
                 <div style={{ background: '#F8FAFC', padding: '10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <label style={{ fontSize: '0.68rem', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>{currentStrings.bloodSugar}</label>
-                  <input type="number" step="0.1" value={bloodSugar} onChange={(e) => setBloodSugar(e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }} />
+                  <label style={{ fontSize: '0.68rem', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>{currentStrings.bloodSugar} (mmol/L)</label>
+                  <input type="number" step="0.1" value={bloodSugar} onChange={(e) => setBloodSugar(e.target.value)} style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }} />
                 </div>
               </div>
             )}
           </div>
 
-          {/* 5. Fetal & Contractions Stopwatch */}
+          {/* 5. Fetal Movement & Contractions */}
           <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <h3 style={{ margin: 0, fontSize: '0.95rem' }}>{currentStrings.fetalTitle}</h3>
@@ -679,46 +679,44 @@ export default function CycleTracker() {
             </div>
 
             {!collapsedSections.fetal && (
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '12px' }}>{currentStrings.statusPrefix} <strong>{fetalStatus}</strong></p>
-                
-                {/* Stopwatch Circle Display */}
-                <div style={{ margin: '0 auto 14px auto', width: '140px', height: '140px', borderRadius: '50%', background: isContractionActive ? '#FEF2F2' : '#F0F9FF', border: `4px solid ${isContractionActive ? '#EF4444' : '#0284c7'}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: '700', color: isContractionActive ? '#991B1B' : '#0369a1', textTransform: 'uppercase', marginBottom: '2px' }}>
-                    {isContractionActive ? currentStrings.tracking : currentStrings.timerReady}
-                  </span>
-                  <span style={{ fontSize: '1.5rem', fontWeight: '800', color: isContractionActive ? '#EF4444' : '#0284c7' }}>
-                    {formatTime(elapsedSeconds)}
-                  </span>
+              <div>
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ fontSize: '0.68rem', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>{currentStrings.statusPrefix}</label>
+                  <select value={fetalStatus} onChange={(e) => setFetalStatus(e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.8rem', background: '#FFFFFF' }}>
+                    <option value="Movement feels normal">Movement feels normal</option>
+                    <option value="Reduced movement noticed">Reduced movement noticed</option>
+                    <option value="Very active / Kicking strongly">Very active / Kicking strongly</option>
+                  </select>
                 </div>
 
-                {/* Control Action Button */}
-                {!isContractionActive ? (
-                  <button 
-                    onClick={startContractionTimer} 
-                    style={{ background: '#0284c7', color: '#FFFFFF', border: 'none', width: '100%', padding: '12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', boxShadow: '0 2px 4px rgba(2,132,199,0.2)' }}
-                  >
-                    {currentStrings.startContraction}
-                  </button>
-                ) : (
-                  <button 
-                    onClick={stopContractionTimer} 
-                    style={{ background: '#EF4444', color: '#FFFFFF', border: 'none', width: '100%', padding: '12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }}
-                  >
-                    {currentStrings.stopContraction}
-                  </button>
-                )}
+                <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '8px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.8rem', fontWeight: '800', fontVariantNumeric: 'tabular-nums', color: isContractionActive ? '#EF4444' : '#0284c7', marginBottom: '8px' }}>
+                    {formatTime(elapsedSeconds)}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', marginBottom: '10px' }}>
+                    {isContractionActive ? currentStrings.tracking : currentStrings.timerReady}
+                  </div>
+                  
+                  {!isContractionActive ? (
+                    <button onClick={startContractionTimer} style={{ background: '#0284c7', color: '#FFFFFF', border: 'none', padding: '10px 16px', borderRadius: '6px', fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer', width: '100%' }}>
+                      {currentStrings.startContraction}
+                    </button>
+                  ) : (
+                    <button onClick={stopContractionTimer} style={{ background: '#EF4444', color: '#FFFFFF', border: 'none', padding: '10px 16px', borderRadius: '6px', fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer', width: '100%' }}>
+                      {currentStrings.stopContraction}
+                    </button>
+                  )}
+                </div>
 
-                {/* Contractions History Log */}
                 {contractions.length > 0 && (
-                  <div style={{ marginTop: '16px', textAlign: language === 'ar' ? 'right' : 'left', borderTop: '1px solid #E2E8F0', paddingTop: '12px' }}>
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.82rem', color: '#475569' }}>{currentStrings.recentLog}</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '150px', overflowY: 'auto' }}>
+                  <div style={{ marginTop: '12px' }}>
+                    <h4 style={{ margin: '0 0 6px 0', fontSize: '0.8rem', color: '#475569' }}>{currentStrings.recentLog}</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
                       {contractions.map((c) => (
-                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', background: '#F8FAFC', padding: '8px 10px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.75rem' }}>
-                          <span>🕒 {c.time}</span>
+                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#F1F5F9', borderRadius: '6px', fontSize: '0.72rem' }}>
+                          <span>{c.time}</span>
                           <span>{currentStrings.duration} <strong>{c.duration}</strong></span>
-                          <span style={{ color: c.intensity === 'Strong' ? '#EF4444' : '#0284c7', fontWeight: '700' }}>{currentStrings.intensities[c.intensity] || c.intensity}</span>
+                          <span>Intensity: <strong>{currentStrings.intensities[c.intensity] || c.intensity}</strong></span>
                         </div>
                       ))}
                     </div>
@@ -730,6 +728,7 @@ export default function CycleTracker() {
 
         </div>
       )}
+
     </div>
   );
 }

@@ -626,7 +626,7 @@ export default function Specialists() {
                             border: '1px solid #CBD5E1',
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
-                            outline: 'none',
+                          outline: 'none',
                             backgroundColor: '#FAFAF9',
                             textAlign: isRtl ? 'right' : 'left'
                           }}
