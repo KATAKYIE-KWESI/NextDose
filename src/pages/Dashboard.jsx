@@ -382,7 +382,7 @@ export default function Dashboard() {
           <div style={{ flex: '1 1 250px', minWidth: 0, textAlign: isRTL ? 'right' : 'left' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
               <span style={{ background: '#fff', color: '#15803D', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #BBF7D0' }}>
-                {t('aura.badge', 'AHED AI · Supportive Sisterhood')}
+                {t('aura.badge', 'AHED AI 💚 · Supportive Sisterhood')}
               </span>
               <span style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                 <span style={{ width: '6px', height: '6px', background: '#22c55e', borderRadius: '50%', display: 'inline-block' }}></span> 
