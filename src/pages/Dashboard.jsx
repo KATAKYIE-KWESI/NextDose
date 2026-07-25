@@ -4,7 +4,7 @@ import { useAuth } from '../AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api/client.js';
 // Import the consolidated AhedAI engine
-import { generateAhedInsight } from '../_lib/ahedAI'; 
+import { generateAhedInsight } from '../../api/_lib/ahedAI';
 
 function Logo({ size = 40, className = '' }) {
   return (
