@@ -327,7 +327,7 @@ export default function HerSignalBrand() {
           HerSignal
         </span>
         <h1 style={{ margin: '0 0 10px 0', fontSize: 'clamp(2rem, 5vw, 2.8rem)', color: '#1E293B', fontWeight: '800', letterSpacing: '-0.02em' }}>
-          Make the <span style={{ background: 'linear-gradient(135deg, #0369A1 0%, #7C3AED 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', padding: '0 2px', borderBottom: '3px solid #7C3AED' }}>invisible</span> <span style={{ background: 'linear-gradient(135deg, #2E7D32 0%, #0369A1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', padding: '0 2px', borderBottom: '3px solid #2E7D32' }}>visible</span>.
+          No stigma <span style={{ background: 'linear-gradient(135deg, #0369A1 0%, #7C3AED 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', padding: '0 2px', borderBottom: '3px solid #7C3AED' }}>just</span> <span style={{ background: 'linear-gradient(135deg, #2E7D32 0%, #0369A1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', padding: '0 2px', borderBottom: '3px solid #2E7D32' }}>support</span>.
         </h1>
         <p style={{ margin: 0, fontSize: '1.1rem', color: '#64748B', fontStyle: 'italic', marginBottom: '20px' }}>
           "We help women understand what their bodies have been trying to tell them."

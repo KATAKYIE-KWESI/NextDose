@@ -70,7 +70,7 @@ function Logo({ size = 40, className = '' }) {
 export default function Dashboard() {
   const { user } = useAuth();
   const location = useLocation();
-  const { t, language, isRTL } = useLanguage(); // Pulling global translation & RTL direction context
+  const { t, language, isRTL } = useLanguage(); 
   
   // Dynamic Health Data States
   const [logs, setLogs] = useState([]);
@@ -156,7 +156,7 @@ export default function Dashboard() {
     }
   }
 
-  // Set Dynamic Aura AI Insight when phase or logs change
+  // Set Dynamic Ahed AI Insight when phase or logs change
   useEffect(() => {
     const moodLog = logs.find(l => l.symptoms?.length > 0);
     const latestMood = moodLog?.symptoms?.[0] || selectedMood;
@@ -389,7 +389,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* STANDOUT SUPPORTIVE AURA AI COMPANION BANNER (WITH AHED AVATAR) */}
+      {/* STANDOUT SUPPORTIVE AHED AI COMPANION BANNER */}
       <div className="card aura-ai-featured-banner animated-entry animated-glow" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', border: '2px solid #BBF7D0', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box', animationDelay: '0.2s' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
           
@@ -410,14 +410,14 @@ export default function Dashboard() {
             <img 
               src="/image_91a5b6.png" 
               alt="Ahed AI Assistant" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} 
             />
           </div>
 
           <div style={{ flex: '1 1 250px', minWidth: 0, textAlign: isRTL ? 'right' : 'left' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
               <span style={{ background: '#fff', color: '#15803D', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #BBF7D0' }}>
-                {t('aura.badge', 'Aura AI · Supportive Sisterhood')}
+                {t('aura.badge', 'AHED AI · Supportive Sisterhood')}
               </span>
               <span style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                 <span style={{ width: '6px', height: '6px', background: '#22c55e', borderRadius: '50%', display: 'inline-block' }}></span> 
@@ -491,7 +491,7 @@ export default function Dashboard() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flexDirection: isRTL ? 'row-reverse' : 'row', textAlign: isRTL ? 'right' : 'left' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🩺</div>
-            <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ minWidth: '0', flex: 1 }}>
               <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B', wordBreak: 'break-word' }}>{t('upcoming.checkup', 'Wellness Checkup')}</div>
               <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>{t('upcoming.scheduled', 'Scheduled via Screening Hub')}</div>
             </div>
