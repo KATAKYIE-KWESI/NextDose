@@ -26,54 +26,6 @@ const TRANSLATIONS = {
     errorHeading: 'Error',
     verifiedTooltip: 'Verified Specialist',
     reviewsText: '+ reviews'
-  },
-  Arabic: {
-    badge: '✨ أفضل الخبراء الإقليميين تقييماً',
-    title: 'أفضل الأخصائيين في الشرق الأوسط',
-    subtitle: 'تواصل مع أطباء النساء والتوليد والمتخصصين الصحيين الموثوقين ذوي التقييمات العالية في دبي، الرياض، أبوظبي، ومنطقة الشرق الأوسط وشمال إفريقيا.',
-    searchPlaceholder: 'ابحث عن طبيب، مدينة، أو حالة (تكيس المبايض، أطفال أنابيب)...',
-    loading: 'جاري تحميل الأخصائيين من الدليل...',
-    noResults: 'لم يتم العثور على أخصائيين مطابقي لـ',
-    bookConsult: 'طلب استشارة خاصة',
-    bookingTitle: 'حجز استشارة مع',
-    bookingSubtitle: 'قدم تفاصيلك أدناه للحصول على مكالمة عكسية خاصة أو تأكيد سري عبر واتساب.',
-    preferredTimeLabel: 'التاريخ والوقت المفضل *',
-    preferredTimePlaceholder: 'مثال: غداً الساعة 5 مساءً، أو صباح السبت',
-    reasonLabel: 'ما الذي ترغب في مناقشته؟ (اختياري)',
-    reasonPlaceholder: 'صف بإيجاز أعراضك أو أهدافك لهذه الجلسة...',
-    contactLabel: 'أفضل طريقة للوصول إليك (هاتف / واتساب) *',
-    contactPlaceholder: 'رقم الهاتف أو الواتساب +971',
-    confirmBtn: 'تأكيد الطلب 💬',
-    sendingBtn: 'جاري إرسال الطلب...',
-    cancelBtn: 'إلغاء',
-    successHeading: 'تم إرسال طلب الحجز!',
-    errorHeading: 'خطأ',
-    verifiedTooltip: 'أخصائي معتمد',
-    reviewsText: '+ تقييم'
-  },
-  French: {
-    badge: '✨ Experts régionaux les mieux notés',
-    title: 'Spécialistes de premier plan au Moyen-Orient',
-    subtitle: 'Connectez-vous avec des gynécologues et des professionnels de la santé de confiance à Dubaï, Riyad, Abou Dhabi et dans toute la région MENA.',
-    searchPlaceholder: 'Rechercher un médecin, une ville ou une affection (SOPK, FIV)...',
-    loading: 'Chargement des spécialistes...',
-    noResults: 'Aucun spécialiste trouvé correspondant à',
-    bookConsult: 'Demander une consultation privée',
-    bookingTitle: 'Réserver une consultation avec',
-    bookingSubtitle: 'Fournissez vos coordonnées ci-dessous pour un rappel privé ou une confirmation WhatsApp.',
-    preferredTimeLabel: 'Date et heure souhaitées *',
-    preferredTimePlaceholder: 'ex: Demain 17h, ou samedi matin',
-    reasonLabel: 'Que souhaitez-vous discuter ? (Optionnel)',
-    reasonPlaceholder: 'Décrivez brièvement vos symptômes ou vos objectifs...',
-    contactLabel: 'Meilleur moyen de vous joindre (Téléphone / WhatsApp) *',
-    contactPlaceholder: '+971 XX XXX XXXX ou numéro WhatsApp',
-    confirmBtn: 'Confirmer la demande 💬',
-    sendingBtn: 'Envoi en cours...',
-    cancelBtn: 'Annuler',
-    successHeading: 'Demande de réservation envoyée !',
-    errorHeading: 'Erreur',
-    verifiedTooltip: 'Spécialiste vérifié',
-    reviewsText: '+ avis'
   }
 };
 
@@ -147,10 +99,10 @@ export default function Specialists() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('English');
 
-  const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS['English'];
-  const isRtl = currentLanguage === 'Arabic';
+  const currentLanguage = 'English';
+  const t = TRANSLATIONS[currentLanguage];
+  const isRtl = false;
 
   useEffect(() => {
     api
@@ -184,13 +136,7 @@ export default function Specialists() {
         reason,
         contact,
       });
-      setSuccess(
-        currentLanguage === 'Arabic' 
-          ? `تم إرسال طلب الاستشارة إلى ${selected.name}. سيتم تأكيد جلستك مباشرة عبر ${contact}.`
-          : currentLanguage === 'French'
-          ? `Demande de consultation envoyée à ${selected.name}. Ils confirmeront votre session directement via ${contact}.`
-          : `Consultation request sent to ${selected.name}. They will confirm your session directly via ${contact}.`
-      );
+      setSuccess(`Consultation request sent to ${selected.name}. They will confirm your session directly via ${contact}.`);
       setSelected(null);
       setPreferredTimes('');
       setReason('');
@@ -227,41 +173,6 @@ export default function Specialists() {
         textAlign: isRtl ? 'right' : 'left'
       }}
     >
-      {/* LANGUAGE SELECTOR HEADER */}
-      <div 
-        className="language-selector-bar"
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginBottom: '16px',
-          gap: '8px'
-        }}
-      >
-        <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#475569' }}>
-          🌐 Language / اللغة / Langue:
-        </span>
-        <select
-          value={currentLanguage}
-          onChange={(e) => setCurrentLanguage(e.target.value)}
-          style={{
-            padding: '6px 10px',
-            borderRadius: '8px',
-            border: '1px solid #CBD5E1',
-            background: '#FFFFFF',
-            color: '#1E293B',
-            fontSize: '0.85rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            outline: 'none'
-          }}
-        >
-          <option value="English">English</option>
-          <option value="Arabic">العربية (Arabic)</option>
-          <option value="French">Français</option>
-        </select>
-      </div>
-
       {/* HEADER SECTION */}
       <div className="specialists-header" style={{ marginBottom: '24px' }}>
         <span 
@@ -626,7 +537,7 @@ export default function Specialists() {
                             border: '1px solid #CBD5E1',
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
-                          outline: 'none',
+                            outline: 'none',
                             backgroundColor: '#FAFAF9',
                             textAlign: isRtl ? 'right' : 'left'
                           }}

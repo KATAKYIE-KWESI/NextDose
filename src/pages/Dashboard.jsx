@@ -389,12 +389,31 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* STANDOUT SUPPORTIVE AURA AI COMPANION BANNER */}
+      {/* STANDOUT SUPPORTIVE AURA AI COMPANION BANNER (WITH AHED AVATAR) */}
       <div className="card aura-ai-featured-banner animated-entry animated-glow" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', border: '2px solid #BBF7D0', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box', animationDelay: '0.2s' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <div style={{ background: '#22c55e', color: '#fff', fontSize: '22px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px', flexShrink: '0', boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)' }} title="Supportive Companion">
-            👩‍❤️‍👩
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+          
+          {/* Ahed Avatar Container */}
+          <div style={{ 
+            width: '56px', 
+            height: '56px', 
+            borderRadius: '50%', 
+            background: '#D8B4FE', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            flexShrink: '0', 
+            boxShadow: '0 4px 12px rgba(126, 34, 206, 0.2)',
+            overflow: 'hidden',
+            border: '2px solid #fff'
+          }} title="Ahed - AI Companion">
+            <img 
+              src="/image_91a5b6.png" 
+              alt="Ahed AI Assistant" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} 
+            />
           </div>
+
           <div style={{ flex: '1 1 250px', minWidth: 0, textAlign: isRTL ? 'right' : 'left' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
               <span style={{ background: '#fff', color: '#15803D', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #BBF7D0' }}>
