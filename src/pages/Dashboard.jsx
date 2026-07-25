@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
-import { useLanguage } from '../LanguageContext.jsx'; // Centralized translation provider
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api/client.js';
 
 function Logo({ size = 40, className = '' }) {
