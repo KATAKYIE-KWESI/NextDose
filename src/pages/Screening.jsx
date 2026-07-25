@@ -338,43 +338,71 @@ export default function MaternalScreeningHub() {
         </div>
       )}
 
-      {/* VIEW 2: SCREENING & HEALTH STORY HUB */}
+      {/* VIEW 2: SCREENING, HEALTH STORY & SAFE SPACE HUB */}
       {activeMainTab === 'screening' && (
         <div className="screening-page">
           {/* SUB-TABS FOR SCREENING SECTION */}
           <div 
             style={{ 
               display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center',
               gap: '8px', 
               marginBottom: '20px', 
               borderBottom: '1px solid #E2E8F0', 
               paddingBottom: '12px',
-              overflowX: 'auto'
+              flexWrap: 'wrap'
             }}
           >
-            {[
-              { id: 'reminders', label: '🩺 Preventive Reminders' },
-              { id: 'story', label: '📖 My Health Story' },
-              { id: 'conditions', label: '🛡️ Women’s Health Focus' }
-            ].map((sub) => (
-              <button
-                key={sub.id}
-                onClick={() => setScreeningSubTab(sub.id)}
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', flex: 1 }}>
+              {[
+                { id: 'reminders', label: '🩺 Preventive Reminders' },
+                { id: 'story', label: '📖 My Health Story' },
+                { id: 'conditions', label: '🛡️ Women’s Health Focus' },
+                { id: 'safespace', label: '🔒 Safe Space & Community' }
+              ].map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => setScreeningSubTab(sub.id)}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '6px',
+                    border: screeningSubTab === sub.id ? '1px solid #7c3aed' : '1px solid #CBD5E1',
+                    background: screeningSubTab === sub.id ? '#7c3aed' : '#FFFFFF',
+                    color: screeningSubTab === sub.id ? '#FFFFFF' : '#475569',
+                    fontWeight: '600',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            {/* LANGUAGE SELECTOR DROPDOWN */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#F8FAFC', border: '1px solid #CBD5E1', borderRadius: '6px', padding: '4px 8px' }}>
+              <span style={{ fontSize: '0.85rem' }}>🌐</span>
+              <select
+                value={currentLanguage || 'en'}
+                onChange={(e) => setCurrentLanguage && setCurrentLanguage(e.target.value)}
                 style={{
-                  padding: '8px 14px',
-                  borderRadius: '6px',
-                  border: screeningSubTab === sub.id ? '1px solid #7c3aed' : '1px solid #CBD5E1',
-                  background: screeningSubTab === sub.id ? '#7c3aed' : '#FFFFFF',
-                  color: screeningSubTab === sub.id ? '#FFFFFF' : '#475569',
-                  fontWeight: '600',
+                  border: 'none',
+                  background: 'transparent',
                   fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap'
+                  fontWeight: '600',
+                  color: '#334155',
+                  outline: 'none',
+                  cursor: 'pointer'
                 }}
               >
-                {sub.label}
-              </button>
-            ))}
+                <option value="en">English</option>
+                <option value="tw">Twi (Akan)</option>
+                <option value="fr">Français</option>
+                <option value="pidgin">Ghana Pidgin</option>
+              </select>
+            </div>
           </div>
 
           {/* SUB-VIEW 1: SCREENING REMINDERS */}
@@ -528,7 +556,7 @@ export default function MaternalScreeningHub() {
             </div>
           )}
 
-          {/* SUB-VIEW 2: MY HEALTH STORY (MATCHING UI REFERENCE) */}
+          {/* SUB-VIEW 2: MY HEALTH STORY */}
           {screeningSubTab === 'story' && (
             <div style={{ display: 'grid', gap: '16px', background: '#FAF5FF', padding: '16px', borderRadius: '16px', border: '1px solid #E9D5FF' }}>
               
@@ -639,7 +667,7 @@ export default function MaternalScreeningHub() {
 
                 <div style={{ display: 'grid', gap: '10px' }}>
                   {[
-                    { title: 'Breast Conditions & Breast Awareness', desc: 'Self-examination guides, regular check-in schedules, and persistence tracking for lumps or skin changes.' },
+                    { title: 'Breast Conditions & Early Detection Support', desc: 'Self-examination guides, regular check-in schedules, and early detection support for tracking lumps, skin changes, or tenderness.' },
                     { title: 'Cervical Conditions & Screening Awareness', desc: 'HPV & Pap smear intervals, abnormal spotting patterns, and clinician discussion guides.' },
                     { title: 'Endometrial & Womb Health Awareness', desc: 'Tracking heavy menstrual bleeding, intermenstrual spotting, and pelvic discomfort trends.' },
                     { title: 'Ovarian Health Awareness', desc: 'Persistent bloating, pelvic pressure tracking, and cycle-correlated symptom flags.' }
@@ -653,6 +681,46 @@ export default function MaternalScreeningHub() {
 
                 <div style={{ marginTop: '16px', background: '#F1F5F9', padding: '12px', borderRadius: '8px', fontSize: '0.82rem', color: '#475569', lineHeight: '1.4' }}>
                   <strong>Safety Notice:</strong> Report uploads and AI-assisted explanations are designed to assist dialogue with your doctor. The app does not independently reinterpret images, overrule clinicians, or claim that a normal-looking result excludes disease.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SUB-VIEW 4: SAFE SPACE & COMMUNITY HUB */}
+          {screeningSubTab === 'safespace' && (
+            <div style={{ display: 'grid', gap: '16px' }}>
+              <div className="card" style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '20px' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#1E293B' }}>🔒 Safe Space & Community Hub</h3>
+                  <p style={{ margin: 0, fontSize: '0.88rem', color: '#64748B', lineHeight: '1.5' }}>
+                    A safe, private, and anonymous space to ask questions normally kept hidden, and connect with a supportive community sharing experiences through similar life stages.
+                  </p>
+                </div>
+
+                <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
+                  <div style={{ padding: '16px', background: '#FAF5FF', borderRadius: '10px', border: '1px solid #E9D5FF' }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#581c87' }}>💬 Anonymous Q&A Sanctuary</h4>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#6B21A8', lineHeight: '1.4' }}>
+                      Ask sensitive questions about intimate symptoms, cycles, or bodily changes completely anonymously without any identity attachment.
+                    </p>
+                  </div>
+
+                  <div style={{ padding: '16px', background: '#F0FDF4', borderRadius: '10px', border: '1px solid #BBF7D0' }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: '#166534' }}>🌱 Shared Life Stages Community</h4>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#15803D', lineHeight: '1.4' }}>
+                      Exchange lived experiences, coping strategies, and encouragement with other women navigating parallel hormonal or reproductive health journeys.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '0.95rem', color: '#1E293B' }}>Ready to join the conversation?</h4>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '0.82rem', color: '#64748B' }}>
+                    Your privacy and anonymity are protected end-to-end within community channels.
+                  </p>
+                  <button style={{ background: '#7c3aed', color: '#FFFFFF', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
+                    Enter Anonymous Community ›
+                  </button>
                 </div>
               </div>
             </div>

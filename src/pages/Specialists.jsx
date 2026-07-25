@@ -1,6 +1,82 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
 
+// Dictionary of translations for Header & UI Elements
+const TRANSLATIONS = {
+  English: {
+    badge: '✨ Top-Rated Regional Experts',
+    title: 'Top-Rated Specialists in the Middle East',
+    subtitle: 'Connect with trusted, highly rated gynecologists and health professionals across Dubai, Riyadh, Abu Dhabi, and the wider MENA region.',
+    searchPlaceholder: 'Search doctor, city, or condition (PCOS, IVF)...',
+    loading: 'Loading specialists from directory...',
+    noResults: 'No specialists found matching',
+    bookConsult: 'Request Private Consult',
+    bookingTitle: 'Book Consultation with',
+    bookingSubtitle: 'Provide your details below for a private callback or confidential WhatsApp confirmation.',
+    preferredTimeLabel: 'Preferred Date & Time *',
+    preferredTimePlaceholder: 'e.g. Tomorrow 5 PM, or Saturday Morning',
+    reasonLabel: 'What would you like to discuss? (Optional)',
+    reasonPlaceholder: 'Briefly describe your symptoms or goals for this session...',
+    contactLabel: 'Best Way to Reach You (Phone / WhatsApp) *',
+    contactPlaceholder: '+971 XX XXX XXXX or WhatsApp number',
+    confirmBtn: 'Confirm Request 💬',
+    sendingBtn: 'Sending Request...',
+    cancelBtn: 'Cancel',
+    successHeading: 'Booking Request Submitted!',
+    errorHeading: 'Error',
+    verifiedTooltip: 'Verified Specialist',
+    reviewsText: '+ reviews'
+  },
+  Arabic: {
+    badge: '✨ أفضل الخبراء الإقليميين تقييماً',
+    title: 'أفضل الأخصائيين في الشرق الأوسط',
+    subtitle: 'تواصل مع أطباء النساء والتوليد والمتخصصين الصحيين الموثوقين ذوي التقييمات العالية في دبي، الرياض، أبوظبي، ومنطقة الشرق الأوسط وشمال إفريقيا.',
+    searchPlaceholder: 'ابحث عن طبيب، مدينة، أو حالة (تكيس المبايض، أطفال أنابيب)...',
+    loading: 'جاري تحميل الأخصائيين من الدليل...',
+    noResults: 'لم يتم العثور على أخصائيين مطابقي لـ',
+    bookConsult: 'طلب استشارة خاصة',
+    bookingTitle: 'حجز استشارة مع',
+    bookingSubtitle: 'قدم تفاصيلك أدناه للحصول على مكالمة عكسية خاصة أو تأكيد سري عبر واتساب.',
+    preferredTimeLabel: 'التاريخ والوقت المفضل *',
+    preferredTimePlaceholder: 'مثال: غداً الساعة 5 مساءً، أو صباح السبت',
+    reasonLabel: 'ما الذي ترغب في مناقشته؟ (اختياري)',
+    reasonPlaceholder: 'صف بإيجاز أعراضك أو أهدافك لهذه الجلسة...',
+    contactLabel: 'أفضل طريقة للوصول إليك (هاتف / واتساب) *',
+    contactPlaceholder: 'رقم الهاتف أو الواتساب +971',
+    confirmBtn: 'تأكيد الطلب 💬',
+    sendingBtn: 'جاري إرسال الطلب...',
+    cancelBtn: 'إلغاء',
+    successHeading: 'تم إرسال طلب الحجز!',
+    errorHeading: 'خطأ',
+    verifiedTooltip: 'أخصائي معتمد',
+    reviewsText: '+ تقييم'
+  },
+  French: {
+    badge: '✨ Experts régionaux les mieux notés',
+    title: 'Spécialistes de premier plan au Moyen-Orient',
+    subtitle: 'Connectez-vous avec des gynécologues et des professionnels de la santé de confiance à Dubaï, Riyad, Abou Dhabi et dans toute la région MENA.',
+    searchPlaceholder: 'Rechercher un médecin, une ville ou une affection (SOPK, FIV)...',
+    loading: 'Chargement des spécialistes...',
+    noResults: 'Aucun spécialiste trouvé correspondant à',
+    bookConsult: 'Demander une consultation privée',
+    bookingTitle: 'Réserver une consultation avec',
+    bookingSubtitle: 'Fournissez vos coordonnées ci-dessous pour un rappel privé ou une confirmation WhatsApp.',
+    preferredTimeLabel: 'Date et heure souhaitées *',
+    preferredTimePlaceholder: 'ex: Demain 17h, ou samedi matin',
+    reasonLabel: 'Que souhaitez-vous discuter ? (Optionnel)',
+    reasonPlaceholder: 'Décrivez brièvement vos symptômes ou vos objectifs...',
+    contactLabel: 'Meilleur moyen de vous joindre (Téléphone / WhatsApp) *',
+    contactPlaceholder: '+971 XX XXX XXXX ou numéro WhatsApp',
+    confirmBtn: 'Confirmer la demande 💬',
+    sendingBtn: 'Envoi en cours...',
+    cancelBtn: 'Annuler',
+    successHeading: 'Demande de réservation envoyée !',
+    errorHeading: 'Erreur',
+    verifiedTooltip: 'Spécialiste vérifié',
+    reviewsText: '+ avis'
+  }
+};
+
 // Roster of top-rated Middle Eastern specialists with UNIQUE high-quality avatars
 const TOP_RATED_ME_SPECIALISTS = [
   {
@@ -71,6 +147,10 @@ export default function Specialists() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('English');
+
+  const t = TRANSLATIONS[currentLanguage] || TRANSLATIONS['English'];
+  const isRtl = currentLanguage === 'Arabic';
 
   useEffect(() => {
     api
@@ -105,7 +185,11 @@ export default function Specialists() {
         contact,
       });
       setSuccess(
-        `Consultation request sent to ${selected.name}. They will confirm your session directly via ${contact}.`
+        currentLanguage === 'Arabic' 
+          ? `تم إرسال طلب الاستشارة إلى ${selected.name}. سيتم تأكيد جلستك مباشرة عبر ${contact}.`
+          : currentLanguage === 'French'
+          ? `Demande de consultation envoyée à ${selected.name}. Ils confirmeront votre session directement via ${contact}.`
+          : `Consultation request sent to ${selected.name}. They will confirm your session directly via ${contact}.`
       );
       setSelected(null);
       setPreferredTimes('');
@@ -132,15 +216,52 @@ export default function Specialists() {
   return (
     <div 
       className="specialists-container"
+      dir={isRtl ? 'rtl' : 'ltr'}
       style={{
         width: '100%',
         maxWidth: '850px',
         margin: '0 auto',
         padding: '16px 12px',
         boxSizing: 'border-box',
-        backgroundColor: '#F9F8F6'
+        backgroundColor: '#F9F8F6',
+        textAlign: isRtl ? 'right' : 'left'
       }}
     >
+      {/* LANGUAGE SELECTOR HEADER */}
+      <div 
+        className="language-selector-bar"
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          marginBottom: '16px',
+          gap: '8px'
+        }}
+      >
+        <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#475569' }}>
+          🌐 Language / اللغة / Langue:
+        </span>
+        <select
+          value={currentLanguage}
+          onChange={(e) => setCurrentLanguage(e.target.value)}
+          style={{
+            padding: '6px 10px',
+            borderRadius: '8px',
+            border: '1px solid #CBD5E1',
+            background: '#FFFFFF',
+            color: '#1E293B',
+            fontSize: '0.85rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            outline: 'none'
+          }}
+        >
+          <option value="English">English</option>
+          <option value="Arabic">العربية (Arabic)</option>
+          <option value="French">Français</option>
+        </select>
+      </div>
+
       {/* HEADER SECTION */}
       <div className="specialists-header" style={{ marginBottom: '24px' }}>
         <span 
@@ -156,13 +277,13 @@ export default function Specialists() {
             marginBottom: '10px'
           }}
         >
-          ✨ Top-Rated Regional Experts
+          {t.badge}
         </span>
         <h1 style={{ margin: '0 0 8px 0', fontSize: 'clamp(1.5rem, 4vw, 1.9rem)', color: '#1E293B', fontWeight: '700' }}>
-          Top-Rated Specialists in the Middle East
+          {t.title}
         </h1>
         <p className="muted-text" style={{ margin: 0, fontSize: '0.92rem', color: '#64748B', lineHeight: '1.5' }}>
-          Connect with trusted, highly rated gynecologists and health professionals across Dubai, Riyadh, Abu Dhabi, and the wider MENA region.
+          {t.subtitle}
         </p>
 
         {/* SEARCH BAR */}
@@ -178,13 +299,14 @@ export default function Specialists() {
             marginTop: '16px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
             width: '100%',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            flexDirection: isRtl ? 'row-reverse' : 'row'
           }}
         >
-          <span style={{ fontSize: '1.1rem', marginRight: '10px', color: '#64748B' }}>🔍</span>
+          <span style={{ fontSize: '1.1rem', [isRtl ? 'marginLeft' : 'marginRight']: '10px', color: '#64748B' }}>🔍</span>
           <input
             type="text"
-            placeholder="Search doctor, city, or condition (PCOS, IVF)..."
+            placeholder={t.searchPlaceholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -193,7 +315,8 @@ export default function Specialists() {
               width: '100%',
               fontSize: '0.92rem',
               color: '#1E293B',
-              background: 'transparent'
+              background: 'transparent',
+              textAlign: isRtl ? 'right' : 'left'
             }}
           />
           {searchTerm && (
@@ -228,12 +351,14 @@ export default function Specialists() {
             display: 'flex',
             gap: '12px',
             alignItems: 'flex-start',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
+            textAlign: isRtl ? 'right' : 'left'
           }}
         >
           <span className="alert-icon" style={{ fontSize: '1.2rem' }}>✨</span>
           <div>
-            <strong style={{ display: 'block', marginBottom: '2px' }}>Booking Request Submitted!</strong>
+            <strong style={{ display: 'block', marginBottom: '2px' }}>{t.successHeading}</strong>
             <p style={{ margin: 0, lineHeight: '1.4' }}>{success}</p>
           </div>
         </div>
@@ -253,12 +378,14 @@ export default function Specialists() {
             display: 'flex',
             gap: '12px',
             alignItems: 'flex-start',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
+            textAlign: isRtl ? 'right' : 'left'
           }}
         >
           <span className="alert-icon" style={{ fontSize: '1.2rem' }}>⚠️</span>
           <div>
-            <strong style={{ display: 'block', marginBottom: '2px' }}>Error</strong>
+            <strong style={{ display: 'block', marginBottom: '2px' }}>{t.errorHeading}</strong>
             <p style={{ margin: 0, lineHeight: '1.4' }}>{error}</p>
           </div>
         </div>
@@ -268,11 +395,11 @@ export default function Specialists() {
       <div className="specialists-list" style={{ display: 'grid', gap: '16px' }}>
         {loading ? (
           <div className="skeleton-container" style={{ padding: '20px 0', textAlign: 'center', color: '#64748B' }}>
-            <p>Loading specialists from directory...</p>
+            <p>{t.loading}</p>
           </div>
         ) : filteredSpecialists.length === 0 ? (
           <div className="card empty-state-card" style={{ padding: '32px', textAlign: 'center', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
-            <p style={{ margin: 0, color: '#64748B', fontSize: '0.95rem' }}>No specialists found matching "{searchTerm}".</p>
+            <p style={{ margin: 0, color: '#64748B', fontSize: '0.95rem' }}>{t.noResults} "{searchTerm}".</p>
           </div>
         ) : (
           filteredSpecialists.map((sp, idx) => {
@@ -298,7 +425,8 @@ export default function Specialists() {
                     display: 'flex',
                     gap: '14px',
                     alignItems: 'flex-start',
-                    flexWrap: 'wrap'
+                    flexWrap: 'wrap',
+                    flexDirection: isRtl ? 'row-reverse' : 'row'
                   }}
                 >
                   {/* DOCTOR AVATAR */}
@@ -325,11 +453,11 @@ export default function Specialists() {
                     />
                     <span 
                       className="verified-dot" 
-                      title="Verified Specialist"
+                      title={t.verifiedTooltip}
                       style={{
                         position: 'absolute',
                         bottom: '0',
-                        right: '0',
+                        [isRtl ? 'left' : 'right']: '0',
                         background: '#38A169',
                         color: '#FFFFFF',
                         width: '20px',
@@ -348,7 +476,7 @@ export default function Specialists() {
                   </div>
 
                   {/* MAIN INFO */}
-                  <div className="specialist-info" style={{ flex: '1 1 240px', minWidth: 0 }}>
+                  <div className="specialist-info" style={{ flex: '1 1 240px', minWidth: 0, textAlign: isRtl ? 'right' : 'left' }}>
                     <div 
                       className="title-row"
                       style={{
@@ -357,7 +485,8 @@ export default function Specialists() {
                         alignItems: 'flex-start',
                         gap: '8px',
                         marginBottom: '6px',
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        flexDirection: isRtl ? 'row-reverse' : 'row'
                       }}
                     >
                       <div className="name-and-rating" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -365,7 +494,7 @@ export default function Specialists() {
                         {sp.rating && (
                           <span className="rating-badge" style={{ fontSize: '0.8rem', color: '#475569', fontWeight: '600' }}>
                             ⭐ {sp.rating}{' '}
-                            <small style={{ color: '#94A3B8', fontWeight: '450' }}>({sp.reviewsCount || 50}+ reviews)</small>
+                            <small style={{ color: '#94A3B8', fontWeight: '450' }}>({sp.reviewsCount || 50}{t.reviewsText})</small>
                           </span>
                         )}
                       </div>
@@ -395,7 +524,8 @@ export default function Specialists() {
                         fontSize: '0.82rem',
                         color: '#64748B',
                         marginBottom: '10px',
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        flexDirection: isRtl ? 'row-reverse' : 'row'
                       }}
                     >
                       <span>📍 {sp.city}</span>
@@ -416,13 +546,14 @@ export default function Specialists() {
                     style={{
                       marginTop: '16px',
                       paddingTop: '16px',
-                      borderTop: '1px solid #E2E8F0'
+                      borderTop: '1px solid #E2E8F0',
+                      textAlign: isRtl ? 'right' : 'left'
                     }}
                   >
                     <div className="form-header" style={{ marginBottom: '14px' }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: '#1E293B' }}>Book Consultation with {sp.name}</h4>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: '#1E293B' }}>{t.bookingTitle} {sp.name}</h4>
                       <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748B' }}>
-                        Provide your details below for a private callback or confidential WhatsApp confirmation.
+                        {t.bookingSubtitle}
                       </p>
                     </div>
 
@@ -437,11 +568,11 @@ export default function Specialists() {
                       )}
 
                       <div className="field-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Preferred Date & Time *</label>
+                        <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>{t.preferredTimeLabel}</label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. Tomorrow 5 PM, or Saturday Morning"
+                          placeholder={t.preferredTimePlaceholder}
                           value={preferredTimes}
                           onChange={(e) => setPreferredTimes(e.target.value)}
                           style={{
@@ -452,16 +583,17 @@ export default function Specialists() {
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
                             outline: 'none',
-                            backgroundColor: '#FAFAF9'
+                            backgroundColor: '#FAFAF9',
+                            textAlign: isRtl ? 'right' : 'left'
                           }}
                         />
                       </div>
 
                       <div className="field-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>What would you like to discuss? (Optional)</label>
+                        <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>{t.reasonLabel}</label>
                         <textarea
                           rows="3"
-                          placeholder="Briefly describe your symptoms or goals for this session..."
+                          placeholder={t.reasonPlaceholder}
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
                           style={{
@@ -473,17 +605,18 @@ export default function Specialists() {
                             boxSizing: 'border-box',
                             outline: 'none',
                             resize: 'vertical',
-                            backgroundColor: '#FAFAF9'
+                            backgroundColor: '#FAFAF9',
+                            textAlign: isRtl ? 'right' : 'left'
                           }}
                         />
                       </div>
 
                       <div className="field-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Best Way to Reach You (Phone / WhatsApp) *</label>
+                        <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>{t.contactLabel}</label>
                         <input
                           type="text"
                           required
-                          placeholder="+971 XX XXX XXXX or WhatsApp number"
+                          placeholder={t.contactPlaceholder}
                           value={contact}
                           onChange={(e) => setContact(e.target.value)}
                           style={{
@@ -494,7 +627,8 @@ export default function Specialists() {
                             fontSize: '0.9rem',
                             boxSizing: 'border-box',
                             outline: 'none',
-                            backgroundColor: '#FAFAF9'
+                            backgroundColor: '#FAFAF9',
+                            textAlign: isRtl ? 'right' : 'left'
                           }}
                         />
                       </div>
@@ -505,7 +639,8 @@ export default function Specialists() {
                           display: 'flex',
                           gap: '10px',
                           marginTop: '6px',
-                          flexWrap: 'wrap'
+                          flexWrap: 'wrap',
+                          flexDirection: isRtl ? 'row-reverse' : 'row'
                         }}
                       >
                         <button
@@ -524,7 +659,7 @@ export default function Specialists() {
                             cursor: saving ? 'not-allowed' : 'pointer'
                           }}
                         >
-                          {saving ? 'Sending Request...' : 'Confirm Request 💬'}
+                          {saving ? t.sendingBtn : t.confirmBtn}
                         </button>
                         <button
                           type="button"
@@ -542,7 +677,7 @@ export default function Specialists() {
                             cursor: 'pointer'
                           }}
                         >
-                          Cancel
+                          {t.cancelBtn}
                         </button>
                       </div>
                     </form>
@@ -573,7 +708,7 @@ export default function Specialists() {
                         cursor: 'pointer'
                       }}
                     >
-                      Request Private Consult &rarr;
+                      {t.bookConsult} {isRtl ? '←' : '→'}
                     </button>
                   </div>
                 )}

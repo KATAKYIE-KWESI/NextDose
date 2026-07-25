@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
+import { translations } from './translations.js';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -95,10 +96,13 @@ function NavLink({ to, children, onClick }) {
   );
 }
 
-function Topbar() {
+function Topbar({ currentLang, setCurrentLang }) {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+
+  // Load language strings for navigation items
+  const t = translations[currentLang] || translations.en;
 
   useEffect(() => {
     setMenuOpen(false);
@@ -118,18 +122,33 @@ function Topbar() {
 
         {/* Desktop Nav Links */}
         <nav className="nav-links desktop-only-nav" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: 'auto', marginRight: '16px' }}>
-          <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/tracker">Tracker</NavLink>
-          <NavLink to="/screening">Screening</NavLink>
-          <NavLink to="/specialists">Specialists</NavLink>
-          <NavLink to="/bookings">My Consults</NavLink>
+          <NavLink to="/">{t.dashboard}</NavLink>
+          <NavLink to="/tracker">{t.tracker}</NavLink>
+          <NavLink to="/screening">{t.screening}</NavLink>
+          <NavLink to="/specialists">{t.specialists}</NavLink>
+          <NavLink to="/bookings">{t.bookings}</NavLink>
         </nav>
 
-        {/* Desktop Logout & Mobile Hamburger Toggle */}
+        {/* Language Selector, Desktop Logout & Mobile Hamburger Toggle */}
         <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          
+          {/* Language Dropdown Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', background: '#F1F5F9', padding: '4px 8px', borderRadius: '8px', border: '1px solid #CBD5E1' }}>
+            <select 
+              value={currentLang} 
+              onChange={(e) => setCurrentLang(e.target.value)}
+              style={{ background: 'transparent', border: 'none', fontSize: '0.8rem', fontWeight: '600', color: '#0F172A', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="en">English</option>
+              <option value="ar">العربية</option>
+              <option value="fr">Français</option>
+              <option value="darija">الدارجة</option>
+            </select>
+          </div>
+
           <div className="desktop-only-action">
             <button className="nav-logout-btn" onClick={logout}>
-              Log out
+              {t.logout}
             </button>
           </div>
 
@@ -178,11 +197,11 @@ function Topbar() {
             boxSizing: 'border-box'
           }}
         >
-          <NavLink to="/" onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
-          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>Tracker</NavLink>
-          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>Screening</NavLink>
-          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>Specialists</NavLink>
-          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>My Consults</NavLink>
+          <NavLink to="/" onClick={() => setMenuOpen(false)}>{t.dashboard}</NavLink>
+          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>{t.tracker}</NavLink>
+          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>{t.screening}</NavLink>
+          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>{t.specialists}</NavLink>
+          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>{t.bookings}</NavLink>
           
           <div style={{ paddingTop: '12px', borderTop: '1px solid #F1F5F9', marginTop: '4px' }}>
             <button 
@@ -190,7 +209,7 @@ function Topbar() {
               onClick={() => { setMenuOpen(false); logout(); }}
               style={{ width: '100%', padding: '10px', textAlign: 'center' }}
             >
-              Log out
+              {t.logout}
             </button>
           </div>
         </div>
@@ -215,10 +234,11 @@ function Topbar() {
 
 export default function App() {
   const { user } = useAuth();
+  const [currentLang, setCurrentLang] = useState('en');
 
   return (
     <div className="app-shell" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
-      <Topbar />
+      <Topbar currentLang={currentLang} setCurrentLang={setCurrentLang} />
       <main className="app-content" style={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -236,7 +256,7 @@ export default function App() {
             element={
               user ? (
                 <PrivateRoute>
-                  <Dashboard />
+                  <Dashboard currentLang={currentLang} />
                 </PrivateRoute>
               ) : (
                 <Navigate to="/welcome" replace />
@@ -248,7 +268,7 @@ export default function App() {
             path="/tracker"
             element={
               <PrivateRoute>
-                <CycleTracker />
+                <CycleTracker currentLang={currentLang} />
               </PrivateRoute>
             }
           />
@@ -257,7 +277,7 @@ export default function App() {
             path="/screening"
             element={
               <PrivateRoute>
-                <Screening />
+                <Screening currentLang={currentLang} />
               </PrivateRoute>
             }
           />
@@ -265,7 +285,7 @@ export default function App() {
             path="/specialists"
             element={
               <PrivateRoute>
-                <Specialists />
+                <Specialists currentLang={currentLang} />
               </PrivateRoute>
             }
           />
@@ -273,7 +293,7 @@ export default function App() {
             path="/bookings"
             element={
               <PrivateRoute>
-                <Bookings />
+                <Bookings currentLang={currentLang} />
               </PrivateRoute>
             }
           />

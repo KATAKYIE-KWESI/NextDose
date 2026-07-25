@@ -1,33 +1,34 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
+import { translations } from '../translations.js';
 
-// Helper to determine badge styling based on booking status (calmer/modern palette)
-const getStatusBadgeStyle = (status = '') => {
+// Helper to determine badge styling based on booking status & current language text
+const getStatusBadgeStyle = (status = '', t) => {
   const normalized = status.toLowerCase();
   switch (normalized) {
     case 'confirmed':
     case 'approved':
-      return { background: '#E8F5E9', color: '#2E7D32', label: 'Confirmed' }; // Sage green vibe
+      return { background: '#E8F5E9', color: '#2E7D32', label: t.statusConfirmed || 'Confirmed' };
     case 'pending':
     case 'requested':
-      return { background: '#FFF8E1', color: '#B7791F', label: 'Pending Review' }; // Amber emphasis
+      return { background: '#FFF8E1', color: '#B7791F', label: t.statusPending || 'Pending Review' };
     case 'completed':
-      return { background: '#E0F2FE', color: '#0369A1', label: 'Completed' }; // Soft blue
+      return { background: '#E0F2FE', color: '#0369A1', label: t.statusCompleted || 'Completed' };
     case 'cancelled':
     case 'declined':
-      return { background: '#F1F5F9', color: '#475569', label: 'Cancelled' }; // Lavender-grey neutral
+      return { background: '#F1F5F9', color: '#475569', label: t.statusCancelled || 'Cancelled' };
     default:
-      return { background: '#F1F5F9', color: '#475569', label: status || 'Pending' };
+      return { background: '#F1F5F9', color: '#475569', label: status || t.statusPending || 'Pending' };
   }
 };
 
 // Safe date formatter
-const formatDate = (dateString) => {
-  if (!dateString) return 'Date unavailable';
+const formatDate = (dateString, lang = 'en') => {
+  if (!dateString) return '';
   const parsed = new Date(dateString);
   return isNaN(parsed.getTime())
     ? dateString
-    : parsed.toLocaleDateString('en-US', {
+    : parsed.toLocaleDateString(lang === 'ar' || lang === 'darija' ? 'ar-EG' : 'en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -42,7 +43,7 @@ const extractArrayData = (res, key) => {
   return Array.isArray(res?.[key]) ? res[key] : [];
 };
 
-export default function Bookings() {
+export default function Bookings({ currentLang = 'en' }) {
   const [bookings, setBookings] = useState([]);
   const [specialists, setSpecialists] = useState({});
   const [loading, setLoading] = useState(true);
@@ -51,6 +52,10 @@ export default function Bookings() {
   // Action states for cancelling or modifying consultations
   const [actionLoading, setActionLoading] = useState(null);
   const [actionError, setActionError] = useState('');
+
+  // Select current language dictionary (fallback to English if missing)
+  const t = translations[currentLang] || translations.en;
+  const isRtl = currentLang === 'ar' || currentLang === 'darija';
 
   const fetchConsults = async () => {
     setLoading(true);
@@ -71,7 +76,7 @@ export default function Bookings() {
       setBookings(rawBookings);
       setSpecialists(specialistMap);
     } catch (err) {
-      setError(err?.message || 'Failed to load consultation records.');
+      setError(err?.message || t.failedLoadConsults || 'Failed to load consultation records.');
       setBookings([]);
     } finally {
       setLoading(false);
@@ -84,7 +89,7 @@ export default function Bookings() {
 
   // Handler to cancel a booking request
   const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to cancel this consultation request?')) return;
+    if (!window.confirm(t.confirmCancelPrompt || 'Are you sure you want to cancel this consultation request?')) return;
     
     setActionLoading(bookingId);
     setActionError('');
@@ -98,7 +103,7 @@ export default function Bookings() {
       }
       await fetchConsults();
     } catch (err) {
-      setActionError(err?.message || 'Failed to cancel consultation.');
+      setActionError(err?.message || t.failedCancelConsult || 'Failed to cancel consultation.');
     } finally {
       setActionLoading(null);
     }
@@ -113,21 +118,23 @@ export default function Bookings() {
         margin: '0 auto',
         padding: '16px 12px',
         boxSizing: 'border-box',
-        backgroundColor: '#FAF8F5', // Warm off-white
+        backgroundColor: '#FAF8F5',
         minHeight: '100vh',
+        direction: isRtl ? 'rtl' : 'ltr',
+        textAlign: isRtl ? 'right' : 'left',
       }}
     >
       {/* PAGE HEADER */}
       <div className="bookings-header" style={{ marginBottom: '20px' }}>
         <h1 style={{ margin: '0 0 6px 0', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', color: '#2C3E50', fontWeight: '700' }}>
-          My Consultations
+          {t.myConsultationsTitle || 'My Consultations'}
         </h1>
         <p style={{ margin: 0, fontSize: '0.9rem', color: '#5A6E7F' }}>
-          Track and manage your requested private appointments and specialist sessions.
+          {t.myConsultationsSubtitle || 'Track and manage your requested private appointments and specialist sessions.'}
         </p>
       </div>
 
-      {/* ERROR BANNER - Urgent Medical Red */}
+      {/* ERROR BANNER */}
       {error && (
         <div
           style={{
@@ -159,12 +166,12 @@ export default function Bookings() {
               fontWeight: '600',
             }}
           >
-            Retry
+            {t.retry || 'Retry'}
           </button>
         </div>
       )}
 
-      {/* ACTION ERROR BANNER - Urgent Medical Red */}
+      {/* ACTION ERROR BANNER */}
       {actionError && (
         <div
           style={{
@@ -184,7 +191,7 @@ export default function Bookings() {
       {/* CONTENT STATES */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#5A6E7F' }}>
-          <p style={{ fontSize: '0.95rem' }}>Fetching your consult requests...</p>
+          <p style={{ fontSize: '0.95rem' }}>{t.fetchingConsults || 'Fetching your consult requests...'}</p>
         </div>
       ) : bookings.length === 0 ? (
         <div
@@ -199,10 +206,10 @@ export default function Bookings() {
         >
           <div style={{ fontSize: '2rem', marginBottom: '8px' }}>💬</div>
           <h3 style={{ margin: '0 0 6px 0', color: '#2C3E50', fontSize: '1.1rem' }}>
-            No Consultations Found
+            {t.noConsultsTitle || 'No Consultations Found'}
           </h3>
           <p style={{ margin: 0, color: '#5A6E7F', fontSize: '0.9rem' }}>
-            You haven't submitted any consultation requests yet.
+            {t.noConsultsDesc || "You haven't submitted any consultation requests yet."}
           </p>
         </div>
       ) : (
@@ -210,9 +217,9 @@ export default function Bookings() {
           {bookings.map((b, index) => {
             const bookingId = b.id || b._id;
             const specialist = specialists[b.specialistId] || {};
-            const specialistName = specialist.name || b.specialistName || 'Specialist';
+            const specialistName = specialist.name || b.specialistName || (t.specialist || 'Specialist');
             const specialty = specialist.specialty;
-            const badge = getStatusBadgeStyle(b.status);
+            const badge = getStatusBadgeStyle(b.status, t);
             const normalizedStatus = (b.status || '').toLowerCase();
             const isCancellable = normalizedStatus === 'pending' || normalizedStatus === 'requested' || normalizedStatus === 'confirmed';
 
@@ -277,7 +284,7 @@ export default function Bookings() {
                   </span>
                 </div>
 
-                {/* DETAILS SECTION - Pale Teal / Soft Blue background accent */}
+                {/* DETAILS SECTION */}
                 <div
                   style={{
                     display: 'grid',
@@ -293,21 +300,21 @@ export default function Bookings() {
                 >
                   {b.preferredTimes && (
                     <div>
-                      <strong style={{ color: '#0369A1' }}>Preferred Schedule: </strong>
+                      <strong style={{ color: '#0369A1' }}>{t.preferredScheduleLabel || 'Preferred Schedule:'} </strong>
                       <span>{b.preferredTimes}</span>
                     </div>
                   )}
 
                   {b.contact && (
                     <div>
-                      <strong style={{ color: '#0369A1' }}>Contact Info: </strong>
+                      <strong style={{ color: '#0369A1' }}>{t.contactInfoLabel || 'Contact Info:'} </strong>
                       <span>{b.contact}</span>
                     </div>
                   )}
 
                   {b.reason && (
                     <div>
-                      <strong style={{ color: '#0369A1' }}>Reason for Visit: </strong>
+                      <strong style={{ color: '#0369A1' }}>{t.reasonForVisitLabel || 'Reason for Visit:'} </strong>
                       <span style={{ color: '#2C3E50' }}>{b.reason}</span>
                     </div>
                   )}
@@ -333,7 +340,7 @@ export default function Bookings() {
                         disabled={actionLoading === bookingId}
                         style={{
                           background: 'transparent',
-                          color: '#DC2626', // Urgent Medical Red for cancellation button emphasis
+                          color: '#DC2626',
                           border: '1px solid #FCA5A5',
                           borderRadius: '8px',
                           padding: '6px 12px',
@@ -343,14 +350,14 @@ export default function Bookings() {
                           opacity: actionLoading === bookingId ? 0.6 : 1,
                         }}
                       >
-                        {actionLoading === bookingId ? 'Cancelling...' : 'Cancel Request'}
+                        {actionLoading === bookingId ? (t.cancelling || 'Cancelling...') : (t.cancelRequest || 'Cancel Request')}
                       </button>
                     )}
                   </div>
 
                   {b.createdAt && (
-                    <div style={{ fontSize: '0.78rem', color: '#7E8C9D', textAlign: 'right', marginLeft: 'auto' }}>
-                      Requested on {formatDate(b.createdAt)}
+                    <div style={{ fontSize: '0.78rem', color: '#7E8C9D', textAlign: isRtl ? 'left' : 'right', marginLeft: isRtl ? '0' : 'auto', marginRight: isRtl ? 'auto' : '0' }}>
+                      {t.requestedOn ? t.requestedOn.replace('{date}', formatDate(b.createdAt, currentLang)) : `Requested on ${formatDate(b.createdAt, currentLang)}`}
                     </div>
                   )}
                 </div>
