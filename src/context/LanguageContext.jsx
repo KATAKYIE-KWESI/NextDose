@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const LanguageContext = createContext();
 
-// Comprehensive dictionary for all supported languages and keys
+// Comprehensive dictionary keyed by standard short codes
 const translations = {
-  English: {
+  en: {
     'greeting.morning': 'Good morning',
     'greeting.afternoon': 'Good afternoon',
     'greeting.evening': 'Good evening',
@@ -59,7 +59,7 @@ const translations = {
     'actions.edit': 'Edit',
     'actions.viewAll': 'View all'
   },
-  Arabic: {
+  ar: {
     'greeting.morning': 'صباح الخير',
     'greeting.afternoon': 'مساء الخير',
     'greeting.evening': 'مساء الخير',
@@ -114,7 +114,7 @@ const translations = {
     'actions.edit': 'تعديل',
     'actions.viewAll': 'عرض الكل'
   },
-  French: {
+  fr: {
     'greeting.morning': 'Bonjour',
     'greeting.afternoon': 'Bon après-midi',
     'greeting.evening': 'Bonsoir',
@@ -169,7 +169,7 @@ const translations = {
     'actions.edit': 'Modifier',
     'actions.viewAll': 'Voir tout'
   },
-  Darija: {
+  darija: {
     'greeting.morning': 'صباح الخير',
     'greeting.afternoon': 'مساء الخير',
     'greeting.evening': 'مساء الخير',
@@ -228,22 +228,22 @@ const translations = {
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('app_language') || 'English';
+    return localStorage.getItem('app_language') || 'en';
   });
 
   useEffect(() => {
     localStorage.setItem('app_language', language);
     // Automatically switch document text direction for Arabic & Darija
-    const isRtl = language === 'Arabic' || language === 'Darija';
+    const isRtl = language === 'ar' || language === 'darija';
     document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
   }, [language]);
 
-  const isRTL = language === 'Arabic' || language === 'Darija';
+  const isRTL = language === 'ar' || language === 'darija';
 
   // Translation function `t(key, fallback)`
   const t = (key, fallback) => {
-    const langDict = translations[language] || translations['English'];
-    return langDict[key] || translations['English'][key] || fallback || key;
+    const langDict = translations[language] || translations['en'];
+    return langDict[key] || translations['en'][key] || fallback || key;
   };
 
   return (

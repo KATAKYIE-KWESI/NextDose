@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
+import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx';
 import { translations } from './translations.js';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
@@ -31,13 +32,7 @@ function Logo({ size = 32, className = '' }) {
         flexShrink: 0
       }}
     >
-      <svg 
-        viewBox="0 0 100 100" 
-        width="100%" 
-        height="100%" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg viewBox="0 0 100 100" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#38BDF8" />
@@ -45,30 +40,9 @@ function Logo({ size = 32, className = '' }) {
             <stop offset="100%" stopColor="#2DD4BF" />
           </linearGradient>
         </defs>
-        <circle 
-          cx="50" 
-          cy="50" 
-          r="44" 
-          stroke="url(#waveGradient)" 
-          strokeWidth="5" 
-          strokeLinecap="round" 
-          strokeDasharray="220"
-          strokeDashoffset="30"
-          opacity="0.85"
-        />
-        <path 
-          d="M 18 52 C 30 38, 40 62, 52 50 C 64 38, 74 62, 82 48" 
-          stroke="url(#waveGradient)" 
-          strokeWidth="6" 
-          strokeLinecap="round" 
-        />
-        <path 
-          d="M 22 66 C 34 52, 44 76, 56 64 C 68 52, 76 72, 84 60" 
-          stroke="url(#waveGradient)" 
-          strokeWidth="4" 
-          strokeLinecap="round" 
-          opacity="0.5"
-        />
+        <circle cx="50" cy="50" r="44" stroke="url(#waveGradient)" strokeWidth="5" strokeLinecap="round" strokeDasharray="220" strokeDashoffset="30" opacity="0.85" />
+        <path d="M 18 52 C 30 38, 40 62, 52 50 C 64 38, 74 62, 82 48" stroke="url(#waveGradient)" strokeWidth="6" strokeLinecap="round" />
+        <path d="M 22 66 C 34 52, 44 76, 56 64 C 68 52, 76 72, 84 60" stroke="url(#waveGradient)" strokeWidth="4" strokeLinecap="round" opacity="0.5" />
       </svg>
     </div>
   );
@@ -97,15 +71,13 @@ function NavLink({ to, children, onClick }) {
   );
 }
 
-function Topbar({ currentLang, setCurrentLang }) {
+function Topbar() {
   const { user, logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const location = useLocation();
 
-  // Load language strings for navigation items (falls back to English 'en' if key is missing)
-  const t = translations[currentLang] || translations.en || translations.English;
-
-  useEffect(() => {
+  React.useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
 
@@ -115,30 +87,25 @@ function Topbar({ currentLang, setCurrentLang }) {
     <header className="navbar" style={{ position: 'sticky', top: 0, zIndex: 1000, background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', width: '100%', boxSizing: 'border-box' }}>
       <div className="nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '12px 16px', boxSizing: 'border-box' }}>
         
-        {/* Brand Logo & Name */}
         <Link to="/" className="nav-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
           <Logo size={32} />
           <span style={{ fontWeight: '700', fontSize: '1.1rem' }}>HerSignal</span>
         </Link>
 
-        {/* Desktop Nav Links */}
         <nav className="nav-links desktop-only-nav" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: 'auto', marginRight: '16px' }}>
-          <NavLink to="/">{t.dashboard || 'Dashboard'}</NavLink>
-          <NavLink to="/tracker">{t.tracker || 'Tracker'}</NavLink>
-          <NavLink to="/screening">{t.screening || 'Screening'}</NavLink>
-          <NavLink to="/specialists">{t.specialists || 'Specialists'}</NavLink>
-          <NavLink to="/bookings">{t.bookings || 'Bookings'}</NavLink>
-          <NavLink to="/community">{t.community || 'Community & Care'}</NavLink>
+          <NavLink to="/">{t('dashboard', 'Dashboard')}</NavLink>
+          <NavLink to="/tracker">{t('tracker', 'Tracker')}</NavLink>
+          <NavLink to="/screening">{t('screening', 'Screening')}</NavLink>
+          <NavLink to="/specialists">{t('specialists', 'Specialists')}</NavLink>
+          <NavLink to="/bookings">{t('bookings', 'Bookings')}</NavLink>
+          <NavLink to="/community">{t('community', 'Community & Care')}</NavLink>
         </nav>
 
-        {/* Language Selector, Desktop Logout & Mobile Hamburger Toggle */}
         <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          
-          {/* Language Dropdown Selector */}
           <div style={{ display: 'flex', alignItems: 'center', background: '#F1F5F9', padding: '4px 8px', borderRadius: '8px', border: '1px solid #CBD5E1' }}>
             <select 
-              value={currentLang} 
-              onChange={(e) => setCurrentLang(e.target.value)}
+              value={language} 
+              onChange={(e) => setLanguage(e.target.value)}
               style={{ background: 'transparent', border: 'none', fontSize: '0.8rem', fontWeight: '600', color: '#0F172A', outline: 'none', cursor: 'pointer' }}
             >
               <option value="en">English</option>
@@ -150,27 +117,15 @@ function Topbar({ currentLang, setCurrentLang }) {
 
           <div className="desktop-only-action">
             <button className="nav-logout-btn" onClick={logout} style={{ padding: '6px 12px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#fff' }}>
-              {t.logout || 'Logout'}
+              {t('logout', 'Logout')}
             </button>
           </div>
 
-          {/* Hamburger Menu Button */}
           <button 
             onClick={() => setMenuOpen(!menuOpen)}
             className="mobile-menu-toggle"
             aria-label="Toggle navigation menu"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-around',
-              width: '28px',
-              height: '24px',
-              padding: 0,
-              zIndex: 101
-            }}
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', width: '28px', height: '24px', padding: 0, zIndex: 101 }}
           >
             <span style={{ width: '100%', height: '3px', background: '#334155', borderRadius: '2px', transition: 'all 0.3s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
             <span style={{ width: '100%', height: '3px', background: '#334155', borderRadius: '2px', opacity: menuOpen ? 0 : 1, transition: 'all 0.3s' }}></span>
@@ -179,143 +134,61 @@ function Topbar({ currentLang, setCurrentLang }) {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu Drawer */}
       {menuOpen && (
-        <div 
-          className="mobile-dropdown-menu"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            width: '100%',
-            background: '#FFFFFF',
-            borderBottom: '1px solid #E2E8F0',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
-            padding: '16px 20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            zIndex: 99,
-            boxSizing: 'border-box'
-          }}
-        >
-          <NavLink to="/" onClick={() => setMenuOpen(false)}>{t.dashboard || 'Dashboard'}</NavLink>
-          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>{t.tracker || 'Tracker'}</NavLink>
-          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>{t.screening || 'Screening'}</NavLink>
-          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>{t.specialists || 'Specialists'}</NavLink>
-          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>{t.bookings || 'Bookings'}</NavLink>
-          <NavLink to="/community" onClick={() => setMenuOpen(false)}>{t.community || 'Community & Care'}</NavLink>
+        <div className="mobile-dropdown-menu" style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 99, boxSizing: 'border-box' }}>
+          <NavLink to="/" onClick={() => setMenuOpen(false)}>{t('dashboard', 'Dashboard')}</NavLink>
+          <NavLink to="/tracker" onClick={() => setMenuOpen(false)}>{t('tracker', 'Tracker')}</NavLink>
+          <NavLink to="/screening" onClick={() => setMenuOpen(false)}>{t('screening', 'Screening')}</NavLink>
+          <NavLink to="/specialists" onClick={() => setMenuOpen(false)}>{t('specialists', 'Specialists')}</NavLink>
+          <NavLink to="/bookings" onClick={() => setMenuOpen(false)}>{t('bookings', 'Bookings')}</NavLink>
+          <NavLink to="/community" onClick={() => setMenuOpen(false)}>{t('community', 'Community & Care')}</NavLink>
           
           <div style={{ paddingTop: '12px', borderTop: '1px solid #F1F5F9', marginTop: '4px' }}>
-            <button 
-              className="nav-logout-btn" 
-              onClick={() => { setMenuOpen(false); logout(); }}
-              style={{ width: '100%', padding: '10px', textAlign: 'center', cursor: 'pointer' }}
-            >
-              {t.logout || 'Logout'}
+            <button className="nav-logout-btn" onClick={() => { setMenuOpen(false); logout(); }} style={{ width: '100%', padding: '10px', textAlign: 'center', cursor: 'pointer' }}>
+              {t('logout', 'Logout')}
             </button>
           </div>
         </div>
       )}
 
-      {/* Responsive CSS Rules */}
       <style>{`
         @media (max-width: 768px) {
-          .desktop-only-nav, .desktop-only-action {
-            display: none !important;
-          }
+          .desktop-only-nav, .desktop-only-action { display: none !important; }
         }
         @media (min-width: 769px) {
-          .mobile-menu-toggle, .mobile-dropdown-menu {
-            display: none !important;
-          }
+          .mobile-menu-toggle, .mobile-dropdown-menu { display: none !important; }
         }
       `}</style>
     </header>
   );
 }
 
-export default function App() {
+function AppRoutes() {
   const { user } = useAuth();
-  const [currentLang, setCurrentLang] = useState('en');
-
-  // Automatically adjust document text direction (RTL for Arabic and Darija)
-  useEffect(() => {
-    const isRtl = currentLang === 'ar' || currentLang === 'darija';
-    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
-  }, [currentLang]);
-
   return (
     <div className="app-shell" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
-      <Topbar currentLang={currentLang} setCurrentLang={setCurrentLang} />
+      <Topbar />
       <main className="app-content" style={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-
-          {/* Public Welcome/Brand Landing Page before login */}
-          <Route 
-            path="/welcome" 
-            element={user ? <Navigate to="/" replace /> : <HerSignalBrand />} 
-          />
-
-          {/* Root route directs to Dashboard if logged in, or Welcome page if logged out */}
-          <Route 
-            path="/" 
-            element={
-              user ? (
-                <PrivateRoute>
-                  <Dashboard currentLang={currentLang} />
-                </PrivateRoute>
-              ) : (
-                <Navigate to="/welcome" replace />
-              )
-            } 
-          />
-
-          <Route
-            path="/tracker"
-            element={
-              <PrivateRoute>
-                <CycleTracker currentLang={currentLang} />
-              </PrivateRoute>
-            }
-          />
-
-          <Route
-            path="/screening"
-            element={
-              <PrivateRoute>
-                <Screening currentLang={currentLang} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/specialists"
-            element={
-              <PrivateRoute>
-                <Specialists currentLang={currentLang} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/bookings"
-            element={
-              <PrivateRoute>
-                <Bookings currentLang={currentLang} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/community"
-            element={
-              <PrivateRoute>
-                <HerSignalCommunityAndCare currentLang={currentLang} />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/welcome" element={user ? <Navigate to="/" replace /> : <HerSignalBrand />} />
+          <Route path="/" element={user ? <PrivateRoute><Dashboard /></PrivateRoute> : <Navigate to="/welcome" replace />} />
+          <Route path="/tracker" element={user ? <PrivateRoute><CycleTracker /></PrivateRoute> : <Navigate to="/welcome" replace />} />
+          <Route path="/screening" element={user ? <PrivateRoute><Screening /></PrivateRoute> : <Navigate to="/welcome" replace />} />
+          <Route path="/specialists" element={user ? <PrivateRoute><Specialists /></PrivateRoute> : <Navigate to="/welcome" replace />} />
+          <Route path="/bookings" element={user ? <PrivateRoute><Bookings /></PrivateRoute> : <Navigate to="/welcome" replace />} />
+          <Route path="/community" element={user ? <PrivateRoute><HerSignalCommunityAndCare /></PrivateRoute> : <Navigate to="/welcome" replace />} />
         </Routes>
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppRoutes />
+    </LanguageProvider>
   );
 }
