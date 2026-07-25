@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api/client.js';
+// Import the consolidated AhedAI engine
+import { generateAhedInsight } from '../_lib/ahedAI'; 
 
 function Logo({ size = 40, className = '' }) {
   return (
@@ -24,45 +26,8 @@ function Logo({ size = 40, className = '' }) {
         animation: 'floatPulse 4s ease-in-out infinite'
       }}
     >
-      <svg 
-        viewBox="0 0 100 100" 
-        width="100%" 
-        height="100%" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#38BDF8" />
-            <stop offset="50%" stopColor="#818CF8" />
-            <stop offset="100%" stopColor="#2DD4BF" />
-          </linearGradient>
-        </defs>
-        <circle 
-          cx="50" 
-          cy="50" 
-          r="44" 
-          stroke="url(#waveGradient)" 
-          strokeWidth="5" 
-          strokeLinecap="round" 
-          strokeDasharray="220"
-          strokeDashoffset="30"
-          opacity="0.85"
-        />
-        <path 
-          d="M 18 52 C 30 38, 40 62, 52 50 C 64 38, 74 62, 82 48" 
-          stroke="url(#waveGradient)" 
-          strokeWidth="6" 
-          strokeLinecap="round" 
-        />
-        <path 
-          d="M 22 66 C 34 52, 44 76, 56 64 C 68 52, 76 72, 84 60" 
-          stroke="url(#waveGradient)" 
-          strokeWidth="4" 
-          strokeLinecap="round" 
-          opacity="0.5"
-        />
-      </svg>
+      {/* Logo replaced with emoji */}
+      <div style={{ fontSize: `${size * 0.6}px`, lineHeight: 1, marginTop: '2px' }}>🌸</div>
     </div>
   );
 }
@@ -80,7 +45,8 @@ export default function Dashboard() {
   const [selectedMood, setSelectedMood] = useState(null);
   const [discreetMode, setDiscreetMode] = useState(false);
   const [carePoints, setCarePoints] = useState(120);
-  const [auraInsight, setAuraInsight] = useState("Analyzing your personal wellness rhythm securely...");
+  // State renamed to ahedInsight
+  const [ahedInsight, setAhedInsight] = useState("Analyzing your personal wellness rhythm securely...");
 
   // User details
   const firstName = user?.name 
@@ -156,21 +122,20 @@ export default function Dashboard() {
     }
   }
 
-  // Set Dynamic Ahed AI Insight when phase or logs change
+  // --- AHED AI INTEGRATION ---
+  // This replaces the previous Aura logic block.
+  // It uses ahedAI.js to generate both phase data and empathetic guidance text.
   useEffect(() => {
     const moodLog = logs.find(l => l.symptoms?.length > 0);
-    const latestMood = moodLog?.symptoms?.[0] || selectedMood;
+    const latestMood = moodLog?.symptoms?.[0] || selectedMood || 'neutral';
     
-    let copy = t('aura.default', "Prioritizing rest during high-stress weeks protects your hormonal rhythm. Take 5 deep breaths today.");
-    if (currentPhase === "Menstrual Phase") {
-      copy = t('aura.menstrual', "Your body is in its renewal phase. Warm hydration and gentle pacing will support your comfort today.");
-    } else if (currentPhase === "Luteal Phase") {
-      copy = t('aura.luteal', "Progesterone is shifting inward. Give yourself permission to step back and protect your emotional space.");
-    } else if (latestMood === 'Crampy') {
-      copy = t('aura.crampy', "We noticed discomfort logged. Consider a gentle stretch or reaching out to a specialist if needed.");
-    }
-    setAuraInsight(copy);
-  }, [currentPhase, logs, selectedMood, t]);
+    // Generate insight using the unified Ahed engine
+    const aiResponse = generateAhedInsight(currentDay, logs, latestMood);
+    
+    // Set the insight text
+    setAhedInsight(aiResponse.insight);
+
+  }, [currentDay, logs, selectedMood]);
 
   // Determine dynamic river gradient/accent colors using modern palette
   const getRiverTheme = () => {
@@ -428,7 +393,7 @@ export default function Dashboard() {
               {t('aura.safeSpaceTitle', 'Your Safe Space Guidance')}
             </h2>
             <p style={{ fontSize: '14px', color: '#166534', lineHeight: '1.4', fontStyle: 'italic', margin: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-              "{auraInsight}"
+              "{ahedInsight}"
             </p>
           </div>
         </div>
