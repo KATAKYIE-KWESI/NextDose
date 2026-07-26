@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 // Bilingual & RTL dictionary strings
 const contentStrings = {
@@ -88,7 +89,12 @@ const contentStrings = {
   }
 };
 
-export default function HerSignalCommunityAndCare({ currentLang = 'en' }) {
+export default function HerSignalCommunityAndCare({ currentLang }) {
+  // Prefer the live app-wide language; `currentLang` prop is only used if a
+  // parent explicitly wants to override it (e.g. for a preview/demo view).
+  const { language } = useLanguage();
+  const activeLang = currentLang || language;
+
   const [activeTab, setActiveTab] = useState('anonymous');
   const [newQuestion, setNewQuestion] = useState('');
   const [questions, setQuestions] = useState([
@@ -108,8 +114,8 @@ export default function HerSignalCommunityAndCare({ currentLang = 'en' }) {
     { id: 3, title: "Circular Palpation Pattern", desc: "Using the pads of your three middle fingers, move in small dime-sized circles across the entire breast tissue.", completed: false }
   ]);
 
-  const t = contentStrings[currentLang] || contentStrings.en;
-  const isRTL = currentLang === 'ar' || currentLang === 'darija';
+  const t = contentStrings[activeLang] || contentStrings.en;
+  const isRTL = activeLang === 'ar' || activeLang === 'darija';
 
   const handlePostQuestion = (e) => {
     e.preventDefault();

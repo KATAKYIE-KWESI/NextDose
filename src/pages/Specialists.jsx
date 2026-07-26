@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext';
 
 // Dictionary of translations for Header & UI Elements
 const TRANSLATIONS = {
-  English: {
+  en: {
     badge: '✨ Top-Rated Regional Experts',
     title: 'Top-Rated Specialists in the Middle East',
     subtitle: 'Connect with trusted, highly rated gynecologists and health professionals across Dubai, Riyadh, Abu Dhabi, and the wider MENA region.',
@@ -26,6 +27,78 @@ const TRANSLATIONS = {
     errorHeading: 'Error',
     verifiedTooltip: 'Verified Specialist',
     reviewsText: '+ reviews'
+  },
+  ar: {
+    badge: '✨ أفضل الخبراء تقييماً في المنطقة',
+    title: 'أفضل الأخصائيين تقييماً في الشرق الأوسط',
+    subtitle: 'تواصلي مع أخصائيي أمراض النساء والمهنيين الصحيين الموثوقين وذوي التقييم العالي في دبي والرياض وأبوظبي وأنحاء المنطقة.',
+    searchPlaceholder: 'ابحثي عن طبيب أو مدينة أو حالة (تكيس المبايض، أطفال الأنابيب)...',
+    loading: 'جارٍ تحميل الأخصائيين من الدليل...',
+    noResults: 'لم يتم العثور على أخصائيين مطابقين لـ',
+    bookConsult: 'طلب استشارة خاصة',
+    bookingTitle: 'حجز استشارة مع',
+    bookingSubtitle: 'أدخلي بياناتك أدناه لمكالمة خاصة أو تأكيد سري عبر واتساب.',
+    preferredTimeLabel: 'التاريخ والوقت المفضل *',
+    preferredTimePlaceholder: 'مثلاً: غداً الساعة 5 مساءً، أو صباح السبت',
+    reasonLabel: 'ما الذي تودين مناقشته؟ (اختياري)',
+    reasonPlaceholder: 'صفي بإيجاز أعراضك أو أهدافك لهذه الجلسة...',
+    contactLabel: 'أفضل طريقة للتواصل معك (هاتف / واتساب) *',
+    contactPlaceholder: '+971 XX XXX XXXX أو رقم واتساب',
+    confirmBtn: 'تأكيد الطلب 💬',
+    sendingBtn: 'جارٍ إرسال الطلب...',
+    cancelBtn: 'إلغاء',
+    successHeading: 'تم إرسال طلب الحجز!',
+    errorHeading: 'خطأ',
+    verifiedTooltip: 'أخصائي موثّق',
+    reviewsText: '+ تقييم'
+  },
+  fr: {
+    badge: '✨ Experts régionaux les mieux notés',
+    title: 'Spécialistes les mieux notés au Moyen-Orient',
+    subtitle: 'Connectez-vous avec des gynécologues et professionnels de santé fiables et très bien notés à Dubaï, Riyad, Abou Dabi et dans toute la région MENA.',
+    searchPlaceholder: 'Rechercher un médecin, une ville ou une condition (SOPK, FIV)...',
+    loading: 'Chargement des spécialistes depuis l’annuaire...',
+    noResults: 'Aucun spécialiste trouvé correspondant à',
+    bookConsult: 'Demander une consultation privée',
+    bookingTitle: 'Réserver une consultation avec',
+    bookingSubtitle: 'Renseignez vos coordonnées ci-dessous pour un rappel privé ou une confirmation confidentielle par WhatsApp.',
+    preferredTimeLabel: 'Date et heure préférées *',
+    preferredTimePlaceholder: 'ex. Demain à 17h, ou samedi matin',
+    reasonLabel: 'De quoi souhaitez-vous parler ? (Facultatif)',
+    reasonPlaceholder: 'Décrivez brièvement vos symptômes ou vos objectifs pour cette séance...',
+    contactLabel: 'Meilleur moyen de vous joindre (Téléphone / WhatsApp) *',
+    contactPlaceholder: '+971 XX XXX XXXX ou numéro WhatsApp',
+    confirmBtn: 'Confirmer la demande 💬',
+    sendingBtn: 'Envoi de la demande...',
+    cancelBtn: 'Annuler',
+    successHeading: 'Demande de réservation envoyée !',
+    errorHeading: 'Erreur',
+    verifiedTooltip: 'Spécialiste vérifié',
+    reviewsText: '+ avis'
+  },
+  darija: {
+    badge: '✨ أحسن الخبراء تقييماً فالمنطقة',
+    title: 'أحسن الأخصائيين تقييماً فالشرق الأوسط',
+    subtitle: 'تواصلي مع أخصائيي أمراض النساء والمهنيين الصحيين الموثوقين وذوي التقييم العالي فدبي والرياض وأبوظبي ومنطقة الشرق الأوسط.',
+    searchPlaceholder: 'قلبي على طبيب، مدينة، ولا حالة (تكيس المبايض، أطفال الأنابيب)...',
+    loading: 'كيتحمل الأخصائيين من الدليل...',
+    noResults: 'ما لقيناش أخصائيين كيوافقو',
+    bookConsult: 'طلب استشارة خاصة',
+    bookingTitle: 'حجز استشارة مع',
+    bookingSubtitle: 'دخلي المعلومات ديالك تحت باش نعاودو ليك بالتيليفون ولا نأكدو ليك عبر واتساب بسرية.',
+    preferredTimeLabel: 'التاريخ والوقت المفضل *',
+    preferredTimePlaceholder: 'مثلاً: غدا 5 دالعشية، ولا نهار السبت الصباح',
+    reasonLabel: 'شنو بغيتي تهضري عليه؟ (اختياري)',
+    reasonPlaceholder: 'وصفي بإيجاز الأعراض ديالك ولا الهدف ديالك من هاد الجلسة...',
+    contactLabel: 'أحسن طريقة نتواصلو معاك (تيليفون / واتساب) *',
+    contactPlaceholder: '+971 XX XXX XXXX ولا رقم واتساب',
+    confirmBtn: 'تأكيد الطلب 💬',
+    sendingBtn: 'كيتصيفط الطلب...',
+    cancelBtn: 'إلغاء',
+    successHeading: 'تصيفط طلب الحجز!',
+    errorHeading: 'خطأ',
+    verifiedTooltip: 'أخصائي متحقق منو',
+    reviewsText: '+ تقييم'
   }
 };
 
@@ -100,9 +173,10 @@ export default function Specialists() {
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const currentLanguage = 'English';
-  const t = TRANSLATIONS[currentLanguage];
-  const isRtl = false;
+  // Pull the live language + RTL state from the global provider instead of hardcoding it
+  const { language, isRTL } = useLanguage();
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
+  const isRtl = isRTL;
 
   useEffect(() => {
     api
