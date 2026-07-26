@@ -5,6 +5,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api/client.js';
 // Import the consolidated AhedAI engine
 import { generateAhedInsight } from '../../api/_lib/ahedAI';
+// Import the Ahed AI avatar image as a module (works regardless of public/ folder setup)
+import ahedAvatarImg from '../assests/ahed-avatar.png';
 
 function Logo({ size = 40, className = '' }) {
   return (
@@ -45,6 +47,7 @@ export default function Dashboard() {
   const [selectedMood, setSelectedMood] = useState(null);
   const [discreetMode, setDiscreetMode] = useState(false);
   const [carePoints, setCarePoints] = useState(120);
+  
   // State renamed to ahedInsight
   const [ahedInsight, setAhedInsight] = useState("Analyzing your personal wellness rhythm securely...");
 
@@ -123,18 +126,12 @@ export default function Dashboard() {
   }
 
   // --- AHED AI INTEGRATION ---
-  // This replaces the previous Aura logic block.
-  // It uses ahedAI.js to generate both phase data and empathetic guidance text.
   useEffect(() => {
     const moodLog = logs.find(l => l.symptoms?.length > 0);
     const latestMood = moodLog?.symptoms?.[0] || selectedMood || 'neutral';
-    
-    // Generate insight using the unified Ahed engine
     const aiResponse = generateAhedInsight(currentDay, logs, latestMood);
     
-    // Set the insight text
     setAhedInsight(aiResponse.insight);
-
   }, [currentDay, logs, selectedMood]);
 
   // Determine dynamic river gradient/accent colors using modern palette
@@ -186,7 +183,7 @@ export default function Dashboard() {
         fontFamily: 'Inter, system-ui, sans-serif', 
         color: '#334155', 
         backgroundColor: '#FBFBFA', 
-        overflowX: 'hidden',
+        overflow: 'hidden',
         textAlign: isRTL ? 'right' : 'left'
       }}
     >
@@ -213,41 +210,140 @@ export default function Dashboard() {
         }
       `}</style>
 
-      {/* HERO / GREETING BANNER */}
-      <header className="dashboard-hero animated-entry" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px', background: '#F0F9FF', padding: '20px', borderRadius: '16px', border: '1px solid #BAE6FD', boxSizing: 'border-box', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+      {/* HERO GREETING BANNER */}
+      <header 
+        className="dashboard-hero animated-entry" 
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '20px', 
+          flexWrap: 'wrap', 
+          gap: '16px', 
+          background: '#F0F9FF', 
+          padding: '20px', 
+          borderRadius: '16px', 
+          border: '1px solid #BAE6FD', 
+          boxSizing: 'border-box', 
+          flexDirection: isRTL ? 'row-reverse' : 'row' 
+        }}
+      >
         <div className="hero-text" style={{ flex: '1 1 250px', minWidth: 0 }}>
-          <h1 className="greeting-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', margin: '0 0 6px 0', fontWeight: '700', color: '#0369A1', wordBreak: 'break-word' }}>
+          <h1 
+            className="greeting-title" 
+            style={{ 
+              fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', 
+              margin: '0 0 6px 0', 
+              fontWeight: 700, 
+              color: '#0369A1', 
+              wordBreak: 'break-word' 
+            }}
+          >
             {greetingData.text}, {firstName}
           </h1>
-          <p className="greeting-subtitle" style={{ fontSize: '0.95rem', color: '#0284C7', margin: 0, wordBreak: 'break-word' }}>
-            {t('dashboard.bodyInPhase', 'Your body is in the')} <span style={{ color: '#0369A1', fontWeight: '600' }}>{discreetMode ? t('dashboard.protectedPhase', 'protected phase') : currentPhase.toLowerCase()}</span>.
+          <p 
+            className="greeting-subtitle" 
+            style={{ 
+              fontSize: '0.95rem', 
+              color: '#0284C7', 
+              margin: 0, 
+              wordBreak: 'break-word' 
+            }}
+          >
+            {t('dashboard.bodyInPhase', 'Your body is in the')}{' '}
+            <span style={{ color: '#0369A1', fontWeight: 600 }}>
+              {discreetMode ? t('dashboard.protectedPhase', 'protected phase') : currentPhase.toLowerCase()}
+            </span>.
           </p>
         </div>
         <div className="hero-avatar" style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #E0F2FE 100%, #BAE6FD 0%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(3, 105, 161, 0.08)' }}>
+          <div 
+            style={{ 
+              width: '48px', 
+              height: '48px', 
+              borderRadius: '50%', 
+              background: 'linear-gradient(135deg, #E0F2FE 100%, #BAE6FD 0%)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              boxShadow: '0 4px 12px rgba(3, 105, 161, 0.08)' 
+            }}
+          >
             <span style={{ fontSize: '24px' }}>{greetingData.emoji}</span>
           </div>
         </div>
       </header>
 
       {/* SIGNAL RIVER FEATURED COMPONENT */}
-      <div className="card signal-river-card animated-entry" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(100, 116, 139, 0.04)', marginBottom: '20px', padding: '20px', borderRadius: '16px', boxSizing: 'border-box', overflow: 'hidden', animationDelay: '0.1s' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+      <div 
+        className="card signal-river-card animated-entry" 
+        style={{ 
+          background: '#FFFFFF', 
+          border: '1px solid #E2E8F0', 
+          boxShadow: '0 4px 20px rgba(100, 116, 139, 0.04)', 
+          marginBottom: '20px', 
+          padding: '20px', 
+          borderRadius: '16px', 
+          boxSizing: 'border-box', 
+          overflow: 'hidden', 
+          animationDelay: '0.1s' 
+        }}
+      >
+        <div 
+          style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '8px', 
+            flexWrap: 'wrap', 
+            gap: '8px', 
+            flexDirection: isRTL ? 'row-reverse' : 'row' 
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0, color: '#1E293B' }}>{t('river.title', 'Signal River')}</h2>
-            <span title={t('river.tooltip', "Your body's signals over the last 7 days")} style={{ cursor: 'pointer', fontSize: '0.85rem', color: '#94A3B8' }}>ⓘ</span>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#1E293B' }}>
+              {t('river.title', 'Signal River')}
+            </h2>
+            <span 
+              title={t('river.tooltip', "Your body's signals over the last 7 days")} 
+              style={{ cursor: 'pointer', fontSize: '0.85rem', color: '#94A3B8' }}
+            >
+              ⓘ
+            </span>
           </div>
-          <span style={{ fontSize: '0.78rem', fontWeight: '600', color: riverTheme.badgeColor, background: riverTheme.badgeBg, padding: '3px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+          <span 
+            style={{ 
+              fontSize: '0.78rem', 
+              fontWeight: 600, 
+              color: riverTheme.badgeColor, 
+              background: riverTheme.badgeBg, 
+              padding: '3px 10px', 
+              borderRadius: '20px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px', 
+              flexDirection: isRTL ? 'row-reverse' : 'row' 
+            }}
+          >
             ✨ {t('river.patternNoticed', 'Pattern noticed')}
           </span>
-
         </div>
         <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 16px 0' }}>
           {t('river.subtitle', "Your body's signals over the last 7 days")}
         </p>
 
         {/* Graphical River Wave UI Simulation */}
-        <div style={{ position: 'relative', background: riverTheme.gradient, borderRadius: '12px', padding: '20px 8px 16px 8px', marginBottom: '16px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div 
+          style={{ 
+            position: 'relative', 
+            background: riverTheme.gradient, 
+            borderRadius: '12px', 
+            padding: '20px 8px 16px 8px', 
+            marginBottom: '16px', 
+            overflowX: 'auto', 
+            WebkitOverflowScrolling: 'touch' 
+          }}
+        >
           
           {/* SVG Wave Line Overlay */}
           <div style={{ position: 'absolute', top: '35px', left: 0, right: 0, height: '40px', pointerEvents: 'none', opacity: 0.4, minWidth: '320px' }}>
@@ -257,28 +353,78 @@ export default function Dashboard() {
           </div>
 
           {/* Timeline Nodes / Markers */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 2, textAlign: 'center', gap: '6px', minWidth: '320px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+          <div 
+            style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'flex-end', 
+              position: 'relative', 
+              zIndex: 2, 
+              textAlign: 'center', 
+              gap: '6px', 
+              minWidth: '320px', 
+              flexDirection: isRTL ? 'row-reverse' : 'row' 
+            }}
+          >
             
             {/* Day -5 */}
             <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.65rem', color: '#0ea5e9', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>{t('days.fatigue', 'Fatigue')}</span>
-              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+              <span style={{ fontSize: '0.65rem', color: '#0ea5e9', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap' }}>
+                {t('days.fatigue', 'Fatigue')}
+              </span>
+              <div 
+                style={{ 
+                  width: '26px', 
+                  height: '26px', 
+                  borderRadius: '50%', 
+                  background: '#e0f2fe', 
+                  color: '#0369a1', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: '12px', 
+                  marginBottom: '8px', 
+                  border: '2px solid #fff', 
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
+                }}
+              >
                 ⚡
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
               <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>{t('days.thu', 'Thu')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may9', 'May 9')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may9', 'May 9')}
+              </span>
             </div>
 
             {/* Day -4 */}
             <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.65rem', color: '#16a34a', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>{t('days.poorSleep', 'Poor sleep')}</span>
-              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+              <span style={{ fontSize: '0.65rem', color: '#16a34a', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap' }}>
+                {t('days.poorSleep', 'Poor sleep')}
+              </span>
+              <div 
+                style={{ 
+                  width: '26px', 
+                  height: '26px', 
+                  borderRadius: '50%', 
+                  background: '#dcfce7', 
+                  color: '#166534', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: '12px', 
+                  marginBottom: '8px', 
+                  border: '2px solid #fff', 
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
+                }}
+              >
                 🌙
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
               <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>{t('days.fri', 'Fri')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may10', 'May 10')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may10', 'May 10')}
+              </span>
             </div>
 
             {/* Day -3 (Headache below) */}
@@ -287,13 +433,30 @@ export default function Dashboard() {
               <div style={{ height: '26px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
               <div style={{ width: '2px', height: '8px', background: 'transparent', marginBottom: '6px' }}></div>
               <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>{t('days.sat', 'Sat')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may11', 'May 11')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may11', 'May 11')}
+              </span>
               {/* Lower node for Headache */}
               <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#F1F5F9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', border: '1px solid #CBD5E1' }}>
+                <div 
+                  style={{ 
+                    width: '20px', 
+                    height: '20px', 
+                    borderRadius: '50%', 
+                    background: '#F1F5F9', 
+                    color: '#475569', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: '10px', 
+                    border: '1px solid #CBD5E1' 
+                  }}
+                >
                   👤
                 </div>
-                <span style={{ fontSize: '0.6rem', color: '#475569', marginTop: '2px', whiteSpace: 'nowrap' }}>{t('days.headache', 'Headache')}</span>
+                <span style={{ fontSize: '0.6rem', color: '#475569', marginTop: '2px', whiteSpace: 'nowrap' }}>
+                  {t('days.headache', 'Headache')}
+                </span>
               </div>
             </div>
 
@@ -303,50 +466,138 @@ export default function Dashboard() {
               <div style={{ height: '26px', display: 'flex', alignItems: 'center', marginBottom: '8px' }}></div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
               <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>{t('days.sun', 'Sun')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may12', 'May 12')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may12', 'May 12')}
+              </span>
             </div>
 
             {/* Day -1 */}
             <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.65rem', color: '#15803d', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>{t('days.mildCramps', 'Mild cramps')}</span>
-              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+              <span style={{ fontSize: '0.65rem', color: '#15803d', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap' }}>
+                {t('days.mildCramps', 'Mild cramps')}
+              </span>
+              <div 
+                style={{ 
+                  width: '26px', 
+                  height: '26px', 
+                  borderRadius: '50%', 
+                  background: '#dcfce7', 
+                  color: '#166534', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: '12px', 
+                  marginBottom: '8px', 
+                  border: '2px solid #fff', 
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
+                }}
+              >
                 〰️
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
               <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>{t('days.mon', 'Mon')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may13', 'May 13')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may13', 'May 13')}
+              </span>
             </div>
 
             {/* Day 0 */}
             <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.65rem', color: '#0d9488', fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap' }}>{t('days.ovulationWindow', 'Ovulation window')}</span>
-              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#ccfbf1', color: '#115e59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', marginBottom: '8px', border: '2px solid #fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+              <span style={{ fontSize: '0.65rem', color: '#0d9488', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap' }}>
+                {t('days.ovulationWindow', 'Ovulation window')}
+              </span>
+              <div 
+                style={{ 
+                  width: '26px', 
+                  height: '26px', 
+                  borderRadius: '50%', 
+                  background: '#ccfbf1', 
+                  color: '#115e59', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: '12px', 
+                  marginBottom: '8px', 
+                  border: '2px solid #fff', 
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
+                }}
+              >
                 ◎
               </div>
               <div style={{ width: '2px', height: '12px', background: '#CBD5E1', marginBottom: '6px' }}></div>
               <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>{t('days.tue', 'Tue')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may14', 'May 14')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#334155', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may14', 'May 14')}
+              </span>
             </div>
 
             {/* Today */}
             <div style={{ flex: 1, minWidth: '38px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <span style={{ fontSize: '0.65rem', color: 'transparent', marginBottom: '4px' }}>&nbsp;</span>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#0ea5e9', marginBottom: '14px', border: '2px solid #fff', boxShadow: '0 0 0 2px #0ea5e9' }}></div>
+              <div 
+                style={{ 
+                  width: '12px', 
+                  height: '12px', 
+                  borderRadius: '50%', 
+                  background: '#0ea5e9', 
+                  marginBottom: '14px', 
+                  border: '2px solid #fff', 
+                  boxShadow: '0 0 0 2px #0ea5e9' 
+                }}
+              ></div>
               <div style={{ width: '2px', height: '12px', background: '#0ea5e9', marginBottom: '6px' }}></div>
-              <span style={{ fontSize: '0.68rem', color: '#0ea5e9', fontWeight: '700', display: 'block' }}>{t('days.today', 'Today')}</span>
-              <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#0ea5e9', display: 'block', whiteSpace: 'nowrap' }}>{t('dates.may15', 'May 15')}</span>
+              <span style={{ fontSize: '0.68rem', color: '#0ea5e9', fontWeight: 700, display: 'block' }}>{t('days.today', 'Today')}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#0ea5e9', display: 'block', whiteSpace: 'nowrap' }}>
+                {t('dates.may15', 'May 15')}
+              </span>
             </div>
 
           </div>
         </div>
 
         {/* Signal Flow Interpretation Box */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#F0F9FF', padding: '12px 14px', borderRadius: '10px', border: '1px solid #BAE6FD', boxSizing: 'border-box', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
+        <div 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '12px', 
+            background: '#F0F9FF', 
+            padding: '12px 14px', 
+            borderRadius: '10px', 
+            border: '1px solid #BAE6FD', 
+            boxSizing: 'border-box', 
+            flexDirection: isRTL ? 'row-reverse' : 'row' 
+          }}
+        >
+          <div 
+            style={{ 
+              width: '36px', 
+              height: '36px', 
+              borderRadius: '50%', 
+              background: '#E0F2FE', 
+              color: '#0369A1', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '18px', 
+              flexShrink: 0 
+            }}
+          >
             🌊
           </div>
-          <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: '1.4', overflowWrap: 'break-word', minWidth: 0, flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
-            <strong>{t('river.recentFlow', 'Your recent signal flow:')}</strong> {t('river.flowDescription', 'fatigue and poor sleep appeared together twice this week. Your flow is calmer today.')}
+          <div 
+            style={{ 
+              fontSize: '0.85rem', 
+              color: '#334155', 
+              lineHeight: 1.4, 
+              overflowWrap: 'break-word', 
+              minWidth: 0, 
+              flex: 1, 
+              textAlign: isRTL ? 'right' : 'left' 
+            }}
+          >
+            <strong>{t('river.recentFlow', 'Your recent signal flow:')}</strong>{' '}
+            {t('river.flowDescription', 'fatigue and poor sleep appeared together twice this week. Your flow is calmer today.')}
             <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: '2px', fontStyle: 'italic' }}>
               {t('river.disclaimer', 'This is a personalized interpretation, not a medical diagnosis.')}
             </div>
@@ -355,44 +606,110 @@ export default function Dashboard() {
       </div>
 
       {/* STANDOUT SUPPORTIVE AHED AI COMPANION BANNER */}
-      <div className="card aura-ai-featured-banner animated-entry animated-glow" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', border: '2px solid #BBF7D0', marginBottom: '20px', padding: '16px', borderRadius: '16px', boxSizing: 'border-box', animationDelay: '0.2s' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+      <div 
+        className="card ahed-ai-featured-banner animated-entry animated-glow" 
+        style={{ 
+          background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', 
+          border: '2px solid #BBF7D0', 
+          marginBottom: '20px', 
+          padding: '16px', 
+          borderRadius: '16px', 
+          boxSizing: 'border-box', 
+          animationDelay: '0.2s' 
+        }}
+      >
+        <div 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'flex-start', 
+            gap: '14px', 
+            flexWrap: 'wrap', 
+            flexDirection: isRTL ? 'row-reverse' : 'row' 
+          }}
+        >
           
           {/* Ahed Avatar Container */}
-          <div style={{ 
-            width: '56px', 
-            height: '56px', 
-            borderRadius: '50%', 
-            background: '#D8B4FE', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            flexShrink: '0', 
-            boxShadow: '0 4px 12px rgba(126, 34, 206, 0.2)',
-            overflow: 'hidden',
-            border: '2px solid #fff'
-          }} title="Ahed - AI Companion">
+          <div 
+            style={{ 
+              width: '56px', 
+              height: '56px', 
+              borderRadius: '50%', 
+              background: '#D8B4FE', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              flexShrink: 0, 
+              boxShadow: '0 4px 12px rgba(126, 34, 206, 0.2)', 
+              overflow: 'hidden', 
+              border: '2px solid #fff' 
+            }} 
+            title="Ahed AI Companion"
+          >
             <img 
-              src="/image_91a5b6.png" 
+              src={ahedAvatarImg} 
               alt="Ahed AI Assistant" 
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '✨';
+              }}
             />
           </div>
 
           <div style={{ flex: '1 1 250px', minWidth: 0, textAlign: isRTL ? 'right' : 'left' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <span style={{ background: '#fff', color: '#15803D', fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px', border: '1px solid #BBF7D0' }}>
-                {t('aura.badge', 'AHED AI 💚 · Supportive Sisterhood')}
+            <div 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                marginBottom: '4px', 
+                flexWrap: 'wrap', 
+                flexDirection: isRTL ? 'row-reverse' : 'row' 
+              }}
+            >
+              <span 
+                style={{ 
+                  background: '#fff', 
+                  color: '#15803D', 
+                  fontSize: '11px', 
+                  fontWeight: 700, 
+                  padding: '2px 8px', 
+                  borderRadius: '20px', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px', 
+                  border: '1px solid #BBF7D0' 
+                }}
+              >
+                Ahed AI · Supportive Sisterhood
               </span>
-              <span style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+              <span 
+                style={{ 
+                  fontSize: '11px', 
+                  color: '#64748B', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '4px', 
+                  flexDirection: isRTL ? 'row-reverse' : 'row' 
+                }}
+              >
                 <span style={{ width: '6px', height: '6px', background: '#22c55e', borderRadius: '50%', display: 'inline-block' }}></span> 
                 {t('aura.encrypted', 'Encrypted')}
               </span>
             </div>
-            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#166534', marginBottom: '4px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#166534', marginBottom: '4px' }}>
               {t('aura.safeSpaceTitle', 'Your Safe Space Guidance')}
             </h2>
-            <p style={{ fontSize: '14px', color: '#166534', lineHeight: '1.4', fontStyle: 'italic', margin: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+            <p 
+              style={{ 
+                fontSize: '14px', 
+                color: '#166534', 
+                lineHeight: 1.4, 
+                fontStyle: 'italic', 
+                margin: 0, 
+                overflowWrap: 'break-word', 
+                wordBreak: 'break-word' 
+              }}
+            >
               "{ahedInsight}"
             </p>
           </div>
@@ -401,39 +718,176 @@ export default function Dashboard() {
 
       {/* TODAY'S FOCUS SECTION */}
       <section className="section-block animated-entry" style={{ marginBottom: '24px', animationDelay: '0.3s' }}>
-        <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: '700', color: '#1E293B' }}>{t('focus.title', "Today's Focus")}</h2>
-          <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: '600' }}>{t('actions.edit', 'Edit')}</Link>
+        <div 
+          className="section-header" 
+          style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '12px', 
+            flexDirection: isRTL ? 'row-reverse' : 'row' 
+          }}
+        >
+          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: 700, color: '#1E293B' }}>
+            {t('focus.title', "Today's Focus")}
+          </h2>
+          <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: 600 }}>
+            {t('actions.edit', 'Edit')}
+          </Link>
         </div>
 
         <div className="two-column-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
           
-          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+          <Link 
+            to="/tracker" 
+            className="card" 
+            style={{ 
+              padding: '16px 10px', 
+              background: '#FFFFFF', 
+              borderRadius: '12px', 
+              border: '1px solid #E2E8F0', 
+              textAlign: 'center', 
+              textDecoration: 'none', 
+              color: '#1E293B', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: '8px', 
+              boxSizing: 'border-box' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px', 
+                background: '#dcfce7', 
+                color: '#166534', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '22px' 
+              }}
+            >
               🩸
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>{t('focus.logSymptoms', 'Log symptoms')}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, wordBreak: 'break-word' }}>
+              {t('focus.logSymptoms', 'Log symptoms')}
+            </span>
           </Link>
 
-          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#F8FAFC', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+          <Link 
+            to="/tracker" 
+            className="card" 
+            style={{ 
+              padding: '16px 10px', 
+              background: '#FFFFFF', 
+              borderRadius: '12px', 
+              border: '1px solid #E2E8F0', 
+              textAlign: 'center', 
+              textDecoration: 'none', 
+              color: '#1E293B', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: '8px', 
+              boxSizing: 'border-box' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px', 
+                background: '#F8FAFC', 
+                color: '#475569', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '22px' 
+              }}
+            >
               😊
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>{t('focus.logMood', 'Log mood')}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, wordBreak: 'break-word' }}>
+              {t('focus.logMood', 'Log mood')}
+            </span>
           </Link>
 
-          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#ccfbf1', color: '#115e59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+          <Link 
+            to="/tracker" 
+            className="card" 
+            style={{ 
+              padding: '16px 10px', 
+              background: '#FFFFFF', 
+              borderRadius: '12px', 
+              border: '1px solid #E2E8F0', 
+              textAlign: 'center', 
+              textDecoration: 'none', 
+              color: '#1E293B', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: '8px', 
+              boxSizing: 'border-box' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px', 
+                background: '#ccfbf1', 
+                color: '#115e59', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '22px' 
+              }}
+            >
               🌡️
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>{t('focus.logBBT', 'Log BBT')}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, wordBreak: 'break-word' }}>
+              {t('focus.logBBT', 'Log BBT')}
+            </span>
           </Link>
 
-          <Link to="/tracker" className="card" style={{ padding: '16px 10px', background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center', textDecoration: 'none', color: '#1E293B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxSizing: 'border-box' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+          <Link 
+            to="/tracker" 
+            className="card" 
+            style={{ 
+              padding: '16px 10px', 
+              background: '#FFFFFF', 
+              borderRadius: '12px', 
+              border: '1px solid #E2E8F0', 
+              textAlign: 'center', 
+              textDecoration: 'none', 
+              color: '#1E293B', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: '8px', 
+              boxSizing: 'border-box' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px', 
+                background: '#e0f2fe', 
+                color: '#0369a1', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '22px' 
+              }}
+            >
               💊
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: '600', wordBreak: 'break-word' }}>{t('focus.logMedication', 'Log medication')}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, wordBreak: 'break-word' }}>
+              {t('focus.logMedication', 'Log medication')}
+            </span>
           </Link>
 
         </div>
@@ -441,24 +895,105 @@ export default function Dashboard() {
 
       {/* UPCOMING SECTION */}
       <section className="section-block animated-entry" style={{ marginBottom: '24px', animationDelay: '0.4s' }}>
-        <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: '700', color: '#1E293B' }}>{t('upcoming.title', 'Upcoming')}</h2>
-          <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: '600' }}>{t('actions.viewAll', 'View all')}</Link>
+        <div 
+          className="section-header" 
+          style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '12px', 
+            flexDirection: isRTL ? 'row-reverse' : 'row' 
+          }}
+        >
+          <h2 className="section-title" style={{ fontSize: '1.15rem', margin: 0, fontWeight: 700, color: '#1E293B' }}>
+            {t('upcoming.title', 'Upcoming')}
+          </h2>
+          <Link to="/tracker" style={{ fontSize: '0.85rem', color: '#0EA5E9', textDecoration: 'none', fontWeight: 600 }}>
+            {t('actions.viewAll', 'View all')}
+          </Link>
         </div>
 
-        <div className="card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', boxSizing: 'border-box' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flexDirection: isRTL ? 'row-reverse' : 'row', textAlign: isRTL ? 'right' : 'left' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>📅</div>
+        <div 
+          className="card" 
+          style={{ 
+            background: '#FFFFFF', 
+            border: '1px solid #E2E8F0', 
+            borderRadius: '12px', 
+            padding: '16px', 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+            gap: '16px', 
+            boxSizing: 'border-box' 
+          }}
+        >
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              minWidth: 0, 
+              flexDirection: isRTL ? 'row-reverse' : 'row', 
+              textAlign: isRTL ? 'right' : 'left' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: '40px', 
+                height: '40px', 
+                borderRadius: '10px', 
+                background: '#F3E8FF', 
+                color: '#7E22CE', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '18px', 
+                flexShrink: 0 
+              }}
+            >
+              📅
+            </div>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B', wordBreak: 'break-word' }}>{t('upcoming.nextPeriod', 'Next Period Expected')}</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>{t('upcoming.inDays', 'In')} {daysUntilNext} {t('upcoming.daysText', 'days')} ({currentPhase === 'Menstrual Phase' ? t('upcoming.activeNow', 'Active now') : t('upcoming.onTrack', 'On track')})</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1E293B', wordBreak: 'break-word' }}>
+                {t('upcoming.nextPeriod', 'Next Period Expected')}
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>
+                {t('upcoming.inDays', 'In')} {daysUntilNext} {t('upcoming.daysText', 'days')} ({currentPhase === 'Menstrual Phase' ? t('upcoming.activeNow', 'Active now') : t('upcoming.onTrack', 'On track')})
+              </div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flexDirection: isRTL ? 'row-reverse' : 'row', textAlign: isRTL ? 'right' : 'left' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🩺</div>
-            <div style={{ minWidth: '0', flex: 1 }}>
-              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1E293B', wordBreak: 'break-word' }}>{t('upcoming.checkup', 'Wellness Checkup')}</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>{t('upcoming.scheduled', 'Scheduled via Screening Hub')}</div>
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              minWidth: 0, 
+              flexDirection: isRTL ? 'row-reverse' : 'row', 
+              textAlign: isRTL ? 'right' : 'left' 
+            }}
+          >
+            <div 
+              style={{ 
+                width: '40px', 
+                height: '40px', 
+                borderRadius: '10px', 
+                background: '#E0F2FE', 
+                color: '#0369A1', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '18px', 
+                flexShrink: 0 
+              }}
+            >
+              🩺
+            </div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1E293B', wordBreak: 'break-word' }}>
+                {t('upcoming.checkup', 'Wellness Checkup')}
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-word' }}>
+                {t('upcoming.scheduled', 'Scheduled via Screening Hub')}
+              </div>
             </div>
           </div>
         </div>
