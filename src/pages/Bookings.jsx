@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
-import { translations } from '../translation.js';
+import { translations } from '../translations.js';
 
 // Helper to determine badge styling based on booking status & current language text
 const getStatusBadgeStyle = (status = '', t) => {
